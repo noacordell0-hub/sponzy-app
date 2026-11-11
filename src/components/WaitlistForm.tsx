@@ -4,8 +4,8 @@ import { useState } from "react";
 
 type Status = { kind: "idle" } | { kind: "loading" } | { kind: "ok" } | { kind: "error"; message: string };
 
-export default function WaitlistForm({ id = "waitlist" }: { id?: string }) {
-  const [role, setRole] = useState<"creator" | "brand">("creator");
+/** Email-only waitlist form, matching the prototype's "Claim my badge" row. */
+export default function WaitlistForm({ id, dark = false }: { id: string; dark?: boolean }) {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -16,12 +16,7 @@ export default function WaitlistForm({ id = "waitlist" }: { id?: string }) {
       const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: form.get("email"),
-          handle: form.get("handle"),
-          company: form.get("company"),
-          role,
-        }),
+        body: JSON.stringify({ email: form.get("email"), company: form.get("company"), role: "creator" }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Something went wrong. Please try again.");
@@ -33,79 +28,42 @@ export default function WaitlistForm({ id = "waitlist" }: { id?: string }) {
 
   if (status.kind === "ok") {
     return (
-      <div role="status" className="chip-pop rounded-[14px] bg-ok-bg p-5 text-ok">
-        <p className="text-lg font-extrabold">You&apos;re on the list.</p>
-        <p className="mt-1 font-medium">
-          {role === "creator"
-            ? "We'll email you when your Founding Creator spot opens."
-            : "We'll email you when brands can start booking creators."}
-        </p>
+      <div role="status" className="chip-pop max-w-[560px] rounded-[14px] bg-ok-bg px-5 py-4 text-ok">
+        <p className="font-extrabold">You&apos;re on the list! Your Founding Creator badge is saved.</p>
+        <p className="mt-1 text-sm font-medium">We&apos;ll email you when Sponzy opens.</p>
       </div>
     );
   }
 
   return (
-    <form id={id} onSubmit={onSubmit} className="flex flex-col gap-3" noValidate>
-      <fieldset className="flex gap-2">
-        <legend className="sr-only">I am a</legend>
-        {(["creator", "brand"] as const).map((r) => (
-          <button
-            key={r}
-            type="button"
-            aria-pressed={role === r}
-            onClick={() => setRole(r)}
-            className={`min-h-11 rounded-full px-4 text-sm font-bold transition-colors ${
-              role === r ? "bg-violet-deep text-white" : "border border-black/10 bg-white text-body hover:text-ink"
-            }`}
-          >
-            {r === "creator" ? "I'm a creator" : "I'm a brand"}
-          </button>
-        ))}
-      </fieldset>
-
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <label className="sr-only" htmlFor={`${id}-email`}>
-          Email address
+    <form onSubmit={onSubmit} noValidate className="flex max-w-[560px] flex-col gap-2">
+      <div className="flex flex-col gap-2.5 sm:flex-row">
+        <label htmlFor={id} className="sr-only">
+          Your email
         </label>
         <input
-          id={`${id}-email`}
+          id={id}
           name="email"
           type="email"
           required
           autoComplete="email"
-          placeholder="you@example.com"
-          className="min-h-12 flex-1 rounded-[12px] border border-black/15 bg-white px-4 text-base font-medium placeholder:text-ink-2"
+          placeholder="Your email"
+          className="min-h-[54px] flex-1 rounded-[12px] border border-black/12 bg-white px-4 text-base font-medium text-ink shadow-[inset_0_1px_2px_rgba(21,19,31,.04)] placeholder:text-ink-2 focus:border-violet focus:shadow-[0_0_0_4px_rgba(108,71,255,.16)] focus:outline-none"
         />
-        <button type="submit" className="btn" disabled={status.kind === "loading"}>
-          {status.kind === "loading" ? "Joining…" : role === "creator" ? "Claim my spot" : "Join as a brand"}
+        <button
+          type="submit"
+          disabled={status.kind === "loading"}
+          className={`btn min-h-[54px] whitespace-nowrap px-6 text-base ${dark ? "![background:#fff] !text-[#4A2FD0] !shadow-none" : ""}`}
+        >
+          {status.kind === "loading" ? "Saving…" : "Claim my badge"}
         </button>
       </div>
-
-      {role === "creator" && (
-        <>
-          <label className="sr-only" htmlFor={`${id}-handle`}>
-            Main social handle (optional)
-          </label>
-          <input
-            id={`${id}-handle`}
-            name="handle"
-            type="text"
-            maxLength={60}
-            placeholder="@yourhandle (optional)"
-            className="min-h-12 rounded-[12px] border border-black/15 bg-white px-4 text-base font-medium placeholder:text-ink-2"
-          />
-        </>
-      )}
-
-      {/* Honeypot for bots: hidden from people and screen readers */}
       <input type="text" name="company" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
-
       {status.kind === "error" && (
         <p role="alert" className="rounded-[14px] bg-err-bg px-4 py-3 text-sm font-bold text-err">
           {status.message}
         </p>
       )}
-      <p className="text-sm text-ink-2">No spam. One email when it&apos;s your turn.</p>
     </form>
   );
 }

@@ -9,7 +9,8 @@ Nov 11, 2026 · @noah
 - [ ] Layers 1 to 5 (see Build order).
 
 Working notes for Claude Code:
-- Only the prototype index page was available when Layer 0 was built; the landing page follows the style guide below. Compare it against `Landing.html` from the prototype and adjust.
+- Prototype screens live in `design/prototype/` (10 of 25 so far, including Landing). Use them as the visual reference. Blip and the logo are copied into `src/components/SpaceLayer.tsx`, icons into `src/components/Icons.tsx`. The landing page matches `Landing.html`; its Deep space toggle comes in Layer 1 as a saved per-user setting.
+- The Checkout prototype shows card fields, but per this spec card details are collected only on Stripe's hosted Checkout page: build /checkout/[service] as the service, brief and summary form, then redirect to Stripe.
 - Server-only code uses `src/lib/supabase-server.ts`. Never import secrets into client components.
 - Database changes go in numbered files under `supabase/migrations/`, each enabling Row Level Security.
 

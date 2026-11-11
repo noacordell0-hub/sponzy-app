@@ -1,221 +1,315 @@
 import Link from "next/link";
 import WaitlistForm from "@/components/WaitlistForm";
-import { Blip, SpaceLayer } from "@/components/SpaceLayer";
-import { getSupabaseAdmin } from "@/lib/supabase-server";
-
-export const revalidate = 60;
+import { Blip, LogoMark, SpaceLayer } from "@/components/SpaceLayer";
+import { Icon, type IconName } from "@/components/Icons";
 
 const FOUNDING_SPOTS = Number(process.env.NEXT_PUBLIC_FOUNDING_SPOTS) || 1000;
 
-async function getSignupCount(): Promise<number | null> {
-  const supabase = getSupabaseAdmin();
-  if (!supabase) return null;
-  const { data, error } = await supabase.rpc("waitlist_count");
-  if (error) return null;
-  return Number(data);
+const steps: { icon: IconName; title: string; body: string }[] = [
+  { icon: "user", title: "Build your shop window", body: "Link your socials, add your bio and audience, then list your services with prices." },
+  { icon: "cash", title: "Brands pay, Sponzy holds it", body: "A brand buys with one tap. The money is held safely until the work is delivered." },
+  {
+    icon: "check",
+    title: "Deliver and get paid",
+    body: "Submit your proof. The brand approves, or it auto-approves after a short review window, and you get paid.",
+  },
+];
+
+const badges: { name: string; tier: string; tip: string; icon: IconName; c1?: string; c2?: string; legendary?: boolean; locked?: boolean }[] = [
+  { name: "Founding Creator", tier: "Legendary", tip: "Joined before launch. Never earnable again.", icon: "star", legendary: true },
+  { name: "Top Rated", tier: "Epic", tip: "4.8 stars or higher across 10+ reviews.", icon: "trophy", c1: "#8A6BFF", c2: "#FF5F8F" },
+  { name: "Cosmic Collab", tier: "Epic", tip: "10 collabs with repeat brands.", icon: "ufo", c1: "#7CF4E0", c2: "#6C47FF" },
+  { name: "On-Time Pro", tier: "Rare", tip: "10 on-time deliveries in a row.", icon: "clock", c1: "#4DC9FF", c2: "#2563EB" },
+  { name: "Verified Socials", tier: "Rare", tip: "All linked accounts confirmed.", icon: "check", c1: "#5BE584", c2: "#12905A" },
+  { name: "Elite", tier: "Locked", tip: "Reach 40 collabs to unlock.", icon: "bolt", locked: true },
+];
+
+const trust: { icon: IconName; title: string; body: string }[] = [
+  {
+    icon: "lock",
+    title: "Money held until approved",
+    body: "Brands pay up front, creators get paid when the work is approved. If something goes wrong, a refund rule applies.",
+  },
+  { icon: "star", title: "Reviews only from paid orders", body: "You can only review a collab that really happened, so ratings mean something." },
+  {
+    icon: "trophy",
+    title: "Streaks and leaderboards",
+    body: "Deliver on time to build a streak and climb boards for top rated, longest streak, and rising stars.",
+  },
+  { icon: "flag", title: "Reports and bans", body: "Report fake accounts, scams, or harassment. Our team reviews every report." },
+];
+
+const invites = [
+  { n: "Invite 3", title: "Shiny avatar frame", body: "A glowing frame around your profile picture." },
+  { n: "Invite 10", title: "Animated badge glow", body: "Your Founding Creator badge gets an extra shimmer." },
+  { n: "Invite 25", title: "Early access", body: "Be first in line when Sponzy opens." },
+];
+
+const faqs = [
+  { q: "Is it free to join the waitlist?", a: "Yes. Joining the waitlist is free, and so is listing your services. Sponzy only takes a fee when a paid collab is completed." },
+  { q: "When does Sponzy launch?", a: "We're opening a private beta soon. Waitlist members get in first." },
+  {
+    q: "How do brands pay?",
+    a: "Brands pay inside Sponzy through Stripe. The money is held and released after you deliver and the brand approves.",
+  },
+  {
+    q: "What if there is a problem with an order?",
+    a: "Either side can open a dispute. Our team reviews it and decides on a refund, a payout, or a split.",
+  },
+];
+
+function HexBadge({ b, showLabel = true }: { b: (typeof badges)[number]; showLabel?: boolean }) {
+  return (
+    <div className={`bgd ${b.locked ? "lk" : ""}`} tabIndex={showLabel ? 0 : -1}>
+      <div className="hw">
+        <div
+          className={`hx ${b.legendary ? "lg" : ""}`}
+          style={b.c1 ? ({ "--c1": b.c1, "--c2": b.c2 } as React.CSSProperties) : undefined}
+        >
+          <span className="hi">
+            <Icon name={b.icon} size={28} />
+          </span>
+        </div>
+      </div>
+      {showLabel && (
+        <>
+          <div className="bn">{b.name}</div>
+          <div className="bt">{b.tier}</div>
+          <div className="tip" role="tooltip">
+            {b.tip}
+          </div>
+        </>
+      )}
+    </div>
+  );
 }
 
-const services = [
-  { name: "Instagram Reel", meta: "3-day turnaround · 1 revision", price: "$350" },
-  { name: "TikTok video", meta: "4-day turnaround · 1 revision", price: "$300" },
-  { name: "Reel + TikTok bundle", meta: "Save 15%", price: "$550" },
-];
+const h2 = "text-[clamp(28px,4.5vw,38px)] font-extrabold leading-[1.1] tracking-[-0.03em]";
+const lead = "text-[17px] leading-[1.55] text-body sm:text-lg";
+const sec = "relative z-[1] mx-auto flex max-w-[1280px] flex-col gap-9 px-4 pt-20 sm:px-10 lg:px-20 lg:pt-[90px]";
 
-const steps = [
-  {
-    n: "1",
-    title: "Post your shop window",
-    body: "Link your socials and list every collab you offer with a fixed price. One post, one link for your bio.",
-  },
-  {
-    n: "2",
-    title: "Brands book and pay up front",
-    body: "A brand picks a service, writes a brief, and pays. Sponzy holds the money safely while you work.",
-  },
-  {
-    n: "3",
-    title: "Deliver and get paid",
-    body: "Share the live post links. When the brand approves, or 3 days pass, the money goes to your bank.",
-  },
-];
-
-export default async function Home() {
-  const count = await getSignupCount();
-  const spotsLeft = count === null ? null : Math.max(FOUNDING_SPOTS - count, 0);
-  const pct = count === null ? 0 : Math.min((count / FOUNDING_SPOTS) * 100, 100);
-
+export default function Home() {
+  const spots = FOUNDING_SPOTS.toLocaleString();
   return (
     <>
       <SpaceLayer />
-      <Blip message="Psst… founding spots go fast 👽" />
+      <Blip message="Grab your badge before they're gone!" />
 
-      <div className="relative z-[1]">
-        <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
-          <Link href="/" className="text-2xl font-extrabold tracking-tight">
-            Sponzy<span className="text-violet">.</span>
-          </Link>
-          <a href="#waitlist-hero" className="btn btn-ghost min-h-11 px-4 text-sm">
-            Join the waitlist
-          </a>
-        </header>
+      <header className="relative z-[2] mx-auto flex max-w-[1280px] items-center gap-6 px-4 py-5 sm:px-10 lg:gap-9 lg:px-20">
+        <Link href="/" className="flex items-center gap-3 text-[26px] font-extrabold tracking-[-0.04em]">
+          <LogoMark size={46} />
+          Sponzy
+        </Link>
+        <div className="flex-1" />
+        <nav aria-label="Page sections" className="hidden items-center gap-6 md:flex">
+          {[
+            ["#how", "How it works"],
+            ["#badges", "Badges"],
+            ["#faq", "FAQ"],
+          ].map(([href, label]) => (
+            <a key={href} href={href} className="px-1.5 py-3 text-[15px] font-bold text-body hover:text-violet">
+              {label}
+            </a>
+          ))}
+        </nav>
+        <a href="#join" className="btn min-h-11 px-4 text-sm">
+          Claim your badge
+        </a>
+      </header>
 
-        <main className="mx-auto max-w-6xl px-4 sm:px-6">
-          {/* Hero */}
-          <section className="grid items-center gap-10 pb-16 pt-6 lg:grid-cols-[1.1fr_1fr] lg:pt-12">
-            <div className="rise">
-              <span className="chip-pop inline-flex items-center gap-2 rounded-full bg-gold/25 px-3 py-1 text-sm font-bold text-gold-ink">
-                ★ Founding Creator spots are open
-              </span>
-              <h1 className="mt-4 text-[clamp(36px,6vw,60px)] font-extrabold leading-[1.05] tracking-[-0.04em]">
-                Sell brand collabs from <span className="text-violet">one post.</span>
-              </h1>
-              <p className="mt-4 max-w-xl text-lg leading-relaxed text-body">
-                List your collab prices in one shop-window post. Brands pay up front, and Sponzy holds the money
-                until your work is approved. No chasing invoices.
-              </p>
-              <div className="card mt-7 max-w-xl p-5 sm:p-6">
-                <WaitlistForm id="waitlist-hero" />
-              </div>
+      <main>
+        {/* Hero */}
+        <section className={`${sec} !pt-8 lg:!pt-[50px] lg:flex-row lg:items-center lg:gap-[60px]`}>
+          <div className="rise flex flex-1 flex-col gap-6">
+            <span className="badge-gold self-start rounded-full px-3 py-1.5 text-xs font-bold">
+              Launching soon · Founding Creator spots are limited
+            </span>
+            <h1 className="text-[clamp(40px,7vw,68px)] font-extrabold leading-[1.02] tracking-[-0.04em]">
+              Get paid for your collabs. <span className="text-violet">Skip the chasing.</span>
+            </h1>
+            <p className={lead}>
+              Sponzy is a shop window for creators. List your services, brands pay securely, and the money is yours once the
+              work is approved.
+            </p>
+            <div id="join" className="scroll-mt-24">
+              <WaitlistForm id="email-hero" />
             </div>
-
-            {/* Shop-window post preview */}
-            <div className="rise rise-2 mx-auto w-full max-w-md" aria-label="Example creator post">
-              <div className="card p-5">
-                <div className="flex items-center gap-3">
-                  <div
-                    aria-hidden="true"
-                    className="grid size-14 place-items-center rounded-full bg-gradient-to-br from-[#ff5f8f] to-violet text-xl font-extrabold text-white"
-                  >
-                    M
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-extrabold">Maya Rivers</p>
-                    <p className="text-sm text-ink-2">@mayarivers · 84K followers · Lifestyle</p>
-                  </div>
-                  <span className="rainbow ml-auto shrink-0 rounded-full px-2.5 py-1 text-xs font-bold text-gold-ink">
-                    Founding
+            <p className="text-[13px] font-semibold text-ink-2">
+              Free to join. Only the first {spots} creators get the Founding Creator badge.
+            </p>
+            <ul className="flex flex-wrap gap-x-[22px] gap-y-2">
+              {["Payment held securely", "Reviews from real orders only", "Reports and bans keep it safe"].map((t) => (
+                <li key={t} className="flex items-center gap-2 text-sm font-bold">
+                  <span className="text-[#1F9D63]">
+                    <Icon name="check" size={18} />
                   </span>
-                </div>
-                <p className="mt-4 text-sm leading-relaxed text-body">
-                  Slow mornings, small-batch coffee, and honest reviews. Booking collabs for spring.
-                </p>
-                <ul className="mt-4 flex flex-col gap-2">
-                  {services.map((s) => (
-                    <li key={s.name} className="flex items-center justify-between rounded-[14px] bg-[#f6f4ff] px-4 py-3">
-                      <div>
-                        <p className="font-bold">{s.name}</p>
-                        <p className="text-xs text-ink-2">{s.meta}</p>
-                      </div>
-                      <p className="font-extrabold text-violet-deep">{s.price}</p>
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-4 flex items-center gap-2 rounded-[14px] bg-ok-bg px-4 py-3 text-sm font-bold text-ok">
-                  <svg aria-hidden="true" viewBox="0 0 20 20" className="size-5 fill-current">
-                    <path d="M10 1 3 4v5c0 4.4 3 8.4 7 9.5 4-1.1 7-5.1 7-9.5V4l-7-3zm-1.2 13L5 10.2l1.4-1.4 2.4 2.4 4.8-4.8L15 7.8 8.8 14z" />
-                  </svg>
-                  Payment held by Sponzy until approved
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Founding spots */}
-          <section className="rainbow rounded-[20px] p-6 sm:p-8" aria-labelledby="founding-title">
-            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-              <div className="max-w-xl">
-                <h2 id="founding-title" className="text-2xl font-extrabold tracking-tight">
-                  Be a Founding Creator
-                </h2>
-                <p className="mt-2 leading-relaxed text-body">
-                  The first {FOUNDING_SPOTS.toLocaleString()} creators on the waitlist get the Founding Creator badge
-                  for life, early access to the beta, and a say in what we build next.
-                </p>
-              </div>
-              <div className="w-full md:max-w-xs">
-                {spotsLeft !== null ? (
-                  <>
-                    <p className="text-sm font-bold text-gold-ink">
-                      {spotsLeft.toLocaleString()} of {FOUNDING_SPOTS.toLocaleString()} spots left
-                    </p>
-                    <div
-                      className="mt-2 h-3 overflow-hidden rounded-full bg-black/5"
-                      role="progressbar"
-                      aria-valuenow={Math.round(pct)}
-                      aria-valuemin={0}
-                      aria-valuemax={100}
-                      aria-label="Founding Creator spots claimed"
-                    >
-                      <div className="h-full rounded-full bg-gradient-to-r from-gold to-[#ff9f3d]" style={{ width: `${Math.max(pct, 2)}%` }} />
-                    </div>
-                  </>
-                ) : (
-                  <p className="text-sm font-bold text-gold-ink">{FOUNDING_SPOTS.toLocaleString()} spots available</p>
-                )}
-              </div>
-            </div>
-          </section>
-
-          {/* How it works */}
-          <section className="py-16" aria-labelledby="how-title">
-            <h2 id="how-title" className="text-xs font-bold uppercase tracking-[0.1em] text-ink-2">
-              How it works
-            </h2>
-            <ol className="mt-4 grid gap-4 md:grid-cols-3">
-              {steps.map((s) => (
-                <li key={s.n} className="card p-6">
-                  <span className="grid size-10 place-items-center rounded-[12px] bg-violet/10 font-extrabold text-violet-deep">
-                    {s.n}
-                  </span>
-                  <h3 className="mt-4 text-lg font-extrabold">{s.title}</h3>
-                  <p className="mt-2 leading-relaxed text-body">{s.body}</p>
+                  {t}
                 </li>
               ))}
-            </ol>
-          </section>
+            </ul>
+          </div>
 
-          {/* Creators / brands */}
-          <section className="grid gap-4 md:grid-cols-2" aria-label="Who Sponzy is for">
-            <div className="card p-6 sm:p-8">
-              <h2 className="text-xl font-extrabold">For creators</h2>
-              <ul className="mt-4 flex flex-col gap-3 text-body">
-                <li>✦ Set your own prices, turnaround, and revisions</li>
-                <li>✦ Money is secured before you start work</li>
-                <li>✦ Earn reviews, badges, and streaks that prove you deliver</li>
-                <li>✦ Climb the leaderboard and get found by brands</li>
-              </ul>
-            </div>
-            <div className="card p-6 sm:p-8">
-              <h2 className="text-xl font-extrabold">For brands</h2>
-              <ul className="mt-4 flex flex-col gap-3 text-body">
-                <li>✦ Browse creators by niche, platform, price, and trust score</li>
-                <li>✦ Clear prices, no back-and-forth to get a quote</li>
-                <li>✦ Pay securely; approve the work before the creator is paid</li>
-                <li>✦ Disputes reviewed by a real person</li>
-              </ul>
-            </div>
-          </section>
-
-          {/* Bottom CTA */}
-          <section className="py-16" aria-labelledby="cta-title">
-            <div className="card mx-auto max-w-2xl p-6 text-center sm:p-10">
-              <h2 id="cta-title" className="text-3xl font-extrabold tracking-tight">
-                Get paid for collabs, safely.
-              </h2>
-              <p className="mx-auto mt-3 max-w-md text-body">
-                Join the waitlist now. Beta invites go out to Founding Creators first.
-              </p>
-              <div className="mx-auto mt-6 max-w-lg text-left">
-                <WaitlistForm id="waitlist-bottom" />
+          {/* Example profile card */}
+          <div className="rise rise-2 relative mx-auto w-full max-w-[420px] lg:w-[420px]" aria-label="Example creator shop window">
+            <div className="rb">
+              <div className="lc overflow-hidden !gap-0 !p-0">
+                <div className="h-[100px] bg-[radial-gradient(circle_at_82%_25%,rgba(255,200,61,.55),transparent_38%),linear-gradient(120deg,#241660,#6C47FF_58%,#FF5F8F)]" />
+                <div className="flex flex-col gap-3 px-[22px] pb-[22px]">
+                  <div className="-mt-6 flex items-end gap-3">
+                    <div
+                      aria-hidden="true"
+                      className="grid size-[68px] place-items-center rounded-[20px] border-[3px] border-white bg-[radial-gradient(circle_at_78%_22%,rgba(255,255,255,.5)_0_13%,transparent_14%),linear-gradient(135deg,#6C47FF,#FF5F8F)] text-[22px] font-extrabold text-white shadow-[0_6px_14px_rgba(27,27,38,.14)]"
+                    >
+                      MR
+                    </div>
+                    <div className="pb-1">
+                      <p className="text-lg font-bold">Maya Rivera</p>
+                      <p className="text-xs font-semibold text-ink-2">Fitness · 4.9 ★ · 12-order streak</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    <span className="badge-gold rounded-full px-2 py-0.5 text-[11px] font-bold">Founding Creator</span>
+                    <span className="badge-violet rounded-full px-2 py-0.5 text-[11px] font-bold">Top Rated</span>
+                    <span className="badge-violet rounded-full px-2 py-0.5 text-[11px] font-bold">On-Time Pro</span>
+                  </div>
+                  {[
+                    ["TikTok video", "5 day turnaround", "$120"],
+                    ["Story shoutout", "2 day turnaround", "$45"],
+                  ].map(([name, meta, price]) => (
+                    <div key={name} className="flex items-center gap-2.5 rounded-[12px] bg-black/[.03] px-3 py-2.5">
+                      <div className="flex-1">
+                        <p className="text-sm font-bold">{name}</p>
+                        <p className="text-[11px] text-ink-2">{meta}</p>
+                      </div>
+                      <b>{price}</b>
+                      <span aria-hidden="true" className="btn !min-h-9 px-3.5 text-[13px]">
+                        Pay
+                      </span>
+                    </div>
+                  ))}
+                  <p className="rounded-[12px] bg-ok-bg px-3.5 py-2.5 text-xs font-bold text-[#1F7A55]">
+                    Payment held securely until delivery is approved
+                  </p>
+                </div>
               </div>
             </div>
-          </section>
-        </main>
+            <div className="float absolute -right-2 -top-11 sm:-right-[34px]" aria-hidden="true">
+              <HexBadge b={badges[0]} showLabel={false} />
+            </div>
+          </div>
+        </section>
 
-        <footer className="mx-auto max-w-6xl px-4 pb-10 text-sm text-ink-2 sm:px-6">
-          © {new Date().getFullYear()} Sponzy. Payments are processed by Stripe; Sponzy never sees your card number.
-        </footer>
-      </div>
+        {/* How it works */}
+        <section id="how" className={`${sec} scroll-mt-4`}>
+          <h2 className={h2}>How Sponzy works</h2>
+          <ol className="grid gap-5 md:grid-cols-3">
+            {steps.map((s, i) => (
+              <li key={s.title} className="lc">
+                <div className="flex items-center gap-3">
+                  <span className="grid size-11 place-items-center rounded-[14px] bg-[#F0ECFF] text-[#4A2FD0]">
+                    <Icon name={s.icon} />
+                  </span>
+                  <b className="text-[13px] tracking-[.08em] text-ink-2">STEP {i + 1}</b>
+                </div>
+                <h3 className="text-xl font-extrabold tracking-[-0.02em]">{s.title}</h3>
+                <p className="text-[15px] leading-relaxed text-body">{s.body}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        {/* Badges */}
+        <section id="badges" className={`${sec} scroll-mt-4 lg:flex-row lg:items-center lg:gap-[60px]`}>
+          <div className="flex flex-1 flex-col gap-[18px]">
+            <h2 className={h2}>Earn your place. Show it off.</h2>
+            <p className={lead}>
+              Every badge comes from real behavior: on-time deliveries, great reviews, repeat brands. Founding Creator is the
+              one badge you can never earn later.
+            </p>
+            <span className="badge-gold self-start rounded-full px-3 py-1.5 text-xs font-bold">
+              Waitlist members get it permanently
+            </span>
+          </div>
+          <div className="lc flex-[1.1] !px-5 !py-[34px]">
+            <div className="flex flex-wrap justify-center gap-x-1 gap-y-[26px] pt-10">
+              {badges.map((b) => (
+                <HexBadge key={b.name} b={b} />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Trust */}
+        <section className={sec}>
+          <h2 className={h2}>Built so everyone can trust the deal</h2>
+          <div className="grid gap-5 md:grid-cols-2">
+            {trust.map((t) => (
+              <div key={t.title} className="lc !flex-row items-start !gap-4">
+                <span className="grid size-12 flex-none place-items-center rounded-[14px] bg-[#F0ECFF] text-[#4A2FD0]">
+                  <Icon name={t.icon} />
+                </span>
+                <div>
+                  <h3 className="text-lg font-extrabold tracking-[-0.02em]">{t.title}</h3>
+                  <p className="mt-1.5 text-[15px] leading-[1.55] text-body">{t.body}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Invites */}
+        <section className={sec}>
+          <div className="flex flex-col gap-4">
+            <h2 className={h2}>Invite friends, move up the list</h2>
+            <p className={`${lead} max-w-[640px]`}>
+              Every friend who joins with your link moves you closer to the front and unlocks extras. Invite links arrive in
+              your welcome email.
+            </p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-3">
+            {invites.map((v, i) => (
+              <div key={v.n} className={`lc ${i === 0 ? "!border-[1.5px] !border-violet" : ""}`}>
+                <p className="text-[13px] font-extrabold uppercase tracking-[.08em] text-ink-2">{v.n}</p>
+                <h3 className="text-[19px] font-extrabold tracking-[-0.02em]">{v.title}</h3>
+                <p className="text-sm leading-[1.55] text-body">{v.body}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section id="faq" className={`${sec} scroll-mt-4`}>
+          <h2 className={h2}>Questions</h2>
+          <div className="flex max-w-[820px] flex-col gap-3">
+            {faqs.map((f) => (
+              <details key={f.q} className="faq">
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        {/* Final CTA */}
+        <section className={`${sec} pb-12`}>
+          <div className="flex flex-col justify-center gap-5 rounded-[28px] bg-[radial-gradient(circle_at_85%_20%,rgba(255,95,143,.45),transparent_40%),radial-gradient(1.5px_1.5px_at_15%_25%,#fff,transparent_100%),radial-gradient(1.5px_1.5px_at_40%_75%,#fff,transparent_100%),radial-gradient(1.5px_1.5px_at_62%_30%,#fff,transparent_100%),linear-gradient(130deg,#1C1250,#4B2FD0)] px-6 py-10 text-white sm:px-[60px] sm:py-[50px]">
+            <h2 className="text-[clamp(30px,5vw,44px)] font-extrabold leading-[1.1] tracking-[-0.03em]">
+              Claim your Founding Creator badge
+            </h2>
+            <p className="max-w-[560px] text-lg leading-[1.55] text-[#E4DEFF]">
+              Join the waitlist and keep the rarest badge on Sponzy forever.
+            </p>
+            <WaitlistForm id="email-bottom" dark />
+          </div>
+        </section>
+      </main>
+
+      <footer className="relative z-[1] mx-auto flex max-w-[1280px] flex-wrap gap-x-6 gap-y-2 px-4 pb-9 pt-5 text-[13px] font-semibold text-ink-2 sm:px-10 lg:px-20">
+        <span>Sponzy · {new Date().getFullYear()}</span>
+        <div className="flex-1" />
+        <span>Terms (coming soon)</span>
+        <span>Privacy (coming soon)</span>
+      </footer>
     </>
   );
 }
