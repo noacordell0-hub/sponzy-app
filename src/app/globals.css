@@ -294,3 +294,39 @@ body {
 .legal p { margin-top: 12px; }
 .legal ul { margin-top: 12px; padding-left: 22px; list-style: disc; display: flex; flex-direction: column; gap: 6px; }
 .legal strong { color: var(--ink); font-weight: 700; }
+
+/* Form inputs used across account pages */
+.input {
+  min-height: 48px;
+  width: 100%;
+  border-radius: 12px;
+  border: 1px solid rgba(21, 19, 31, 0.12);
+  background: #fff;
+  padding: 0 16px;
+  font-size: 16px;
+  color: var(--ink);
+}
+textarea.input { padding: 12px 16px; min-height: 96px; line-height: 1.5; }
+.input:focus { outline: none; border-color: var(--violet); box-shadow: 0 0 0 4px rgba(108, 71, 255, 0.16); }
+
+/* Deep space mode (signed-in pages): dark sky behind white cards */
+.deep-space {
+  background:
+    radial-gradient(700px 500px at 85% -10%, rgba(108, 71, 255, 0.45), transparent 70%),
+    radial-gradient(600px 450px at 0% 100%, rgba(192, 79, 216, 0.25), transparent 70%),
+    linear-gradient(160deg, #0b0a1e, #14103a 55%, #1b0f2e);
+  min-height: 100vh;
+}
+.deep-space .starfield { filter: brightness(3) saturate(0.4); }
+.deep-space .app-header { background: rgba(14, 12, 36, 0.75); border-color: rgba(255, 255, 255, 0.08); }
+.deep-space .app-header, .deep-space .app-header a:not([aria-current]) { color: #e4e0ff; }
+.deep-space .app-header a[aria-current] { background: rgba(108, 71, 255, 0.35); color: #fff; }
+.deep-space .on-bg { color: #fff; }
+.deep-space .on-bg-muted { color: #c9c3f0; }
+.deep-space .panel { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 20px 50px rgba(0, 0, 0, 0.45); }
+
+/* Toggle switch */
+.switch { position: relative; width: 48px; height: 28px; flex: none; border-radius: 999px; background: #b9b9c8; transition: background 0.2s; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1); }
+.switch[aria-checked="true"] { background: #1f9d63; }
+.switch[aria-checked="true"]::after { transform: translateX(20px); }

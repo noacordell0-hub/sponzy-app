@@ -101,6 +101,9 @@ export default function Home() {
               </a>
             ))}
           </nav>
+          <Link href="/login" className="px-2 py-3 text-[15px] font-semibold text-body hover:text-ink">
+            Log in
+          </Link>
           <a href="#join" className="btn min-h-10 px-4 text-sm">
             Join the waitlist
           </a>
