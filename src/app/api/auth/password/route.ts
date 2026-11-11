@@ -7,7 +7,7 @@ const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 /**
  * POST { mode: "signup" | "login", email, password } → signs in with a password, no email needed.
  * Sign-up creates the account server-side (already confirmed) for waitlist emails during the beta.
- * An existing account that never set a password and hasn't finished onboarding may set one here.
+ * An existing account that has never signed in and hasn't finished onboarding may set one here.
  * NOTE: password sign-up does not prove email ownership; verify email before enabling payouts.
  */
 export async function POST(request: Request) {
@@ -43,10 +43,10 @@ export async function POST(request: Request) {
     const existing = Array.isArray(rows) ? rows[0] : null;
 
     if (existing) {
-      if (existing.has_password || existing.onboarded) {
+      if (existing.ever_signed_in || existing.onboarded) {
         return NextResponse.json({ error: "An account with this email already exists. Log in instead." }, { status: 409 });
       }
-      // Unfinished account from an email link that never arrived: let them set a password.
+      // Account that has never signed in (e.g. email link never worked) and has no profile yet: let them set a password.
       const { error } = await admin.auth.admin.updateUserById(existing.user_id, { password, email_confirm: true });
       if (error) return NextResponse.json({ error: "Couldn't set up your account. Please try again." }, { status: 500 });
     } else {
