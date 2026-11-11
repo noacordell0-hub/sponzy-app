@@ -1,26 +1,164 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink: #15131f;
+  --ink-2: #6b6b7b;
+  --body: #4b4b5a;
+  --violet: #6c47ff;
+  --violet-deep: #5b3df5;
+  --gold: #ffc83d;
+  --gold-ink: #7a5200;
+  --ok: #18794e;
+  --ok-bg: #e8f8f0;
+  --err: #b3262b;
+  --err-bg: #fdecec;
+  --hair: rgba(21, 19, 31, 0.08);
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-body: var(--body);
+  --color-violet: var(--violet);
+  --color-violet-deep: var(--violet-deep);
+  --color-gold: var(--gold);
+  --color-gold-ink: var(--gold-ink);
+  --color-ok: var(--ok);
+  --color-ok-bg: var(--ok-bg);
+  --color-err: var(--err);
+  --color-err-bg: var(--err-bg);
+  --font-sans: var(--font-jakarta), system-ui, sans-serif;
+  --radius-card: 20px;
+  --radius-row: 14px;
+  --radius-btn: 12px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+html { scroll-behavior: smooth; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  background:
+    radial-gradient(700px 500px at 90% -10%, rgba(108, 71, 255, 0.16), transparent 70%),
+    radial-gradient(600px 420px at 0% 60%, rgba(255, 95, 143, 0.1), transparent 70%),
+    radial-gradient(600px 420px at 100% 100%, rgba(80, 160, 255, 0.1), transparent 70%),
+    linear-gradient(180deg, #faf8ff, #f2f0fb);
+  background-attachment: fixed;
+}
+
+:focus-visible {
+  outline: 3px solid var(--violet);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Cards: white at 90%, hairline border, soft two-layer shadow */
+.card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--hair);
+  border-radius: var(--radius-card);
+  box-shadow: 0 1px 2px rgba(21, 19, 31, 0.04), 0 10px 30px rgba(21, 19, 31, 0.06);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: var(--radius-btn);
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(180deg, #7655ff, #5b3df5);
+  box-shadow: 0 6px 18px rgba(91, 61, 245, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s;
+  cursor: pointer;
+}
+.btn:hover { box-shadow: 0 10px 26px rgba(91, 61, 245, 0.38); filter: brightness(1.05); }
+.btn:active { transform: scale(0.97); }
+.btn:disabled { opacity: 0.6; cursor: progress; }
+.btn-ghost {
+  background: #fff;
+  color: #4a2fd0;
+  border: 1px solid rgba(21, 19, 31, 0.12);
+  box-shadow: none;
+}
+
+/* Rainbow outline: only for earned or premium items */
+.rainbow {
+  position: relative;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.96)) padding-box,
+    linear-gradient(120deg, #ff5f8f, #ffc83d, #3ddc97, #50a0ff, #6c47ff, #ff5f8f) border-box;
+  background-size: 100% 100%, 300% 300%;
+  animation: rainbow 8s linear infinite;
+}
+@keyframes rainbow { to { background-position: 0 0, 300% 0; } }
+
+/* Page rise-in */
+.rise { animation: rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.rise-2 { animation-delay: 0.08s; }
+.rise-3 { animation-delay: 0.16s; }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } }
+
+/* Chip pop */
+.chip-pop { animation: pop 0.35s cubic-bezier(0.3, 1.6, 0.5, 1) both; }
+@keyframes pop { from { transform: scale(0.85); opacity: 0; } }
+
+/* Space layer */
+.stars {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 18%, rgba(108, 71, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 28% 72%, rgba(108, 71, 255, 0.4), transparent),
+    radial-gradient(1.5px 1.5px at 46% 34%, rgba(255, 95, 143, 0.4), transparent),
+    radial-gradient(1px 1px at 63% 12%, rgba(80, 160, 255, 0.5), transparent),
+    radial-gradient(1.5px 1.5px at 78% 58%, rgba(108, 71, 255, 0.45), transparent),
+    radial-gradient(1px 1px at 88% 84%, rgba(255, 200, 61, 0.6), transparent),
+    radial-gradient(1px 1px at 6% 90%, rgba(80, 160, 255, 0.4), transparent),
+    radial-gradient(1.5px 1.5px at 54% 92%, rgba(108, 71, 255, 0.35), transparent);
+  animation: twinkle 6s ease-in-out infinite alternate;
+}
+@keyframes twinkle { to { opacity: 0.55; } }
+
+.shooting-star {
+  position: fixed;
+  top: 12%;
+  left: -10%;
+  width: 120px;
+  height: 2px;
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(90deg, transparent, rgba(108, 71, 255, 0.7));
+  border-radius: 2px;
+  transform: rotate(18deg);
+  animation: shoot 9s ease-in 2s infinite;
+  opacity: 0;
+}
+@keyframes shoot {
+  0% { transform: translate(0, 0) rotate(18deg); opacity: 0; }
+  3% { opacity: 1; }
+  12% { transform: translate(70vw, 22vw) rotate(18deg); opacity: 0; }
+  100% { opacity: 0; }
+}
+
+.float { animation: float 7s ease-in-out infinite; }
+@keyframes float { 50% { transform: translateY(-10px); } }
+
+/* Blip the alien: peeks from the corner, hidden on phone layouts */
+.blip { animation: peek 0.8s cubic-bezier(0.2, 1.4, 0.4, 1) 1.2s both; }
+@keyframes peek { from { transform: translateY(110%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }
