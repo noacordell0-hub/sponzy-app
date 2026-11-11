@@ -181,7 +181,7 @@ export default function Home() {
         </section>
 
         {/* Proof strip */}
-        <section aria-label="Protections" className="relative border-y border-black/[.06] bg-white">
+        <section aria-label="Protections" className="relative border-y border-black/[.06] bg-white/70">
           <ul className={`${wrap} grid grid-cols-2 gap-x-6 gap-y-4 py-6 md:grid-cols-4`}>
             {proof.map((p) => (
               <li key={p.label} className="flex items-center gap-2.5 text-sm font-semibold text-body">
@@ -222,7 +222,7 @@ export default function Home() {
         </section>
 
         {/* Earnings calculator */}
-        <section className="relative border-y border-black/[.06] bg-white">
+        <section className="relative border-y border-black/[.06] bg-white/70">
           <div className={`${wrap} py-20 lg:py-28`}>
             <div className="max-w-[640px]">
               <p className="eyebrow">Earnings</p>
@@ -262,7 +262,7 @@ export default function Home() {
         </section>
 
         {/* Reputation */}
-        <section className="relative border-y border-black/[.06] bg-white">
+        <section className="relative border-y border-black/[.06] bg-white/70">
           <div className={`${wrap} grid items-center gap-12 py-20 lg:grid-cols-2 lg:py-28`}>
             <div className="flex flex-col gap-4">
               <p className="eyebrow">Reputation</p>
@@ -311,7 +311,7 @@ export default function Home() {
         </section>
 
         {/* FAQ */}
-        <section id="faq" className="relative border-t border-black/[.06] bg-white">
+        <section id="faq" className="relative border-t border-black/[.06] bg-white/70">
           <div className={`${wrap} grid gap-10 py-20 lg:grid-cols-[1fr_2fr] lg:py-28`}>
             <div>
               <p className="eyebrow">FAQ</p>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { Intro } from "@/components/Intro";
 
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -16,8 +17,20 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
-      <body className={`${jakarta.variable} antialiased`}>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        {/* Show the intro once per visit: skip it on later page views in the same tab session. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(sessionStorage.getItem('clouta-intro')){document.documentElement.classList.add('no-intro')}else{sessionStorage.setItem('clouta-intro','1')}}catch(e){}",
+          }}
+        />
+      </head>
+      <body className={`${jakarta.variable} antialiased`}>
+        <Intro />
+        {children}
+      </body>
     </html>
   );
 }

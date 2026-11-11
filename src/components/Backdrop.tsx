@@ -2,12 +2,25 @@
  * Quiet space backdrop: a few shooting stars plus faint planets.
  * Decorative only: hidden from screen readers, never clickable, and still under reduced motion.
  */
+const SHOOTING = [
+  { top: "6%", left: "72%", delay: "0.5s", dur: "6s" },
+  { top: "18%", left: "98%", delay: "2.5s", dur: "7s" },
+  { top: "34%", left: "84%", delay: "4s", dur: "6.5s" },
+  { top: "48%", left: "102%", delay: "1.5s", dur: "8s" },
+  { top: "62%", left: "76%", delay: "5.5s", dur: "7s" },
+  { top: "78%", left: "96%", delay: "3.2s", dur: "6s" },
+  { top: "12%", left: "40%", delay: "6.8s", dur: "7.5s" },
+];
+
+/** Page-wide starfield: twinkling dots plus frequent shooting stars, fixed behind everything. */
 export function ShootingStars() {
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-      <i className="shoot" style={{ top: "8%", left: "78%", animationDelay: "1s" }} />
-      <i className="shoot" style={{ top: "26%", left: "96%", animationDelay: "5.5s", animationDuration: "11s" }} />
-      <i className="shoot" style={{ top: "52%", left: "88%", animationDelay: "9s", animationDuration: "12s" }} />
+      <div className="starfield starfield-a" />
+      <div className="starfield starfield-b" />
+      {SHOOTING.map((s, i) => (
+        <i key={i} className="shoot" style={{ top: s.top, left: s.left, animationDelay: s.delay, animationDuration: s.dur }} />
+      ))}
     </div>
   );
 }

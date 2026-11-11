@@ -186,3 +186,104 @@ body {
 .drift-slow { animation: drift 24s ease-in-out infinite reverse; }
 @keyframes drift { 50% { transform: translateY(-12px) rotate(3deg); } }
 @media (prefers-reduced-motion: reduce) { .shoot { display: none; } }
+
+/* Page-wide starfield: two tiled layers that twinkle out of step */
+.starfield { position: absolute; inset: 0; }
+.starfield-a {
+  background-image:
+    radial-gradient(1.4px 1.4px at 20px 30px, rgba(91, 61, 245, 0.55), transparent),
+    radial-gradient(1px 1px at 140px 80px, rgba(91, 61, 245, 0.45), transparent),
+    radial-gradient(1.6px 1.6px at 90px 170px, rgba(91, 61, 245, 0.5), transparent),
+    radial-gradient(1.1px 1.1px at 200px 210px, rgba(192, 79, 216, 0.45), transparent),
+    radial-gradient(1.3px 1.3px at 232px 44px, rgba(91, 61, 245, 0.5), transparent),
+    radial-gradient(1px 1px at 60px 240px, rgba(91, 61, 245, 0.45), transparent),
+    radial-gradient(1.2px 1.2px at 170px 130px, rgba(232, 164, 0, 0.55), transparent);
+  background-size: 260px 260px;
+  animation: twinkle 4.5s ease-in-out infinite alternate;
+}
+.starfield-b {
+  background-image:
+    radial-gradient(2px 2px at 40px 90px, rgba(91, 61, 245, 0.45), transparent),
+    radial-gradient(1.5px 1.5px at 300px 40px, rgba(192, 79, 216, 0.4), transparent),
+    radial-gradient(2px 2px at 210px 300px, rgba(91, 61, 245, 0.45), transparent),
+    radial-gradient(1.6px 1.6px at 360px 220px, rgba(232, 164, 0, 0.5), transparent),
+    radial-gradient(1.8px 1.8px at 120px 360px, rgba(91, 61, 245, 0.45), transparent);
+  background-size: 410px 410px;
+  animation: twinkle 6s ease-in-out 1.5s infinite alternate-reverse;
+}
+@keyframes twinkle { 0% { opacity: 1; } 100% { opacity: 0.25; } }
+
+/* ---- Intro screen (plays once per visit) ---- */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(700px 500px at 50% 40%, rgba(108, 71, 255, 0.45), transparent 70%),
+    linear-gradient(160deg, #0b0a1e, #1c1450 60%, #2a1b6e);
+  animation: intro-lift 0.75s cubic-bezier(0.7, 0, 0.2, 1) 1.65s forwards;
+}
+.no-intro .intro { display: none; }
+.intro-stars {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(1.5px 1.5px at 20px 30px, #fff, transparent),
+    radial-gradient(1px 1px at 140px 80px, rgba(255, 255, 255, 0.8), transparent),
+    radial-gradient(1.8px 1.8px at 90px 170px, #fff, transparent),
+    radial-gradient(1.2px 1.2px at 200px 210px, rgba(255, 200, 61, 0.9), transparent),
+    radial-gradient(1.4px 1.4px at 232px 44px, rgba(255, 255, 255, 0.9), transparent),
+    radial-gradient(1px 1px at 60px 240px, rgba(255, 255, 255, 0.7), transparent);
+  background-size: 260px 260px;
+  animation: intro-stars-in 1.2s ease-out both, twinkle 1.6s ease-in-out 1.2s infinite alternate;
+}
+.intro-center { position: relative; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.intro-logo { animation: intro-pop 0.7s cubic-bezier(0.3, 1.6, 0.5, 1) 0.15s both; filter: drop-shadow(0 12px 40px rgba(108, 71, 255, 0.6)); }
+.intro-logo .intro-c { stroke-dasharray: 40; stroke-dashoffset: 40; animation: intro-draw 0.6s ease-out 0.55s forwards; }
+.intro-word {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: #fff;
+  animation: intro-rise 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.75s both;
+}
+.intro-ring {
+  position: absolute;
+  top: 48px;
+  left: 50%;
+  width: 96px;
+  height: 96px;
+  margin: -48px 0 0 -48px;
+  border-radius: 50%;
+  border: 2px solid rgba(155, 92, 255, 0.7);
+  animation: intro-ring 1s ease-out 0.5s both;
+}
+.intro-shoot {
+  position: absolute;
+  top: 30%;
+  left: 70%;
+  width: 180px;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(90deg, #ffc83d, rgba(155, 92, 255, 0.6) 40%, transparent);
+  opacity: 0;
+  animation: intro-shoot 0.9s ease-in 0.9s forwards;
+}
+@keyframes intro-stars-in { from { opacity: 0; transform: scale(1.08); } }
+@keyframes intro-pop { from { opacity: 0; transform: scale(0.4) rotate(-12deg); } }
+@keyframes intro-draw { to { stroke-dashoffset: 0; } }
+@keyframes intro-rise { from { opacity: 0; transform: translateY(14px); } }
+@keyframes intro-ring { 0% { opacity: 0; transform: scale(0.6); } 30% { opacity: 1; } 100% { opacity: 0; transform: scale(2.4); } }
+@keyframes intro-shoot {
+  0% { opacity: 0; transform: translate(0, 0) rotate(-25deg); }
+  15% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-520px, 240px) rotate(-25deg); }
+}
+@keyframes intro-lift { to { transform: translateY(-100%); visibility: hidden; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .intro { display: none !important; }
+  .starfield { animation: none !important; }
+}

@@ -187,7 +187,8 @@ Clean and professional, with a light cosmic touch in the background. The prototy
 
 - **Design direction (updated Nov 2026): professional first.** Clean SaaS layout: white and near-white (#FBFAFF) sections divided by hairlines, 16px card radius, restrained shadows, violet as the single accent, eyebrow labels over section headings. No mascots or cartoon elements.
 - Motion: subtle page rise-in and hover lifts only; all off under reduced motion.
-- Space layer (kept subtle): faint shooting stars across the page and low-opacity planets (about 15-25%) in the hero. Never behind checkout, money or dispute controls. Blip the alien and the UFO have been removed and should not be added back.
+- Space layer: a page-wide twinkling starfield and frequent shooting stars (`src/components/Backdrop.tsx`), with low-opacity planets (about 15-25%) in the hero. Light sections use translucent white (bg-white/70) so the stars show through.
+- Intro screen: a 2-second branded load-in (`src/components/Intro.tsx`), pure CSS, shown once per browser session and skipped under reduced motion. Never behind checkout, money or dispute controls. Blip the alien and the UFO have been removed and should not be added back.
 - Badges: flat hexagons with static gradients; no spinning rainbow outlines.
 - Accessibility: 4.5:1 text contrast, 44px touch targets, visible focus outlines, real buttons and labels.
 
