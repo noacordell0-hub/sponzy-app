@@ -16,7 +16,7 @@ Without Supabase keys the page still works locally, but signups are only logged 
 
 ### 1. Supabase (database)
 1. At supabase.com, create a free project called `sponzy`. Save the database password somewhere safe.
-2. Open **SQL Editor**, paste all of `supabase/migrations/0001_waitlist.sql`, and click **Run**. This creates the `waitlist` table with Row Level Security turned on.
+2. Open **SQL Editor** and run each file in `supabase/migrations/` in order (0001, then 0002). This creates the `waitlist` table with Row Level Security turned on.
 3. Open **Project Settings > API** and copy into `.env.local`:
    - Project URL → `NEXT_PUBLIC_SUPABASE_URL`
    - `service_role` secret key → `SUPABASE_SERVICE_ROLE_KEY` (server-only, keep it secret)
