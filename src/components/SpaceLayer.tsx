@@ -56,18 +56,18 @@ export function Blip({ message }: { message: string }) {
   );
 }
 
-/** Sponzy logo mark from the prototype: speech bubble with an S and a gold sparkle. */
+/** Clouta logo mark from the prototype: speech bubble with a C and a gold sparkle. */
 export function LogoMark({ size = 36 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 44 44" aria-hidden="true">
       <defs>
-        <linearGradient id="sponzy-lg" x1="0" y1="0" x2="1" y2="1">
+        <linearGradient id="clouta-lg" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#6C47FF" />
           <stop offset="1" stopColor="#FF5F8F" />
         </linearGradient>
       </defs>
-      <path d="M22 3C32 3 40 10 40 20s-8 17-18 17h-2l-8 6v-8C7 32 4 27 4 20 4 10 12 3 22 3z" fill="url(#sponzy-lg)" />
-      <path d="M27 15c-5-3-12 0-10.5 4.5S28 22 27 27s-7 5-11 2" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" />
+      <path d="M22 3C32 3 40 10 40 20s-8 17-18 17h-2l-8 6v-8C7 32 4 27 4 20 4 10 12 3 22 3z" fill="url(#clouta-lg)" />
+      <path d="M27.5 14.5A8 8 0 1 0 27.5 25.5" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" />
       <path d="M35 2l1.7 4.8L41.5 8.5l-4.8 1.7L35 15l-1.7-4.8L28.5 8.5l4.8-1.7z" fill="#FFC83D" />
     </svg>
   );

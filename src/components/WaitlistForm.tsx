@@ -30,7 +30,7 @@ export default function WaitlistForm({ id, dark = false }: { id: string; dark?: 
     return (
       <div role="status" className="chip-pop max-w-[560px] rounded-[14px] bg-ok-bg px-5 py-4 text-ok">
         <p className="font-extrabold">You&apos;re on the list! Your Founding Creator badge is saved.</p>
-        <p className="mt-1 text-sm font-medium">We&apos;ll email you when Sponzy opens.</p>
+        <p className="mt-1 text-sm font-medium">We&apos;ll email you when Clouta opens.</p>
       </div>
     );
   }

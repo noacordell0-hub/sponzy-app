@@ -7,7 +7,7 @@ const FOUNDING_SPOTS = Number(process.env.NEXT_PUBLIC_FOUNDING_SPOTS) || 1000;
 
 const steps: { icon: IconName; title: string; body: string }[] = [
   { icon: "user", title: "Build your shop window", body: "Link your socials, add your bio and audience, then list your services with prices." },
-  { icon: "cash", title: "Brands pay, Sponzy holds it", body: "A brand buys with one tap. The money is held safely until the work is delivered." },
+  { icon: "cash", title: "Brands pay, Clouta holds it", body: "A brand buys with one tap. The money is held safely until the work is delivered." },
   {
     icon: "check",
     title: "Deliver and get paid",
@@ -42,15 +42,15 @@ const trust: { icon: IconName; title: string; body: string }[] = [
 const invites = [
   { n: "Invite 3", title: "Shiny avatar frame", body: "A glowing frame around your profile picture." },
   { n: "Invite 10", title: "Animated badge glow", body: "Your Founding Creator badge gets an extra shimmer." },
-  { n: "Invite 25", title: "Early access", body: "Be first in line when Sponzy opens." },
+  { n: "Invite 25", title: "Early access", body: "Be first in line when Clouta opens." },
 ];
 
 const faqs = [
-  { q: "Is it free to join the waitlist?", a: "Yes. Joining the waitlist is free, and so is listing your services. Sponzy only takes a fee when a paid collab is completed." },
-  { q: "When does Sponzy launch?", a: "We're opening a private beta soon. Waitlist members get in first." },
+  { q: "Is it free to join the waitlist?", a: "Yes. Joining the waitlist is free, and so is listing your services. Clouta only takes a fee when a paid collab is completed." },
+  { q: "When does Clouta launch?", a: "We're opening a private beta soon. Waitlist members get in first." },
   {
     q: "How do brands pay?",
-    a: "Brands pay inside Sponzy through Stripe. The money is held and released after you deliver and the brand approves.",
+    a: "Brands pay inside Clouta through Stripe. The money is held and released after you deliver and the brand approves.",
   },
   {
     q: "What if there is a problem with an order?",
@@ -98,7 +98,7 @@ export default function Home() {
       <header className="relative z-[2] mx-auto flex max-w-[1280px] items-center gap-6 px-4 py-5 sm:px-10 lg:gap-9 lg:px-20">
         <Link href="/" className="flex items-center gap-3 text-[26px] font-extrabold tracking-[-0.04em]">
           <LogoMark size={46} />
-          Sponzy
+          Clouta
         </Link>
         <div className="flex-1" />
         <nav aria-label="Page sections" className="hidden items-center gap-6 md:flex">
@@ -128,7 +128,7 @@ export default function Home() {
               Get paid for your collabs. <span className="text-violet">Skip the chasing.</span>
             </h1>
             <p className={lead}>
-              Sponzy is a shop window for creators. List your services, brands pay securely, and the money is yours once the
+              Clouta is a shop window for creators. List your services, brands pay securely, and the money is yours once the
               work is approved.
             </p>
             <div id="join" className="scroll-mt-24">
@@ -201,7 +201,7 @@ export default function Home() {
 
         {/* How it works */}
         <section id="how" className={`${sec} scroll-mt-4`}>
-          <h2 className={h2}>How Sponzy works</h2>
+          <h2 className={h2}>How Clouta works</h2>
           <ol className="grid gap-5 md:grid-cols-3">
             {steps.map((s, i) => (
               <li key={s.title} className="lc">
@@ -297,7 +297,7 @@ export default function Home() {
               Claim your Founding Creator badge
             </h2>
             <p className="max-w-[560px] text-lg leading-[1.55] text-[#E4DEFF]">
-              Join the waitlist and keep the rarest badge on Sponzy forever.
+              Join the waitlist and keep the rarest badge on Clouta forever.
             </p>
             <WaitlistForm id="email-bottom" dark />
           </div>
@@ -305,7 +305,7 @@ export default function Home() {
       </main>
 
       <footer className="relative z-[1] mx-auto flex max-w-[1280px] flex-wrap gap-x-6 gap-y-2 px-4 pb-9 pt-5 text-[13px] font-semibold text-ink-2 sm:px-10 lg:px-20">
-        <span>Sponzy · {new Date().getFullYear()}</span>
+        <span>Clouta · {new Date().getFullYear()}</span>
         <div className="flex-1" />
         <span>Terms (coming soon)</span>
         <span>Privacy (coming soon)</span>

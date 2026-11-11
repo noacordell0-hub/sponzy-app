@@ -1,4 +1,6 @@
-# Sponzy Build Spec v1
+# Clouta Build Spec v1
+
+> **Name change (Nov 2026):** the product was renamed from Sponzy to **Clouta** after a legal check found "Sponzy" was taken. Use "Clouta" in all user-facing text. The prototype files in `design/prototype/` still say Sponzy; ignore that. Some infrastructure names (GitHub repo `sponzy-app`, Vercel project/team, the sponzy-app.vercel.app address) still use the old name until they are renamed.
 
 Nov 11, 2026 · @noah
 
@@ -16,11 +18,11 @@ Working notes for Claude Code:
 
 ## Overview
 
-Sponzy is a web app where creators sell brand collabs from one shop-window post, brands pay up front, and Sponzy holds the money until the work is approved.
+Clouta is a web app where creators sell brand collabs from one shop-window post, brands pay up front, and Clouta holds the money until the work is approved.
 
 - Creators: link socials, list services with prices, deliver, get paid, build trust (reviews, badges, streaks, leaderboard).
 - Brands: find creators, pay securely, approve work, review creators.
-- Sponzy: holds payments, takes a fee, handles reports and disputes.
+- Clouta: holds payments, takes a fee, handles reports and disputes.
 
 MVP goal: a working beta for 20 to 30 creators and a few brands, running real paid collabs, on free-tier tools for about $20 a month (Claude Pro only). Desktop web first, usable on phones.
 
@@ -32,10 +34,10 @@ Three answers are still open; the build uses the placeholders until you fill the
 
 | Decision | Placeholder | Suggested default |
 |---|---|---|
-| Sponzy fee and who pays it | [YOUR FEE] | 10% from the creator plus a small brand fee, so small orders still cover card costs |
+| Clouta fee and who pays it | [YOUR FEE] | 10% from the creator plus a small brand fee, so small orders still cover card costs |
 | Can under-18 creators join? | **Decided: yes.** Brands should be able to promote young entrepreneurs. | Ages 13+ can join (birth date at sign-up; under 13 blocked, per COPPA and the social platforms). Ages 13-17: a parent or guardian owns the Stripe payout account (Stripe requires an adult) and is copied on order emails. Optional public "Young entrepreneur" tag. Never show a minor's exact age or location publicly. Get legal review before public launch. |
 | Founding Creator spots | [1,000] | First 500 to 1,000 waitlist signups |
-| App address | sponzy.vercel.app | Free subdomain now; buy a domain at public launch |
+| App address | clouta.vercel.app (currently sponzy-app.vercel.app) | Free subdomain now; buy a domain at public launch |
 
 The review window (3 days), included revision (1), and double-blind reveal (14 days) are set below and can change.
 
@@ -60,7 +62,7 @@ Setup checklist
 - [ ] Install Claude Code and log in with your Claude Pro account
 - [ ] Keep all keys in a .env.local file that is never committed to GitHub
 
-Never handle card numbers in Sponzy's own code: Stripe's hosted pages collect them.
+Never handle card numbers in Clouta's own code: Stripe's hosted pages collect them.
 
 ## Data model
 
@@ -85,13 +87,13 @@ Trust score, streaks, and leaderboard ranks are computed from orders and reviews
 
 ## Order flow and money rules
 
-Every order moves through fixed statuses, and money only leaves Sponzy's Stripe balance on approval or a dispute decision.
+Every order moves through fixed statuses, and money only leaves Clouta's Stripe balance on approval or a dispute decision.
 
 1. Ordered: brand picks a service, writes a brief, sets a post-by date.
 2. Funded: brand pays through Stripe Checkout; funds are held on the platform (separate charges and transfers).
 3. In progress: creator works; chat stays attached to the order.
 4. Proof submitted: creator adds live-post links and checks off deliverables; auto_approve_at = now + 3 days.
-5. Approved: brand approves, or the timer passes; Sponzy transfers price minus fee to the creator's Connect account.
+5. Approved: brand approves, or the timer passes; Clouta transfers price minus fee to the creator's Connect account.
 6. Paid: payout reaches the creator's bank on Stripe's schedule; both sides are asked for a review.
 
 Branches
@@ -109,7 +111,7 @@ Trust comes only from completed, paid orders, and both creators and brands are s
 Reviews
 - Only the two sides of an approved order can review each other, once each.
 - Double-blind: a review stays hidden until both submit, or 14 days pass.
-- Overall stars plus category stars, quick tags, would-rehire, optional private note to Sponzy.
+- Overall stars plus category stars, quick tags, would-rehire, optional private note to Clouta.
 - The subject can reply publicly but cannot edit or delete a review; anyone can mark one helpful or report it.
 
 Trust score (0 to 100), starting weights to tune later
@@ -140,7 +142,7 @@ At launch you review every report and dispute by hand in a team-only admin panel
 - Banned mid-order: active orders are refunded to the brand and the other side is told.
 - Ban evasion: block re-signup with the same email, phone, or linked social handles.
 - Admin panel: report queue, open disputes with both statements, chat and proof, a refund / pay / split control, and ban tools. Only role = admin can open it, enforced on the server.
-- Messages: contact details are allowed, but a gentle notice reminds users that payments outside Sponzy are not protected.
+- Messages: contact details are allowed, but a gentle notice reminds users that payments outside Clouta are not protected.
 
 ## Screens
 

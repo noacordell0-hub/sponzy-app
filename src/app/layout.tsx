@@ -9,9 +9,9 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Sponzy · Sell brand collabs from one post",
+  title: "Clouta · Sell brand collabs from one post",
   description:
-    "Creators list their collab prices in one shop-window post. Brands pay up front, and Sponzy holds the money until the work is approved.",
+    "Creators list their collab prices in one shop-window post. Brands pay up front, and Clouta holds the money until the work is approved.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

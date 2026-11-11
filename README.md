@@ -1,6 +1,6 @@
-# Sponzy
+# Clouta
 
-Creators sell brand collabs from one shop-window post; brands pay up front; Sponzy holds the money until the work is approved. The full build spec is in `CLAUDE.md`.
+Creators sell brand collabs from one shop-window post; brands pay up front; Clouta holds the money until the work is approved. The full build spec is in `CLAUDE.md`.
 
 ## Run it on your computer
 
@@ -15,7 +15,7 @@ Without Supabase keys the page still works locally, but signups are only logged 
 ## Layer 0: finish setup (about 15 minutes)
 
 ### 1. Supabase (database)
-1. At supabase.com, create a free project called `sponzy`. Save the database password somewhere safe.
+1. At supabase.com, create a free project called `clouta`. Save the database password somewhere safe.
 2. Open **SQL Editor** and run each file in `supabase/migrations/` in order (0001, then 0002). This creates the `waitlist` table with Row Level Security turned on.
 3. Open **Project Settings > API** and copy into `.env.local`:
    - Project URL → `NEXT_PUBLIC_SUPABASE_URL`
@@ -23,10 +23,10 @@ Without Supabase keys the page still works locally, but signups are only logged 
 4. Restart `npm run dev`, sign up on the page, and check **Table Editor > waitlist** for your row.
 
 ### 2. GitHub (code storage)
-Create an empty **private** repository called `sponzy` on github.com, then:
+Create an empty **private** repository called `clouta` on github.com, then:
 
 ```bash
-git remote add origin https://github.com/YOUR-USERNAME/sponzy.git
+git remote add origin https://github.com/YOUR-USERNAME/clouta.git
 ```
 
 ```bash
@@ -34,9 +34,9 @@ git push -u origin main
 ```
 
 ### 3. Vercel (hosting)
-1. At vercel.com, click **Add New > Project** and import the `sponzy` GitHub repo.
+1. At vercel.com, click **Add New > Project** and import the `clouta` GitHub repo.
 2. Under **Environment Variables**, add the same three values as `.env.local`.
-3. Click **Deploy**. You get an address like `sponzy.vercel.app`. Every future push to `main` redeploys automatically.
+3. Click **Deploy**. You get an address like `clouta.vercel.app`. Every future push to `main` redeploys automatically.
 
 ## How the waitlist works
 - `src/app/page.tsx`: the landing page (server-rendered; shows Founding Creator spots left).
