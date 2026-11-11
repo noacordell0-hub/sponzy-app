@@ -4,7 +4,7 @@ import { useState } from "react";
 
 type Status = { kind: "idle" } | { kind: "loading" } | { kind: "ok" } | { kind: "error"; message: string };
 
-/** Email-only waitlist form, matching the prototype's "Claim my badge" row. */
+/** Email-only waitlist form, matching the prototype's "Join the waitlist" row. */
 export default function WaitlistForm({ id, dark = false }: { id: string; dark?: boolean }) {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
 
@@ -29,8 +29,8 @@ export default function WaitlistForm({ id, dark = false }: { id: string; dark?: 
   if (status.kind === "ok") {
     return (
       <div role="status" className="chip-pop max-w-[560px] rounded-[14px] bg-ok-bg px-5 py-4 text-ok">
-        <p className="font-extrabold">You&apos;re on the list! Your Founding Creator badge is saved.</p>
-        <p className="mt-1 text-sm font-medium">We&apos;ll email you when Clouta opens.</p>
+        <p className="font-extrabold">You&apos;re on the list. Your Founding Creator spot is saved.</p>
+        <p className="mt-1 text-sm font-medium">We&apos;ll email you when your beta invite is ready.</p>
       </div>
     );
   }
@@ -55,7 +55,7 @@ export default function WaitlistForm({ id, dark = false }: { id: string; dark?: 
           disabled={status.kind === "loading"}
           className={`btn min-h-[54px] whitespace-nowrap px-6 text-base ${dark ? "![background:#fff] !text-[#4A2FD0] !shadow-none" : ""}`}
         >
-          {status.kind === "loading" ? "Saving…" : "Claim my badge"}
+          {status.kind === "loading" ? "Saving…" : "Join the waitlist"}
         </button>
       </div>
       <input type="text" name="company" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />

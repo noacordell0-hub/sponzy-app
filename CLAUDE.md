@@ -11,7 +11,7 @@ Nov 11, 2026 · @noah
 - [ ] Layers 1 to 5 (see Build order).
 
 Working notes for Claude Code:
-- Prototype screens live in `design/prototype/` (10 of 25 so far, including Landing). Use them as the visual reference. Blip and the logo are copied into `src/components/SpaceLayer.tsx`, icons into `src/components/Icons.tsx`. The landing page matches `Landing.html`; its Deep space toggle comes in Layer 1 as a saved per-user setting.
+- Prototype screens live in `design/prototype/` (10 of 25 so far, including Landing). Use them as the visual reference. The logo is in `src/components/Logo.tsx`, the space backdrop in `src/components/Backdrop.tsx`, icons into `src/components/Icons.tsx`. The landing page matches `Landing.html`; its Deep space toggle comes in Layer 1 as a saved per-user setting.
 - The Checkout prototype shows card fields, but per this spec card details are collected only on Stripe's hosted Checkout page: build /checkout/[service] as the service, brief and summary form, then redirect to Stripe.
 - Server-only code uses `src/lib/supabase-server.ts`. Never import secrets into client components.
 - Database changes go in numbered files under `supabase/migrations/`, each enabling Row Level Security.
@@ -171,7 +171,7 @@ Every page must work at phone width, following the two phone screens.
 
 ## Style guide
 
-Clean, premium, and quietly cosmic: calm cards and money screens, personality in rewards and the background.
+Clean and professional, with a light cosmic touch in the background. The prototype screens are more playful than the product should be: follow their layout and content, but use this calmer style.
 
 | Token | Value |
 |---|---|
@@ -185,10 +185,10 @@ Clean, premium, and quietly cosmic: calm cards and money screens, personality in
 | Radius | Cards 20px, inner rows 14px, buttons 12px |
 | Cards | White at 90% opacity, 1px hairline border, soft two-layer shadow |
 
-- Motion: button ripple and press, chip pop, page rise-in; all off under reduced motion.
-- Space layer: starfield, shooting stars, ringed planet, moon, rocket, UFO, all behind content and never on checkout or dispute screens' controls.
-- Blip the alien: peeks from a corner with a speech bubble per screen; hidden on phone layouts.
-- Rainbow outline: only for earned or premium items (Founding Creator, #1, featured).
+- **Design direction (updated Nov 2026): professional first.** Clean SaaS layout: white and near-white (#FBFAFF) sections divided by hairlines, 16px card radius, restrained shadows, violet as the single accent, eyebrow labels over section headings. No mascots or cartoon elements.
+- Motion: subtle page rise-in and hover lifts only; all off under reduced motion.
+- Space layer (kept subtle): faint shooting stars across the page and low-opacity planets (about 15-25%) in the hero. Never behind checkout, money or dispute controls. Blip the alien and the UFO have been removed and should not be added back.
+- Badges: flat hexagons with static gradients; no spinning rainbow outlines.
 - Accessibility: 4.5:1 text contrast, 44px touch targets, visible focus outlines, real buttons and labels.
 
 ## Build order
