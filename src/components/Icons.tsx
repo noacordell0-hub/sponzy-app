@@ -35,6 +35,31 @@ const paths: Record<string, React.ReactNode> = {
     </>
   ),
   flag: <path d="M5 21V4M5 4h11l-2 4 2 4H5" />,
+  link: (
+    <>
+      <path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1" />
+      <path d="M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1" />
+    </>
+  ),
+  copy: (
+    <>
+      <rect x="8" y="8" width="12" height="12" rx="2" />
+      <path d="M16 8V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h2" />
+    </>
+  ),
+  share: (
+    <>
+      <path d="M12 3v12M7 8l5-5 5 5" />
+      <path d="M5 13v6a2 2 0 002 2h10a2 2 0 002-2v-6" />
+    </>
+  ),
+  gift: (
+    <>
+      <rect x="3" y="9" width="18" height="12" rx="2" />
+      <path d="M3 13h18M12 9v12M12 9c-2-4-6-4-6-1.5S9 9 12 9zm0 0c2-4 6-4 6-1.5S15 9 12 9z" />
+    </>
+  ),
+  arrow: <path d="M5 12h14M13 6l6 6-6 6" />,
 };
 
 export type IconName = keyof typeof paths;

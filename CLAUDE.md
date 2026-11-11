@@ -7,7 +7,7 @@ Nov 11, 2026 · @noah
 ## Progress
 
 - [x] Layer 0 code: Next.js app, waitlist landing page, `waitlist` table migration (`supabase/migrations/0001_waitlist.sql`), `/api/waitlist` route.
-- [x] Layer 0 deploy: live at https://clouta.vercel.app (old address sponzy-app.vercel.app still works; Vercel project `sponzy-app`, team `sponzy`), Supabase project `izsdilnqktjrdiknrkge`. Migrations 0001 and 0002 applied. Signups verified end to end.
+- [x] Layer 0 deploy: live at https://clouta.vercel.app (old address sponzy-app.vercel.app still works; Vercel project `sponzy-app`, team `sponzy`), Supabase project `izsdilnqktjrdiknrkge`. Migrations 0001 and 0002 applied. Signups verified end to end. Migration 0003 adds waitlist referrals: each signup gets a referral_code, ?ref=CODE links credit the referrer, each referral moves them up 5 places, inviting 3 = first beta wave. Place in line comes from waitlist_status() (server only).
 - [ ] Layers 1 to 5 (see Build order).
 
 Working notes for Claude Code:
@@ -36,7 +36,7 @@ Three answers are still open; the build uses the placeholders until you fill the
 |---|---|---|
 | Clouta fee and who pays it | [YOUR FEE] | 10% from the creator plus a small brand fee, so small orders still cover card costs |
 | Can under-18 creators join? | **Decided: yes.** Brands should be able to promote young entrepreneurs. | Ages 13+ can join (birth date at sign-up; under 13 blocked, per COPPA and the social platforms). Ages 13-17: a parent or guardian owns the Stripe payout account (Stripe requires an adult) and is copied on order emails. Optional public "Young entrepreneur" tag. Never show a minor's exact age or location publicly. Get legal review before public launch. |
-| Founding Creator spots | [1,000] | First 500 to 1,000 waitlist signups |
+| Founding Creator spots | [1,000] | First 500 to 1,000 waitlist signups. **Promised publicly: Founding Creators pay half the standard Clouta fee, for life.** Honour this in Layer 4 fee logic (profiles.is_founding). |
 | App address | clouta.vercel.app (live) | Free subdomain now; buy a domain at public launch |
 
 The review window (3 days), included revision (1), and double-blind reveal (14 days) are set below and can change.

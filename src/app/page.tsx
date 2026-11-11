@@ -3,17 +3,21 @@ import WaitlistForm from "@/components/WaitlistForm";
 import { LogoMark } from "@/components/Logo";
 import { Icon, type IconName } from "@/components/Icons";
 import { HeroPlanets, ShootingStars } from "@/components/Backdrop";
+import EarningsCalculator from "@/components/EarningsCalculator";
 
 const FOUNDING_SPOTS = Number(process.env.NEXT_PUBLIC_FOUNDING_SPOTS) || 1000;
 
 const steps: { icon: IconName; title: string; body: string }[] = [
-  { icon: "user", title: "Build your shop window", body: "Link your socials, add your bio and audience, then list your services with fixed prices." },
-  { icon: "cash", title: "Brands pay up front", body: "A brand books a service and pays. Clouta holds the money safely while you do the work." },
-  {
-    icon: "check",
-    title: "Deliver and get paid",
-    body: "Submit proof of the live post. The brand approves, or it auto-approves after 3 days, and the money is released to you.",
-  },
+  { icon: "link", title: "Share your Clouta link", body: "Set up your storefront with your services and prices, then put one link in your bio." },
+  { icon: "cash", title: "A brand books and pays", body: "Brands pick a service, send a brief and pay up front. Clouta holds the money." },
+  { icon: "check", title: "You deliver", body: "Post the content and submit the live link as proof. Chat with the brand in one place." },
+  { icon: "star", title: "You get paid", body: "The brand approves, or it auto-approves after 3 days, and the money goes to your bank." },
+];
+
+const perks: { icon: IconName; title: string; body: string }[] = [
+  { icon: "cash", title: "Half fees, for life", body: "Founding Creators pay half the standard Clouta fee on every collab, permanently." },
+  { icon: "bolt", title: "First into the beta", body: "Waitlist members get invited before anyone else. Invite 3 friends to join the first wave." },
+  { icon: "star", title: "Founding Creator badge", body: "A permanent badge on your profile that brands see. It can never be earned after launch." },
 ];
 
 const proof: { icon: IconName; label: string }[] = [
@@ -59,6 +63,10 @@ const faqs = [
   {
     q: "What if there is a problem with an order?",
     a: "Either side can open a dispute before approval. Our team reviews both sides and decides on a refund, a payout or a split.",
+  },
+  {
+    q: "How do I move up the waitlist?",
+    a: "After you join you get a personal invite link. Every friend who signs up with it moves you up 5 spots, and inviting 3 friends gets you into the first beta wave.",
   },
   {
     q: "Can young creators join?",
@@ -110,16 +118,16 @@ export default function Home() {
               Private beta · {spots} Founding Creator spots
             </span>
             <h1 className="text-[clamp(40px,6vw,64px)] font-extrabold leading-[1.04] tracking-[-0.04em]">
-              Get paid for your collabs. <span className="text-violet-deep">Skip the chasing.</span>
+              Sell brand deals from <span className="text-violet-deep">one link.</span>
             </h1>
             <p className={`${lead} max-w-[540px] sm:text-lg`}>
-              Clouta is a storefront for creators. List your services with clear prices, brands pay up front, and the money is
-              released to you once the work is approved.
+              Clouta is the storefront for creator sponsorships. Set your prices, brands book and pay up front, and you get paid
+              as soon as the work is approved. No DMs, no invoices, no chasing.
             </p>
             <div id="join" className="scroll-mt-24">
               <WaitlistForm id="email-hero" />
             </div>
-            <p className="text-sm text-ink-2">Free to join. The first {spots} creators keep the Founding Creator badge for life.</p>
+            <p className="text-sm text-ink-2">Free to join. The first {spots} creators get half fees for life.</p>
           </div>
 
           {/* Product preview */}
@@ -190,22 +198,67 @@ export default function Home() {
         <section id="how" className={`${wrap} scroll-mt-20 py-20 lg:py-28`}>
           <div className="max-w-[640px]">
             <p className="eyebrow">How it works</p>
-            <h2 className={`${h2} mt-3`}>From booking to payout in three steps</h2>
+            <h2 className={`${h2} mt-3`}>From link in bio to money in the bank</h2>
           </div>
-          <ol className="mt-12 grid gap-6 md:grid-cols-3">
+          <ol className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {steps.map((s, i) => (
-              <li key={s.title} className="panel flex flex-col gap-3 p-7">
+              <li key={s.title} className="panel relative flex flex-col gap-3 p-6">
                 <div className="flex items-center justify-between">
                   <span className="grid size-11 place-items-center rounded-xl bg-[#F3F0FF] text-violet-deep">
                     <Icon name={s.icon} />
                   </span>
-                  <span className="text-sm font-bold text-ink-2">0{i + 1}</span>
+                  <span className="text-sm font-bold text-ink-2">Step {i + 1}</span>
                 </div>
-                <h3 className="mt-2 text-lg font-bold">{s.title}</h3>
+                <h3 className="mt-1 text-lg font-bold">{s.title}</h3>
                 <p className="text-[15px] leading-relaxed text-body">{s.body}</p>
+                {i < steps.length - 1 && (
+                  <span aria-hidden="true" className="absolute -right-3.5 top-1/2 z-[1] hidden size-7 -translate-y-1/2 place-items-center rounded-full border border-black/[.08] bg-white text-ink-2 lg:grid">
+                    <Icon name="arrow" size={14} />
+                  </span>
+                )}
               </li>
             ))}
           </ol>
+        </section>
+
+        {/* Earnings calculator */}
+        <section className="relative border-y border-black/[.06] bg-white">
+          <div className={`${wrap} py-20 lg:py-28`}>
+            <div className="max-w-[640px]">
+              <p className="eyebrow">Earnings</p>
+              <h2 className={`${h2} mt-3`}>See what your sponsorships are worth</h2>
+              <p className={`${lead} mt-4`}>Move the sliders to estimate a year of brand deals on Clouta.</p>
+            </div>
+            <div className="mt-10">
+              <EarningsCalculator />
+            </div>
+          </div>
+        </section>
+
+        {/* Founding perks */}
+        <section className={`${wrap} py-20 lg:py-28`}>
+          <div className="max-w-[640px]">
+            <p className="eyebrow">Founding Creators</p>
+            <h2 className={`${h2} mt-3`}>Join early, keep the perks forever</h2>
+            <p className={`${lead} mt-4`}>The first {spots} creators on the waitlist lock in these benefits for life.</p>
+          </div>
+          <div className="mt-12 grid gap-6 md:grid-cols-3">
+            {perks.map((p) => (
+              <div key={p.title} className="panel flex flex-col gap-3 p-7">
+                <span className="grid size-11 place-items-center rounded-xl bg-[#FFF4D6] text-[#7A5200]">
+                  <Icon name={p.icon} />
+                </span>
+                <h3 className="mt-1 text-lg font-bold">{p.title}</h3>
+                <p className="text-[15px] leading-relaxed text-body">{p.body}</p>
+              </div>
+            ))}
+          </div>
+          <div className="mt-10">
+            <a href="#join" className="btn px-6 text-base">
+              Claim my spot
+              <Icon name="arrow" size={18} />
+            </a>
+          </div>
         </section>
 
         {/* Reputation */}
@@ -282,7 +335,7 @@ export default function Home() {
               Claim your Founding Creator spot
             </h2>
             <p className="max-w-[540px] text-[17px] leading-relaxed text-[#D9D3FF]">
-              Join the waitlist to get early access to the beta and keep the Founding Creator badge on your profile for good.
+              Join the waitlist for early access, half fees for life and the Founding Creator badge. Invite friends to move up the line.
             </p>
             <WaitlistForm id="email-bottom" dark />
           </div>
