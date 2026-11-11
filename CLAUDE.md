@@ -28,12 +28,12 @@ The clickable prototype (25 screens) is the visual reference for every screen na
 
 ## Decisions to make before coding
 
-Four answers are still open; the build uses the placeholders until you fill them in.
+Three answers are still open; the build uses the placeholders until you fill them in.
 
 | Decision | Placeholder | Suggested default |
 |---|---|---|
 | Sponzy fee and who pays it | [YOUR FEE] | 10% from the creator plus a small brand fee, so small orders still cover card costs |
-| Can under-18 creators join? | [AGE POLICY] | 18+ only for the beta; revisit with legal advice |
+| Can under-18 creators join? | **Decided: yes.** Brands should be able to promote young entrepreneurs. | Ages 13+ can join (birth date at sign-up; under 13 blocked, per COPPA and the social platforms). Ages 13-17: a parent or guardian owns the Stripe payout account (Stripe requires an adult) and is copied on order emails. Optional public "Young entrepreneur" tag. Never show a minor's exact age or location publicly. Get legal review before public launch. |
 | Founding Creator spots | [1,000] | First 500 to 1,000 waitlist signups |
 | App address | sponzy.vercel.app | Free subdomain now; buy a domain at public launch |
 
