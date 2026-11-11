@@ -5,7 +5,7 @@ Nov 11, 2026 · @noah
 ## Progress
 
 - [x] Layer 0 code: Next.js app, waitlist landing page, `waitlist` table migration (`supabase/migrations/0001_waitlist.sql`), `/api/waitlist` route.
-- [ ] Layer 0 deploy: connect a real Supabase project and deploy to Vercel (see README.md).
+- [x] Layer 0 deploy: live at https://sponzy-app.vercel.app (Vercel project `sponzy-app`, team `sponzy`), Supabase project `izsdilnqktjrdiknrkge`. Migrations 0001 and 0002 applied. Signups verified end to end.
 - [ ] Layers 1 to 5 (see Build order).
 
 Working notes for Claude Code:
@@ -193,7 +193,7 @@ Clean, premium, and quietly cosmic: calm cards and money screens, personality in
 
 Build one layer at a time, test it, commit to GitHub, then start the next.
 
-- [ ] Layer 0, project and waitlist: "Read CLAUDE.md. Create a Next.js + TypeScript + Tailwind app connected to Supabase. Build the waitlist landing page from the prototype, saving emails to a waitlist table, and deploy it to Vercel. Explain each step as you go."
+- [x] Layer 0, project and waitlist: "Read CLAUDE.md. Create a Next.js + TypeScript + Tailwind app connected to Supabase. Build the waitlist landing page from the prototype, saving emails to a waitlist table, and deploy it to Vercel. Explain each step as you go."
 - [ ] Layer 1, accounts: "Add Supabase Auth sign up and log in, the onboarding flow, profiles and social_accounts tables with Row Level Security, and the Account and Settings pages."
 - [ ] Layer 2, marketplace: "Add posts and services, the creator profile, brand profiles and dashboard, and Browse with search and filters."
 - [ ] Layer 3, messages: "Add order and direct message threads using Supabase Realtime, with offer and system messages."
