@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthShell } from "@/components/AuthShell";
-import EmailLinkForm from "@/components/EmailLinkForm";
+import AuthForms from "@/components/AuthForms";
 
 export const metadata: Metadata = { title: "Sign up · Clouta" };
 
@@ -14,7 +14,7 @@ export default function SignupPage() {
         Use the email you joined the waitlist with. You&apos;ll choose creator or brand next.
       </p>
       <div className="mt-6">
-        <EmailLinkForm mode="signup" />
+        <AuthForms mode="signup" />
       </div>
       <p className="mt-4 text-center text-xs text-ink-2">
         By creating an account, you agree to our{" "}

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthShell } from "@/components/AuthShell";
-import EmailLinkForm from "@/components/EmailLinkForm";
+import AuthForms from "@/components/AuthForms";
 
 export const metadata: Metadata = { title: "Log in · Clouta" };
 
@@ -17,7 +17,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
         </p>
       )}
       <div className="mt-6">
-        <EmailLinkForm mode="login" next={next} />
+        <AuthForms mode="login" next={next} />
       </div>
       <p className="mt-6 border-t border-black/[.06] pt-5 text-center text-sm text-body">
         New to Clouta?{" "}

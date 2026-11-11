@@ -50,8 +50,7 @@ export default function EmailLinkForm({ mode, next }: { mode: "signup" | "login"
         type="email"
         required
         autoComplete="email"
-        autoFocus
-        placeholder="you@example.com"
+                placeholder="you@example.com"
         className="min-h-12 rounded-[12px] border border-black/12 bg-white px-4 text-base focus:border-violet focus:shadow-[0_0_0_4px_rgba(108,71,255,.16)] focus:outline-none"
       />
       <button type="submit" className="btn mt-1 min-h-12 text-base" disabled={state.kind === "sending"}>
