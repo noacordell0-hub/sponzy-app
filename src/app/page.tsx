@@ -5,7 +5,7 @@ import { Icon, type IconName } from "@/components/Icons";
 import { HeroPlanets, ShootingStars } from "@/components/Backdrop";
 import EarningsCalculator from "@/components/EarningsCalculator";
 
-const FOUNDING_SPOTS = Number(process.env.NEXT_PUBLIC_FOUNDING_SPOTS) || 1000;
+import { FOUNDING_SPOTS } from "@/lib/site";
 
 const steps: { icon: IconName; title: string; body: string }[] = [
   { icon: "link", title: "Share your Clouta link", body: "Set up your storefront with your services and prices, then put one link in your bio." },
@@ -350,8 +350,12 @@ export default function Home() {
           </span>
           <span>© {new Date().getFullYear()}</span>
           <div className="flex-1" />
-          <span>Terms (coming soon)</span>
-          <span>Privacy (coming soon)</span>
+          <Link href="/terms" className="py-2 hover:text-ink">
+            Terms
+          </Link>
+          <Link href="/privacy" className="py-2 hover:text-ink">
+            Privacy
+          </Link>
         </div>
       </footer>
     </>

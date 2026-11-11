@@ -8,6 +8,8 @@ Nov 11, 2026 · @noah
 
 - [x] Layer 0 code: Next.js app, waitlist landing page, `waitlist` table migration (`supabase/migrations/0001_waitlist.sql`), `/api/waitlist` route.
 - [x] Layer 0 deploy: live at https://clouta.vercel.app (old address sponzy-app.vercel.app still works; Vercel project `sponzy-app`, team `sponzy`), Supabase project `izsdilnqktjrdiknrkge`. Migrations 0001 and 0002 applied. Signups verified end to end. Migration 0003 adds waitlist referrals: each signup gets a referral_code, ?ref=CODE links credit the referrer, each referral moves them up 5 places, inviting 3 = first beta wave. Place in line comes from waitlist_status() (server only).
+- [x] Legal pages (waitlist stage, US): `/privacy` and `/terms`. Drafts written for the waitlist only; get a lawyer to review, and replace with full marketplace terms before Layer 4 payments. Contact email comes from `NEXT_PUBLIC_CONTACT_EMAIL` (not set yet; a placeholder sentence shows until it is).
+  Commitments these pages make, which later layers must honour: every marketing email has an unsubscribe link; data access/correction/deletion requests answered within 30 days; no selling or ad-sharing of personal data; delete waitlist data if Clouta does not launch; ask for date of birth at account signup (13+, guardian for payouts under 18); notify waitlist by email of significant policy or perk changes.
 - [ ] Layers 1 to 5 (see Build order).
 
 Working notes for Claude Code:

@@ -94,6 +94,17 @@ export default function WaitlistForm({ id, dark = false }: { id: string; dark?: 
           {form.kind === "loading" ? "Saving…" : "Claim my spot"}
         </button>
       </div>
+      <p className={`text-xs ${dark ? "text-[#D9D3FF]" : "text-ink-2"}`}>
+        By joining, you agree to our{" "}
+        <a href="/terms" className="underline underline-offset-2">
+          Terms
+        </a>{" "}
+        and{" "}
+        <a href="/privacy" className="underline underline-offset-2">
+          Privacy Policy
+        </a>
+        . You must be 13 or older.
+      </p>
       <input type="text" name="company" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
       {form.kind === "error" && (
         <p role="alert" className="rounded-[14px] bg-err-bg px-4 py-3 text-sm font-bold text-err">

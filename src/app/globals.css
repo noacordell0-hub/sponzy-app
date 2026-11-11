@@ -287,3 +287,10 @@ body {
   .intro { display: none !important; }
   .starfield { animation: none !important; }
 }
+
+/* Legal pages */
+.legal h2 { margin-top: 40px; font-size: 21px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
+.legal p, .legal li { font-size: 16px; line-height: 1.7; color: var(--body); }
+.legal p { margin-top: 12px; }
+.legal ul { margin-top: 12px; padding-left: 22px; list-style: disc; display: flex; flex-direction: column; gap: 6px; }
+.legal strong { color: var(--ink); font-weight: 700; }
