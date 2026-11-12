@@ -14,7 +14,7 @@ export function AuthShell({ children, wide = false }: { children: React.ReactNod
             Clouta
           </Link>
         </header>
-        <main className="flex flex-1 items-start justify-center px-4 pb-16 pt-6 sm:pt-12">
+        <main className="auth-main flex flex-1 items-start justify-center px-4 pb-16 pt-6 sm:pt-12">
           <div className={`panel w-full ${wide ? "max-w-[560px]" : "max-w-[440px]"} p-6 sm:p-9`}>{children}</div>
         </main>
       </div>

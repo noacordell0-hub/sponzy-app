@@ -63,7 +63,7 @@ export default async function BrandDashboard({ searchParams }: { searchParams: P
       <div className="grid gap-4 sm:grid-cols-3">
         {stats.map((s) => (
           <div key={s.label} className="panel p-5">
-            <p className="text-xs font-bold uppercase tracking-[0.08em] text-ink-2">{s.label}</p>
+            <p className="text-sm font-bold text-ink">{s.label}</p>
             <p className="mt-1 text-3xl font-extrabold tracking-[-0.03em]">{s.value}</p>
             {s.note && <p className="text-xs text-ink-2">{s.note}</p>}
           </div>

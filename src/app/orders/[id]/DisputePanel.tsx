@@ -85,7 +85,7 @@ export default function DisputePanel({ orderId, dispute, viewerId, myRole, other
           </p>
         </div>
         <div className="rounded-xl bg-[#FFF5F7] p-4">
-          <p className="text-xs font-bold uppercase tracking-[0.06em] text-[#A3134A]">
+          <p className="text-sm font-bold text-[#A3134A]">
             {iOpened ? "Your dispute" : `${otherName}'s dispute`} · {DISPUTE_REASONS[active.reason]?.label ?? active.reason}
           </p>
           <p className="mt-2 whitespace-pre-line text-sm text-ink">{active.statement}</p>
@@ -93,7 +93,7 @@ export default function DisputePanel({ orderId, dispute, viewerId, myRole, other
         </div>
         {active.response && (
           <div className="rounded-xl bg-[#F7F5FF] p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.06em] text-violet-deep">{iOpened ? `${otherName}'s response` : "Your response"}</p>
+            <p className="text-sm font-bold text-violet-deep">{iOpened ? `${otherName}'s response` : "Your response"}</p>
             <p className="mt-2 whitespace-pre-line text-sm text-ink">{active.response}</p>
             <Links links={active.response_evidence} />
           </div>

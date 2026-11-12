@@ -190,7 +190,7 @@ function Conversation({
         <ReportButton targetType="profile" targetId={other.id} ownerId={other.id} ownerName={other.display_name ?? "them"} viewerId={me} />
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto bg-[#FBFAFF] px-4 py-5" aria-live="polite">
+      <div className="min-h-0 flex-1 overflow-y-auto bg-[#FAF8F3] px-4 py-5" aria-live="polite">
         <div className="mx-auto mb-5 max-w-md rounded-xl border border-black/[.06] bg-white px-4 py-3 text-center text-xs leading-relaxed text-body">
           🔒 Keep payments on Clouta. Money is only held and protected when the order is paid through Clouta.
           {other.young_tag && (
@@ -259,7 +259,7 @@ function Bubble({ m, me, iAmBrand }: { m: Message; me: string; iAmBrand: boolean
     <div className={`flex flex-col ${mine ? "items-end" : "items-start"}`}>
       <p
         className={`max-w-[78%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2.5 text-[15px] leading-relaxed ${
-          mine ? "rounded-br-md bg-[linear-gradient(180deg,#7655FF,#5B3DF5)] text-white" : "rounded-bl-md bg-white text-ink ring-1 ring-black/[.06]"
+          mine ? "rounded-br-md bg-[#5B3DF5] text-white" : "rounded-bl-md bg-white text-ink ring-1 ring-black/[.06]"
         }`}
       >
         {m.body}
@@ -293,7 +293,7 @@ function OfferCard({ m, mine, iAmBrand }: { m: Message; mine: boolean; iAmBrand:
     <div className={`flex min-w-0 ${mine ? "justify-end" : "justify-start"}`}>
       <div className="w-full min-w-0 max-w-sm rounded-2xl border border-black/[.08] bg-white p-4 shadow-[0_4px_16px_rgba(21,19,31,.06)]">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-xs font-bold uppercase tracking-[0.08em] text-violet-deep">{mine ? "Your offer" : "Offer"}</span>
+          <span className="text-sm font-bold text-violet-deep">{mine ? "Your offer" : "Offer"}</span>
           <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold capitalize ${statusStyle[m.offer_status ?? "pending"]}`}>{m.offer_status}</span>
         </div>
         <p className="mt-2 font-bold">{o.title}</p>

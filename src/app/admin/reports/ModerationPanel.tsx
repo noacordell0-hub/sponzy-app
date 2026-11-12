@@ -34,8 +34,8 @@ export default function ModerationPanel({ profileId, name, reportIds, flagged, b
   if (compact) return b("unban", "Lift ban", () => act("unban", {}, `Restore ${name}'s account?`));
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl bg-[#FBFAFF] p-4">
-      <p className="text-xs font-bold uppercase tracking-[0.06em] text-ink-2">Actions · {warnings} earlier warning{warnings === 1 ? "" : "s"}</p>
+    <div className="flex flex-col gap-3 rounded-xl bg-[#FAF8F3] p-4">
+      <p className="text-sm font-bold text-ink-2">Actions · {warnings} earlier warning{warnings === 1 ? "" : "s"}</p>
       <div className="flex flex-wrap gap-2">
         {b("dismiss", "Dismiss reports", () => act("dismiss"))}
         {flagged && b("unflag", "Show in Browse again", () => act("unflag"))}

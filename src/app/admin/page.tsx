@@ -35,7 +35,7 @@ export default async function AdminHome() {
         {cards.map((c) => {
           const inner = (
             <>
-              <p className="text-xs font-bold uppercase tracking-[0.08em] text-ink-2">{c.label}</p>
+              <p className="text-sm font-bold text-ink">{c.label}</p>
               <p className={`mt-1 text-4xl font-extrabold tracking-[-0.03em] ${c.urgent ? "text-err" : ""}`}>{c.value}</p>
             </>
           );

@@ -72,7 +72,7 @@ export default function ReviewForm({ orderId, otherName, reviewingCreator, tags,
       <section className="panel flex flex-col gap-4 p-6">
         <StarInput id="overall" label={`Overall, how was working with ${otherName}?`} value={overall} onChange={setOverall} big />
         <div className="flex flex-col gap-2 border-t border-black/[.06] pt-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.06em] text-ink-2">Optional details</p>
+          <p className="text-sm font-bold text-ink-2">Optional details</p>
           {catLabels.map(([k, l]) => (
             <StarInput key={k} id={k} label={l} value={cats[k]} onChange={(n) => setCats((c) => ({ ...c, [k]: n }))} />
           ))}

@@ -81,7 +81,7 @@ export default async function EarningsPage({ searchParams }: { searchParams: Pro
           ["Clouta fees", money(fees), profile.is_founding ? "5% Founding Creator rate" : "10% of each order"],
         ].map(([l, v, n]) => (
           <div key={l} className="panel p-5">
-            <p className="text-xs font-bold uppercase tracking-[0.08em] text-ink-2">{l}</p>
+            <p className="text-sm font-bold text-ink">{l}</p>
             <p className="mt-1 text-3xl font-extrabold tracking-[-0.03em]">{v}</p>
             <p className="text-xs text-ink-2">{n}</p>
           </div>
@@ -98,7 +98,7 @@ export default async function EarningsPage({ searchParams }: { searchParams: Pro
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-[0.06em] text-ink-2">
+                <tr className="text-left text-xs text-ink-2">
                   <th className="px-5 py-3 font-bold">Order</th>
                   <th className="px-3 py-3 font-bold">Price</th>
                   <th className="px-3 py-3 font-bold">Fee</th>

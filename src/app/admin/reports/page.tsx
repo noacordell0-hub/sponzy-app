@@ -78,7 +78,7 @@ export default async function AdminReports() {
                 </ul>
                 {past.length > 0 && (
                   <div className="mt-4">
-                    <p className="text-xs font-bold uppercase tracking-[0.06em] text-ink-2">History</p>
+                    <p className="text-sm font-bold text-ink-2">History</p>
                     <ul className="mt-1 text-xs text-body">
                       {past.map((h, i) => <li key={i}>{new Date(h.created_at).toLocaleDateString()} · {h.action}{h.until ? ` until ${new Date(h.until).toLocaleDateString()}` : ""}{h.note ? `: ${h.note}` : ""}</li>)}
                     </ul>

@@ -17,8 +17,8 @@ export default function OpenGraphImage() {
           flexDirection: "column",
           justifyContent: "space-between",
           padding: "64px 72px",
-          color: "#fff",
-          background: "radial-gradient(900px 600px at 85% 0%, rgba(108,71,255,0.55), transparent 70%), linear-gradient(150deg, #0b0a1e 0%, #1c1450 55%, #2a1b6e 100%)",
+          color: "#15131f",
+          background: "#f7f4ee",
           fontFamily: "sans-serif",
         }}
       >
@@ -26,8 +26,8 @@ export default function OpenGraphImage() {
           <svg width="64" height="64" viewBox="0 0 44 44">
             <defs>
               <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-                <stop offset="0" stopColor="#8A6BFF" />
-                <stop offset="1" stopColor="#B07CFF" />
+                <stop offset="0" stopColor="#6C47FF" />
+                <stop offset="1" stopColor="#9B5CFF" />
               </linearGradient>
             </defs>
             <path d="M22 3C32 3 40 10 40 20s-8 17-18 17h-2l-8 6v-8C7 32 4 27 4 20 4 10 12 3 22 3z" fill="url(#g)" />
@@ -38,15 +38,15 @@ export default function OpenGraphImage() {
         <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
           <div style={{ fontSize: 82, fontWeight: 800, lineHeight: 1.02, letterSpacing: -3, display: "flex", flexWrap: "wrap" }}>
             <span>Sell brand deals from&nbsp;</span>
-            <span style={{ color: "#B9A6FF" }}>one link.</span>
+            <span style={{ color: "#5B3DF5", borderBottom: "8px solid #5B3DF5", paddingBottom: 4 }}>one link.</span>
           </div>
-          <div style={{ fontSize: 32, color: "#D9D3FF", lineHeight: 1.35, maxWidth: 940 }}>
+          <div style={{ fontSize: 32, color: "#4b4b5a", lineHeight: 1.35, maxWidth: 940 }}>
             Set your prices. Brands pay up front. Clouta holds the money until the work is approved.
           </div>
         </div>
         <div style={{ display: "flex", gap: 14 }}>
           {[`${FOUNDING_SPOTS.toLocaleString()} Founding Creator spots`, "Half fees for life", "Payments by Stripe"].map((t) => (
-            <div key={t} style={{ display: "flex", padding: "12px 22px", borderRadius: 999, background: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.22)", fontSize: 26, fontWeight: 700 }}>
+            <div key={t} style={{ display: "flex", padding: "12px 22px", borderRadius: 999, background: "#ffffff", border: "2px solid rgba(21,19,31,0.18)", fontSize: 26, fontWeight: 700 }}>
               {t}
             </div>
           ))}

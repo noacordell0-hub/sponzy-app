@@ -54,7 +54,7 @@ export default function BrowseFilters() {
       </div>
 
       <div>
-        <label htmlFor="f-sort" className="text-xs font-bold uppercase tracking-[0.08em] text-ink-2">
+        <label htmlFor="f-sort" className="text-sm font-bold text-ink">
           Sort by
         </label>
         <select id="f-sort" value={params.get("sort") ?? "recommended"} onChange={(e) => update({ sort: e.target.value === "recommended" ? null : e.target.value })} className="input mt-2">
@@ -68,7 +68,7 @@ export default function BrowseFilters() {
       </div>
 
       <fieldset>
-        <legend className="text-xs font-bold uppercase tracking-[0.08em] text-ink-2">Niche</legend>
+        <legend className="text-sm font-bold text-ink">Niche</legend>
         <div className="mt-2 flex flex-wrap gap-1.5">
           {NICHES.map((n) => (
             <button key={n} type="button" aria-pressed={params.get("niche") === n} onClick={() => toggle("niche", n)} className={chip(params.get("niche") === n)}>
@@ -79,7 +79,7 @@ export default function BrowseFilters() {
       </fieldset>
 
       <fieldset>
-        <legend className="text-xs font-bold uppercase tracking-[0.08em] text-ink-2">Platform</legend>
+        <legend className="text-sm font-bold text-ink">Platform</legend>
         <div className="mt-2 flex flex-wrap gap-1.5">
           {PLATFORM_KEYS.map((p) => (
             <button key={p} type="button" aria-pressed={params.get("platform") === p} onClick={() => toggle("platform", p)} className={chip(params.get("platform") === p)}>
@@ -90,7 +90,7 @@ export default function BrowseFilters() {
       </fieldset>
 
       <fieldset>
-        <legend className="text-xs font-bold uppercase tracking-[0.08em] text-ink-2">Starting price (USD)</legend>
+        <legend className="text-sm font-bold text-ink">Starting price (USD)</legend>
         <div className="mt-2 flex items-center gap-2">
           <label htmlFor="f-min" className="sr-only">
             Minimum price
@@ -105,7 +105,7 @@ export default function BrowseFilters() {
       </fieldset>
 
       <fieldset>
-        <legend className="text-xs font-bold uppercase tracking-[0.08em] text-ink-2">Verified followers</legend>
+        <legend className="text-sm font-bold text-ink">Verified followers</legend>
         <div className="mt-2 grid grid-cols-2 gap-1.5">
           {TIERS.map((t) => (
             <button key={t.key} type="button" aria-pressed={params.get("tier") === t.key} onClick={() => toggle("tier", t.key)} className={`${chip(params.get("tier") === t.key)} !rounded-xl py-1.5 text-left`}>
@@ -117,7 +117,7 @@ export default function BrowseFilters() {
       </fieldset>
 
       <fieldset className="flex flex-col gap-1">
-        <legend className="mb-1 text-xs font-bold uppercase tracking-[0.08em] text-ink-2">Badges</legend>
+        <legend className="mb-1 text-sm font-bold text-ink">Badges</legend>
         {(
           [
             ["top", "Top Rated (4.8+, 10+ reviews)"],

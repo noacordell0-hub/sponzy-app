@@ -16,7 +16,7 @@ const DAYS = 30;
 function Tile({ label, value, note }: { label: string; value: string; note?: string }) {
   return (
     <div className="panel p-5">
-      <p className="text-xs font-bold uppercase tracking-[0.08em] text-ink-2">{label}</p>
+      <p className="text-sm font-bold text-ink">{label}</p>
       <p className="mt-1 text-3xl font-extrabold tracking-[-0.03em]">{value}</p>
       {note && <p className="mt-0.5 text-xs text-ink-2">{note}</p>}
     </div>
@@ -32,7 +32,7 @@ function Table({ title, head, rows, empty }: { title: string; head: string[]; ro
       ) : (
         <table className="mt-2 w-full text-sm">
           <thead>
-            <tr className="text-left text-xs uppercase tracking-[0.06em] text-ink-2">
+            <tr className="text-left text-xs text-ink-2">
               {head.map((h, i) => <th key={h} className={`px-5 py-2 font-bold ${i ? "text-right" : ""}`}>{h}</th>)}
             </tr>
           </thead>
