@@ -20,7 +20,7 @@ export function Avatar({ name, source, pattern, url, mainPlatform, size = 40, ro
     <span className="relative inline-block flex-none" style={{ width: size, height: size }}>
       {showPhoto ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={url!} alt="" className="size-full object-cover" style={{ borderRadius: radius }} />
+        <img src={url!} alt="" width={size} height={size} loading="lazy" decoding="async" className="size-full object-cover" style={{ borderRadius: radius }} />
       ) : (
         <span
           aria-hidden="true"
