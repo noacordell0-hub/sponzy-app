@@ -28,6 +28,7 @@ Nov 11, 2026 · @noah
   - Part 4, community: comments on creator profiles (one reply level, likes, author or creator can delete, 10/hour, respects show_comments and blocks); `/leaderboard` with Top rated (5+ reviews), Longest streak, Rising stars (under 90 days), and week / season / all time; respects show_rank. Migration 0020.
   - Admin panel: `/admin` overview, Reports, Disputes, Verifications (all server-checked for is_admin).
   - Later: thin-event webhook for Stripe v2 accounts; screenshot uploads for reports (links for now); review reminders by email once SMTP is set up.
+- [~] Optimization pass 1 (branch `optimize-pass-1`, see OPTIMIZATION_REPORT.md): Vercel Analytics + Speed Insights, funnel events (`src/lib/analytics.ts` → Vercel + `analytics_events`), first-visit UTM saved on waitlist, `error_events` + `src/lib/log.ts` + `instrumentation.ts`, `/api/health`, `/admin/metrics`, rate limits (`src/lib/rate-limit.ts`), security headers (`next.config.ts`), Next 15.5.29, no-JS waitlist fallback, SEO (icons, share image, sitemap, robots, canonical, JSON-LD), a11y fixes, A/B helper (`src/lib/experiments.ts`, tests off), Playwright suite (`npm run test:e2e`). Migrations 0021-0022 applied; 0023 (rank fix) and 0024 (revoke default grants) await approval.
 - [ ] Layers 4 to 5 (see Build order).
 
 Working notes for Claude Code:
