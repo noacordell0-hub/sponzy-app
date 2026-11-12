@@ -12,7 +12,7 @@ for (const path of PAGES) {
   test(`${path} has no serious or critical accessibility issues`, async ({ page }) => {
     await page.goto(path);
     await page.waitForTimeout(800); // let entrance animations finish so colours are final
-    const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+    const results = await new AxeBuilder({ page: page as never }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
     const bad = results.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
     expect(bad.map((v) => `${v.id}: ${v.help} (${v.nodes.length}) e.g. ${v.nodes[0]?.target.join(" ")}`)).toEqual([]);
   });

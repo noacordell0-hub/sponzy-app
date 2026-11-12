@@ -1,4 +1,4 @@
-import { clientIp, rateLimit } from "@/lib/rate-limit";
+import { rateLimit } from "@/lib/rate-limit";
 import { logError } from "@/lib/log";
 import { refreshCreatorPayouts } from "@/lib/payouts";
 import { NextResponse } from "next/server";
