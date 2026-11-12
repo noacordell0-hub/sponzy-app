@@ -1,3 +1,4 @@
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { logError } from "@/lib/log";
 import { refreshCreatorPayouts } from "@/lib/payouts";
 import { NextResponse } from "next/server";
@@ -18,6 +19,8 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Please log in to book." }, { status: 401 });
+  const lim = rateLimit(`checkout:${user.id}`, 10, 60000);
+  if (!lim.ok) return NextResponse.json({ error: "Too many checkout attempts. Please wait a minute." }, { status: 429, headers: { "Retry-After": String(lim.retryAfter) } });
 
   const admin = getSupabaseAdmin();
   const stripe = getStripe();

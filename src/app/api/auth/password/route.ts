@@ -1,3 +1,4 @@
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { logError } from "@/lib/log";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
@@ -20,6 +21,10 @@ export async function POST(request: Request) {
   if (!EMAIL_RE.test(email) || email.length > 254) {
     return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
   }
+  // Slow down password guessing: per visitor and per email address.
+  const ipLim = rateLimit(`pw:ip:${clientIp(request)}`, 10, 5 * 60_000);
+  const lim = ipLim.ok ? rateLimit(`pw:email:${email}`, 5, 5 * 60_000) : ipLim;
+  if (!lim.ok) return NextResponse.json({ error: "Too many attempts. Please wait a few minutes and try again." }, { status: 429, headers: { "Retry-After": String(lim.retryAfter) } });
   if (password.length < 8 || password.length > 72) {
     return NextResponse.json({ error: "Passwords need at least 8 characters." }, { status: 400 });
   }

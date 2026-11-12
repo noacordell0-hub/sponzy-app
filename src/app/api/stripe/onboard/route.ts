@@ -1,3 +1,4 @@
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { logError } from "@/lib/log";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
@@ -12,6 +13,8 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Please log in." }, { status: 401 });
+  const lim = rateLimit(`stripe-onboard:${user.id}`, 5, 60000);
+  if (!lim.ok) return NextResponse.json({ error: "Please wait a moment before trying again." }, { status: 429, headers: { "Retry-After": String(lim.retryAfter) } });
 
   const admin = getSupabaseAdmin();
   if (!admin || !getStripe()) return NextResponse.json({ error: "Payouts aren't available yet." }, { status: 503 });

@@ -1,3 +1,4 @@
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { logError } from "@/lib/log";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
@@ -19,6 +20,11 @@ export async function POST(request: Request) {
   if (!EMAIL_RE.test(email) || email.length > 254) {
     return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
   }
+
+  // Each request sends an email, so keep it to a few per visitor and per address.
+  const ipLim = rateLimit(`otp:ip:${clientIp(request)}`, 5, 10 * 60_000);
+  const lim = ipLim.ok ? rateLimit(`otp:email:${email}`, 3, 10 * 60_000) : ipLim;
+  if (!lim.ok) return NextResponse.json({ error: "Too many login emails requested. Please wait a few minutes." }, { status: 429, headers: { "Retry-After": String(lim.retryAfter) } });
 
   if (mode === "signup" && process.env.BETA_OPEN !== "true") {
     const admin = getSupabaseAdmin();
