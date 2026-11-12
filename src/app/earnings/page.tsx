@@ -25,11 +25,10 @@ export default async function EarningsPage({ searchParams }: { searchParams: Pro
   let payoutsEnabled = Boolean(priv?.payouts_enabled);
   let detailsSubmitted = Boolean(priv?.details_submitted);
   if (admin && stripe && priv?.stripe_account_id) {
-    const account = await stripe.accounts.retrieve(priv.stripe_account_id).catch(() => null);
-    if (account) {
-      await syncAccount(admin, account);
-      payoutsEnabled = Boolean(account.payouts_enabled);
-      detailsSubmitted = Boolean(account.details_submitted);
+    const status = await syncAccount(admin, priv.stripe_account_id).catch(() => null);
+    if (status) {
+      payoutsEnabled = status.ready;
+      detailsSubmitted = status.detailsSubmitted;
     }
   }
 

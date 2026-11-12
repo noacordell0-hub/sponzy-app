@@ -74,7 +74,7 @@ export async function POST(request: Request) {
         break;
       }
       case "account.updated": {
-        await syncAccount(admin, event.data.object as Stripe.Account);
+        await syncAccount(admin, (event.data.object as Stripe.Account).id);
         break;
       }
     }
