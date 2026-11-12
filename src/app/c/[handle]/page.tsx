@@ -91,9 +91,9 @@ export default async function CreatorPage({ params }: Params) {
             ) : (
               <>
                 <SaveButton creatorId={creator.id} initialSaved={Boolean(savedRow)} viewerId={user?.id ?? null} />
-                <span className="btn min-h-11 cursor-not-allowed px-4 text-sm opacity-60" title="Messaging opens soon" aria-disabled="true" style={{ background: theme.button, color: theme.text }}>
+                <Link href={`/messages/new?to=${creator.handle}`} className="btn min-h-11 px-4 text-sm" style={{ background: theme.button, color: theme.text }}>
                   Message
-                </span>
+                </Link>
               </>
             )}
           </div>

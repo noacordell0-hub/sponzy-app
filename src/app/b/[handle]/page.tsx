@@ -65,9 +65,9 @@ export default async function BrandPage({ params }: Params) {
               Edit profile
             </Link>
           ) : (
-            <span className="btn min-h-11 cursor-not-allowed px-4 text-sm opacity-60" aria-disabled="true" title="Messaging opens soon" style={{ background: theme.button, color: theme.text }}>
+            <Link href={`/messages/new?to=${brand.handle}`} className="btn min-h-11 px-4 text-sm" style={{ background: theme.button, color: theme.text }}>
               Message
-            </span>
+            </Link>
           )}
         </div>
       </section>

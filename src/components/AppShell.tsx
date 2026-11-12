@@ -3,6 +3,7 @@ import { LogoMark } from "@/components/Logo";
 import { Avatar } from "@/components/Avatar";
 import { ShootingStars } from "@/components/Backdrop";
 import type { Profile } from "@/lib/auth";
+import { createClient } from "@/lib/supabase/server";
 
 type Tab = { href: string; label: string; key: string };
 
@@ -11,13 +12,14 @@ function tabsFor(profile: Profile | null): Tab[] {
   if (!profile) return tabs;
   if (profile.role === "creator") tabs.push({ href: "/post/edit", label: "My shop", key: "shop" });
   if (profile.role === "brand") tabs.push({ href: "/brand", label: "Dashboard", key: "dashboard" });
+  tabs.push({ href: "/messages", label: "Messages", key: "messages" });
   tabs.push({ href: "/settings/account", label: "Account", key: "account" }, { href: "/settings", label: "Settings", key: "settings" });
   if (profile.is_admin) tabs.push({ href: "/admin/verifications", label: "Admin", key: "admin" });
   return tabs;
 }
 
 /** Header and background for app pages. Works for visitors (profile = null) and signed-in users. */
-export function AppShell({
+export async function AppShell({
   profile,
   active,
   children,
@@ -29,6 +31,12 @@ export function AppShell({
   wide?: boolean;
 }) {
   const tabs = tabsFor(profile);
+  let unread = 0;
+  if (profile) {
+    const supabase = await createClient();
+    const { data } = await supabase.rpc("unread_total");
+    unread = Number(data) || 0;
+  }
   const width = wide ? "max-w-[1200px]" : "max-w-[1100px]";
   return (
     <div className={profile?.deep_space ? "deep-space" : ""}>
@@ -49,6 +57,11 @@ export function AppShell({
                   className={`flex-none rounded-lg px-3 py-2.5 text-sm font-semibold ${active === t.key ? "bg-[#F3F0FF] text-violet-deep" : "text-body hover:text-ink"}`}
                 >
                   {t.label}
+                  {t.key === "messages" && unread > 0 && (
+                    <span className="ml-1.5 inline-grid min-w-5 place-items-center rounded-full bg-violet-deep px-1.5 text-[11px] font-bold text-white" aria-label={`${unread} unread`}>
+                      {unread > 99 ? "99+" : unread}
+                    </span>
+                  )}
                 </Link>
               ))}
             </nav>
