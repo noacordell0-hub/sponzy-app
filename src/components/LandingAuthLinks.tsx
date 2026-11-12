@@ -18,17 +18,17 @@ export default function LandingAuthLinks() {
 
   if (signedIn) {
     return (
-      <Link href="/browse" className="btn min-h-10 px-4 text-sm">
+      <Link href="/browse" data-track="cta_click" data-track-location="nav" data-track-target="open_app" className="btn min-h-10 px-4 text-sm">
         Open Clouta
       </Link>
     );
   }
   return (
     <>
-      <Link href="/login" className="px-2 py-3 text-[15px] font-semibold text-body hover:text-ink">
+      <Link href="/login" data-track="nav_click" data-track-target="login" className="px-2 py-3 text-[15px] font-semibold text-body hover:text-ink">
         Log in
       </Link>
-      <a href="#join" className="btn min-h-10 px-4 text-sm">
+      <a href="#join" data-track="cta_click" data-track-location="nav" className="btn min-h-10 px-4 text-sm">
         Join the waitlist
       </a>
     </>

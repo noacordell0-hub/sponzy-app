@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useState } from "react";
 import { Icon } from "@/components/Icons";
+import { getUtm, track } from "@/lib/analytics";
 
 type Status = { code: string; position: number; referrals: number; total: number };
 type FormState = { kind: "idle" } | { kind: "loading" } | { kind: "error"; message: string };
@@ -32,6 +33,11 @@ function refFromUrl(): string | null {
   }
 }
 
+/** Where on the page this form sits, for analytics. */
+function location_(id: string) {
+  return id.includes("bottom") ? "footer" : id.includes("hero") ? "hero" : id;
+}
+
 /** Waitlist signup. After joining, shows place in line and a personal invite link. */
 export default function WaitlistForm({ id, dark = false }: { id: string; dark?: boolean }) {
   const [form, setForm] = useState<FormState>({ kind: "idle" });
@@ -49,23 +55,42 @@ export default function WaitlistForm({ id, dark = false }: { id: string; dark?: 
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    if (form.kind === "loading") return; // ignore double clicks while saving
     const data = new FormData(e.currentTarget);
+    const email = String(data.get("email") ?? "").trim();
+    const ref = refFromUrl();
+    track("waitlist_submit", { location: location_(id), referred: Boolean(ref) });
+    // Quick check in the browser for instant feedback; the server checks again.
+    if (!email) {
+      track("waitlist_error", { reason: "empty" });
+      return setForm({ kind: "error", message: "Enter your email to claim your spot." });
+    }
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      track("waitlist_error", { reason: "invalid_email_client" });
+      return setForm({ kind: "error", message: "Please enter a valid email address." });
+    }
     setForm({ kind: "loading" });
     try {
       const res = await fetch("/api/waitlist", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: data.get("email"), company: data.get("company"), role: "creator", ref: refFromUrl() }),
+        body: JSON.stringify({ email, company: data.get("company"), role: "creator", ref, ...getUtm() }),
       });
       const json = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(json.error || "Something went wrong. Please try again.");
+      if (!res.ok) {
+        track("waitlist_error", { reason: res.status === 429 ? "rate_limited" : res.status === 400 ? "invalid_email" : `http_${res.status}` });
+        throw new Error(json.error || "Something went wrong. Please try again.");
+      }
+      track("waitlist_success", { location: location_(id), returning: Boolean(json.returning), referred: Boolean(ref) });
+      if (ref && !json.returning) track("referral_signup", { referrer: ref });
       if (json.code) {
         save(json.code);
         setStatus({ code: json.code, position: json.position, referrals: json.referrals, total: json.total });
       }
       setForm({ kind: "idle" });
     } catch (err) {
-      setForm({ kind: "error", message: err instanceof Error ? err.message : "Something went wrong." });
+      if (!(err instanceof Error) || err.message === "Failed to fetch") track("waitlist_error", { reason: "network" });
+      setForm({ kind: "error", message: err instanceof Error && err.message !== "Failed to fetch" ? err.message : "We couldn't reach Clouta. Check your connection and try again." });
     }
   }
 
@@ -127,6 +152,7 @@ function ReferralCard({ status, dark }: { status: Status; dark: boolean }) {
   async function copy() {
     try {
       await navigator.clipboard.writeText(link);
+      track("invite_link_copied", { referrals: status.referrals });
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -140,6 +166,7 @@ function ReferralCard({ status, dark }: { status: Status; dark: boolean }) {
         text: "Clouta lets creators sell brand deals from one link, with payment held until the work is approved. Join the waitlist:",
         url: link,
       });
+      track("invite_link_shared", { method: "native_share" });
     } catch {
       /* user cancelled */
     }
@@ -165,6 +192,7 @@ function ReferralCard({ status, dark }: { status: Status; dark: boolean }) {
           readOnly
           value={link}
           onFocus={(e) => e.currentTarget.select()}
+          onCopy={() => track("invite_link_copied", { referrals: status.referrals, method: "manual" })}
           className="min-h-11 flex-1 rounded-[10px] border border-black/12 bg-[#F7F5FF] px-3 text-sm font-medium text-ink"
         />
         <button type="button" onClick={copy} className="btn min-h-11 px-4 text-sm">

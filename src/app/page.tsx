@@ -7,6 +7,7 @@ import EarningsCalculator from "@/components/EarningsCalculator";
 
 import { FOUNDING_SPOTS } from "@/lib/site";
 import LandingAuthLinks from "@/components/LandingAuthLinks";
+import TrackView from "@/components/TrackView";
 
 const steps: { icon: IconName; title: string; body: string }[] = [
   { icon: "link", title: "Share your Clouta link", body: "Set up your storefront with your services and prices, then put one link in your bio." },
@@ -51,25 +52,31 @@ const trust: { icon: IconName; title: string; body: string }[] = [
   { icon: "flag", title: "Reporting and moderation", body: "Report fake accounts, scams or harassment. Our team reviews every report by hand." },
 ];
 
-const faqs = [
+const faqs: { id: string; q: string; a: string }[] = [
   {
+    id: "free",
     q: "Is it free to join?",
     a: "Yes. Joining the waitlist and listing your services are free. Clouta only takes a fee when a paid collab is completed.",
   },
-  { q: "When does Clouta launch?", a: "We're opening a private beta soon. Waitlist members are invited first." },
+  { id: "launch",
+    q: "When does Clouta launch?", a: "We're opening a private beta soon. Waitlist members are invited first." },
   {
+    id: "payments",
     q: "How do brands pay?",
     a: "Brands pay inside Clouta through Stripe. The money is held and released after the creator delivers and the brand approves.",
   },
   {
+    id: "problems",
     q: "What if there is a problem with an order?",
     a: "Either side can open a dispute before approval. Our team reviews both sides and decides on a refund, a payout or a split.",
   },
   {
+    id: "move_up",
     q: "How do I move up the waitlist?",
     a: "After you join you get a personal invite link. Every friend who signs up with it moves you up 5 spots, and inviting 3 friends gets you into the first beta wave.",
   },
   {
+    id: "young",
     q: "Can young creators join?",
     a: "Yes, creators aged 13 and up are welcome. For creators under 18, a parent or guardian manages payouts.",
   },
@@ -83,6 +90,7 @@ export default function Home() {
   const spots = FOUNDING_SPOTS.toLocaleString();
   return (
     <>
+      <TrackView name="landing_view" />
       <ShootingStars />
       <header className="sticky top-0 z-20 border-b border-black/[.06] bg-[#fbfaff]/80 backdrop-blur-md">
         <div className={`${wrap} flex h-16 items-center gap-6`}>
@@ -98,7 +106,7 @@ export default function Home() {
               ["#trust", "Trust & safety"],
               ["#faq", "FAQ"],
             ].map(([href, label]) => (
-              <a key={href} href={href} className="py-3 text-[15px] font-medium text-body hover:text-ink">
+              <a key={href} href={href} data-track="nav_click" data-track-target={href.replace("#", "").replace("/", "")} className="py-3 text-[15px] font-medium text-body hover:text-ink">
                 {label}
               </a>
             ))}
@@ -254,7 +262,7 @@ export default function Home() {
             ))}
           </div>
           <div className="mt-10">
-            <a href="#join" className="btn px-6 text-base">
+            <a href="#join" data-track="cta_click" data-track-location="founding" className="btn px-6 text-base">
               Claim my spot
               <Icon name="arrow" size={18} />
             </a>
@@ -319,7 +327,7 @@ export default function Home() {
             </div>
             <div className="border-t border-black/10">
               {faqs.map((f) => (
-                <details key={f.q} className="faq">
+                <details key={f.id} className="faq" data-faq={f.id}>
                   <summary>{f.q}</summary>
                   <p>{f.a}</p>
                 </details>
@@ -350,10 +358,10 @@ export default function Home() {
           </span>
           <span>© {new Date().getFullYear()}</span>
           <div className="flex-1" />
-          <Link href="/terms" className="py-2 hover:text-ink">
+          <Link href="/terms" data-track="nav_click" data-track-target="terms" className="py-2 hover:text-ink">
             Terms
           </Link>
-          <Link href="/privacy" className="py-2 hover:text-ink">
+          <Link href="/privacy" data-track="nav_click" data-track-target="privacy" className="py-2 hover:text-ink">
             Privacy
           </Link>
         </div>

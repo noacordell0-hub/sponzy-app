@@ -1,3 +1,4 @@
+import TrackView from "@/components/TrackView";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthShell } from "@/components/AuthShell";
@@ -9,6 +10,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   const { next, error } = await searchParams;
   return (
     <AuthShell>
+      <TrackView name="login_view" />
       <h1 className="text-2xl font-extrabold tracking-[-0.03em]">Welcome back</h1>
       <p className="mt-1.5 text-[15px] text-body">Log in to your Clouta account.</p>
       {error === "link" && (

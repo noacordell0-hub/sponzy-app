@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -53,6 +54,7 @@ export default function ReviewForm({ orderId, otherName, reviewingCreator, tags,
     const data = await res.json().catch(() => ({}));
     setBusy(false);
     if (!res.ok) return setErr(data.error ?? "Couldn't save your review.");
+    track("review_submitted", { role: reviewingCreator ? "brand" : "creator", overall, revealed: Boolean(data.revealed) });
     router.push(`/orders/${orderId}?reviewed=${data.revealed ? "revealed" : "hidden"}`);
     router.refresh();
   }

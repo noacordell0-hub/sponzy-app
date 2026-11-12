@@ -1,3 +1,4 @@
+import TrackView from "@/components/TrackView";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -60,6 +61,7 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
 
   return (
     <AppShell profile={profile} active="browse" wide>
+      <TrackView name="browse_view" props={{ filtered, results: rows.length, signed_in: Boolean(user) }} />
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="on-bg text-3xl font-extrabold tracking-[-0.03em]">Discover creators</h1>

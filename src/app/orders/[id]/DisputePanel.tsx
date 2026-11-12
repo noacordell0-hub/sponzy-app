@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { DISPUTE_REASONS } from "@/lib/dispute-labels";
@@ -47,6 +48,7 @@ export default function DisputePanel({ orderId, dispute, viewerId, myRole, other
     const data = await res.json().catch(() => ({}));
     setBusy(false);
     if (!res.ok) return setErr(data.error ?? "Something went wrong.");
+    if ((body as { action?: string }).action === "open") track("dispute_opened", { role: myRole, reason: (body as { reason?: string }).reason ?? "" });
     setOpen(false);
     setText("");
     setLinks("");

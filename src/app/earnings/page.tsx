@@ -10,6 +10,7 @@ import { money } from "@/lib/format";
 import { STATUS_LABEL, STATUS_STYLE } from "@/lib/order-status";
 import type { Order } from "@/lib/orders";
 import PayoutButtons from "./PayoutButtons";
+import TrackView from "@/components/TrackView";
 
 export const metadata: Metadata = { title: "Earnings · Clouta" };
 
@@ -43,6 +44,8 @@ export default async function EarningsPage({ searchParams }: { searchParams: Pro
   return (
     <AppShell profile={profile} active="earnings">
       <h1 className="on-bg mb-8 text-3xl font-extrabold tracking-[-0.03em]">Earnings</h1>
+      {setup === "done" && <TrackView name={payoutsEnabled ? "stripe_onboard_success" : "stripe_onboard_error"} props={{ stage: payoutsEnabled ? "active" : detailsSubmitted ? "pending_review" : "incomplete" }} />}
+      {setup === "retry" && <TrackView name="stripe_onboard_error" props={{ stage: "link_expired" }} />}
 
       {/* Payout setup */}
       <section className={`panel mb-6 flex flex-col gap-4 p-6 sm:flex-row sm:items-center ${payoutsEnabled ? "" : "border-[#F2D58A]"}`} aria-labelledby="payout-t">

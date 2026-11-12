@@ -1,6 +1,7 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { bucket, track } from "@/lib/analytics";
 
 /** Slider calculator: what a creator could earn from sponsored posts in a year. */
 export default function EarningsCalculator() {
@@ -9,6 +10,14 @@ export default function EarningsCalculator() {
   const priceId = useId();
   const countId = useId();
   const yearly = price * perMonth * 12;
+
+  // Count a "use" once the visitor stops moving the sliders for a moment (not on every pixel).
+  const touched = useRef(false);
+  useEffect(() => {
+    if (!touched.current) return;
+    const t = setTimeout(() => track("earnings_calculator_used", { price: bucket(price, [50, 100, 250, 500]), deals: bucket(perMonth, [2, 4, 7]), yearly: bucket(yearly, [1000, 5000, 20000, 50000]) }), 1200);
+    return () => clearTimeout(t);
+  }, [price, perMonth, yearly]);
 
   return (
     <div className="panel grid gap-8 p-6 sm:p-8 md:grid-cols-[1.2fr_1fr] md:items-center">
@@ -27,7 +36,7 @@ export default function EarningsCalculator() {
             max={1000}
             step={5}
             value={price}
-            onChange={(e) => setPrice(Number(e.target.value))}
+            onChange={(e) => { touched.current = true; setPrice(Number(e.target.value)); }}
             className="mt-3 w-full accent-[#5B3DF5]"
           />
         </div>
@@ -45,7 +54,7 @@ export default function EarningsCalculator() {
             max={12}
             step={1}
             value={perMonth}
-            onChange={(e) => setPerMonth(Number(e.target.value))}
+            onChange={(e) => { touched.current = true; setPerMonth(Number(e.target.value)); }}
             className="mt-3 w-full accent-[#5B3DF5]"
           />
         </div>

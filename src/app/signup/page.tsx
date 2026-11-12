@@ -1,3 +1,4 @@
+import TrackView from "@/components/TrackView";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { AuthShell } from "@/components/AuthShell";
@@ -8,6 +9,7 @@ export const metadata: Metadata = { title: "Sign up · Clouta" };
 export default function SignupPage() {
   return (
     <AuthShell>
+      <TrackView name="signup_view" />
       <span className="badge-violet inline-block rounded-full px-3 py-1 text-xs font-semibold">Private beta</span>
       <h1 className="mt-3 text-2xl font-extrabold tracking-[-0.03em]">Create your Clouta account</h1>
       <p className="mt-1.5 text-[15px] text-body">
