@@ -1,3 +1,4 @@
+import { logError } from "@/lib/log";
 import { randomBytes } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
@@ -47,6 +48,10 @@ export async function POST(request: Request) {
   const role = body.role === "brand" ? "brand" : "creator";
   const ref = typeof body.ref === "string" && CODE_RE.test(body.ref) ? body.ref : null;
 
+  // Where they came from (first visit). Plain text only, trimmed; never trusted for anything but reporting.
+  const tag = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim().replace(/[^\w.\-/ ]/g, "").slice(0, 100) || null : null);
+  const attribution = { utm_source: tag(body.utm_source), utm_medium: tag(body.utm_medium), utm_campaign: tag(body.utm_campaign), landing_page: tag(body.landing_page) };
+
   if (!EMAIL_RE.test(email) || email.length > 254) {
     return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
   }
@@ -78,7 +83,7 @@ export async function POST(request: Request) {
     const code = newCode();
     const { error } = await supabase
       .from("waitlist")
-      .insert({ email, role, source: ref ? "referral" : "landing", referral_code: code, referred_by: referredBy });
+      .insert({ email, role, source: ref ? "referral" : "landing", referral_code: code, referred_by: referredBy, ...attribution });
 
     if (!error) {
       const status = await statusFor(code);
@@ -91,7 +96,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, returning: true, ...status });
     }
     if (error.code !== "23505") {
-      console.error("[waitlist] insert failed:", error.message);
+      await logError(error.message, { route: "POST /api/waitlist", code: error.code });
       break;
     }
   }
