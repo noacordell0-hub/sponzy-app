@@ -37,6 +37,7 @@ function visitorId() {
 }
 
 export function track(name: EventName, props: Props = {}) {
+  captureUtm(); // make sure the first event of a visit already knows where it came from
   try {
     vercelTrack(name, props);
   } catch {
