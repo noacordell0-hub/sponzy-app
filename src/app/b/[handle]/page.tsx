@@ -22,7 +22,10 @@ async function load(handle: string) {
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { handle } = await params;
   const { brand } = await load(handle);
-  return brand ? { title: `${brand.display_name} · Brand on Clouta`, description: brand.tagline ?? undefined } : { title: "Brand not found · Clouta" };
+  if (!brand) return { title: "Brand not found · Clouta" };
+  const title = `${brand.display_name} · Brand on Clouta`;
+  const description = brand.tagline ?? `${brand.display_name} works with creators on Clouta.`;
+  return { title, description, alternates: { canonical: `/b/${brand.handle}` }, openGraph: { title, description, url: `/b/${brand.handle}` } };
 }
 
 export default async function BrandPage({ params }: Params) {

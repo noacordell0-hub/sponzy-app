@@ -8,6 +8,10 @@ import EarningsCalculator from "@/components/EarningsCalculator";
 import { FOUNDING_SPOTS } from "@/lib/site";
 import LandingAuthLinks from "@/components/LandingAuthLinks";
 import TrackView from "@/components/TrackView";
+import { SITE_URL } from "@/lib/site";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = { alternates: { canonical: "/" }, openGraph: { url: "/" } };
 
 const steps: { icon: IconName; title: string; body: string }[] = [
   { icon: "link", title: "Share your Clouta link", body: "Set up your storefront with your services and prices, then put one link in your bio." },
@@ -91,6 +95,17 @@ export default function Home() {
   return (
     <>
       <TrackView name="landing_view" />
+      {/* Structured data so search engines understand the brand, the site and the FAQ. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            { "@context": "https://schema.org", "@type": "Organization", name: "Clouta", url: SITE_URL, logo: `${SITE_URL}/apple-icon.png`, description: "A storefront for creator sponsorships: brands pay up front and Clouta holds the money until the work is approved." },
+            { "@context": "https://schema.org", "@type": "WebSite", name: "Clouta", url: SITE_URL },
+            { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqs.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })) },
+          ]).replace(/</g, "\\u003c"),
+        }}
+      />
       <ShootingStars />
       <header className="sticky top-0 z-20 border-b border-black/[.06] bg-[#fbfaff]/80 backdrop-blur-md">
         <div className={`${wrap} flex h-16 items-center gap-6`}>

@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { SITE_URL } from "@/lib/site";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
@@ -14,11 +15,20 @@ const jakarta = Plus_Jakarta_Sans({
   weight: ["500", "700", "800"],
 });
 
+const DESCRIPTION =
+  "Creators list their collab prices in one shop-window post. Brands pay up front, and Clouta holds the money until the work is approved.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "Clouta · Sell brand collabs from one post",
-  description:
-    "Creators list their collab prices in one shop-window post. Brands pay up front, and Clouta holds the money until the work is approved.",
+  description: DESCRIPTION,
+  applicationName: "Clouta",
+  openGraph: { type: "website", siteName: "Clouta", locale: "en_US", title: "Clouta · Sell brand deals from one link", description: DESCRIPTION },
+  twitter: { card: "summary_large_image", title: "Clouta · Sell brand deals from one link", description: DESCRIPTION },
+  formatDetection: { telephone: false },
 };
+
+export const viewport: Viewport = { themeColor: "#5B3DF5", width: "device-width", initialScale: 1 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { AuthShell } from "@/components/AuthShell";
 import AuthForms from "@/components/AuthForms";
 
-export const metadata: Metadata = { title: "Log in · Clouta" };
+export const metadata: Metadata = { title: "Log in · Clouta", description: "Log in to your Clouta account to manage your shop, orders and messages.", alternates: { canonical: "/login" } };
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; error?: string }> }) {
   const { next, error } = await searchParams;

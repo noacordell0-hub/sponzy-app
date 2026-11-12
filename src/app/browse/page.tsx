@@ -11,6 +11,7 @@ import type { CreatorResult } from "@/lib/market";
 export const metadata: Metadata = {
   title: "Browse creators · Clouta",
   description: "Find creators with clear prices, verified reach and protected payments.",
+  alternates: { canonical: "/browse" },
 };
 
 type SP = Record<string, string | undefined>;

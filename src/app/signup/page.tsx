@@ -4,7 +4,7 @@ import Link from "next/link";
 import { AuthShell } from "@/components/AuthShell";
 import AuthForms from "@/components/AuthForms";
 
-export const metadata: Metadata = { title: "Sign up · Clouta" };
+export const metadata: Metadata = { title: "Sign up · Clouta", description: "Create your Clouta account. During the private beta, sign-up is open to people on the waitlist.", alternates: { canonical: "/signup" } };
 
 export default function SignupPage() {
   return (

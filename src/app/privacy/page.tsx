@@ -4,6 +4,7 @@ import { ContactLink, LegalPage } from "@/components/LegalPage";
 export const metadata: Metadata = {
   title: "Privacy Policy · Clouta",
   description: "How Clouta collects, uses and protects your information.",
+  alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPage() {
