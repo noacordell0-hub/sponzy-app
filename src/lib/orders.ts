@@ -45,6 +45,8 @@ export type Order = {
   cancelled_at: string | null;
   refunded_at: string | null;
   created_at: string;
+  payout_cents: number | null;
+  refunded_cents: number | null;
 };
 
 /** Record an order event and post a system message into the brand-creator conversation. */
@@ -81,7 +83,9 @@ export async function payCreator(admin: SupabaseClient, order: Order, actorId: s
     return { paid: false };
   }
 
-  const amount = order.price_cents - order.creator_fee_cents;
+  // A dispute split sets payout_cents; otherwise the creator gets the price minus Clouta's fee.
+  const amount = order.payout_cents ?? order.price_cents - order.creator_fee_cents;
+  if (amount <= 0) return { paid: true };
   const transfer = await stripe.transfers.create(
     {
       amount,

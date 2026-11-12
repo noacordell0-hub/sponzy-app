@@ -72,7 +72,7 @@ export default function OrderActions({ order, isBrand, otherName }: { order: Ord
       if (revisionsLeft > 0) buttons.push(btn("rev_open", `Request a revision (${revisionsLeft} left)`, () => setRevisionOpen((o) => !o), true));
     } else if (s === "approved" || s === "paid") {
       title = "Order complete";
-      body = s === "paid" ? `You approved the work and ${otherName} has been paid. Reviews open in a later update.` : `You approved the work. ${otherName} will be paid as soon as their payout setup is finished.`;
+      body = s === "paid" ? `You approved the work and ${otherName} has been paid.` : `You approved the work. ${otherName} will be paid as soon as their payout setup is finished.`;
     }
   } else {
     if (s === "funded") {

@@ -55,7 +55,7 @@ export async function AppShell({
   const menuItems: { href: string; label: string; icon: IconName }[] = [
     { href: "/settings/account", label: "Account and profile", icon: "user" },
     { href: "/settings", label: "Settings", icon: "settings" },
-    ...(profile?.is_admin ? [{ href: "/admin/verifications", label: "Admin", icon: "shield" as IconName }] : []),
+    ...(profile?.is_admin ? [{ href: "/admin", label: "Admin", icon: "shield" as IconName }] : []),
   ];
 
   return (

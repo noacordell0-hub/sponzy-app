@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { requireProfile } from "@/lib/auth";
 import { AppShell } from "@/components/AppShell";
 import VerificationQueue from "./VerificationQueue";
+import { AdminHeader } from "../AdminNav";
 
 export const metadata: Metadata = { title: "Verifications · Clouta Admin", robots: { index: false } };
 
@@ -25,10 +26,7 @@ export default async function AdminVerificationsPage() {
 
   return (
     <AppShell profile={profile} active="admin">
-      <div className="mb-8 flex flex-wrap items-center gap-3">
-        <h1 className="on-bg text-3xl font-extrabold tracking-[-0.03em]">Social verifications</h1>
-        <span className="rounded-full bg-err-bg px-3 py-1 text-xs font-semibold text-err">Team only</span>
-      </div>
+      <AdminHeader title="Social verifications" active="verifications" />
       <VerificationQueue initial={(data as Pending[]) ?? []} />
     </AppShell>
   );

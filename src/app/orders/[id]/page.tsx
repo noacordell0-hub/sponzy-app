@@ -9,6 +9,7 @@ import { money } from "@/lib/format";
 import { autoApproveDue, type Order } from "@/lib/orders";
 import { STATUS_LABEL, STATUS_STYLE } from "@/lib/order-status";
 import OrderActions from "./OrderActions";
+import DisputePanel from "./DisputePanel";
 import { REVIEW_WINDOW_DAYS } from "@/lib/trust";
 
 export const metadata: Metadata = { title: "Order · Clouta" };
@@ -40,6 +41,8 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
     supabase.from("order_events").select("kind, note, created_at").eq("order_id", order.id).order("created_at"),
   ]);
   const rank = RANK[order.status] ?? -1;
+  const { data: dispute } = await supabase.from("disputes").select("*").eq("order_id", order.id).order("created_at", { ascending: false }).limit(1).maybeSingle();
+  const canDispute = ["funded", "in_progress", "proof_submitted", "revision_requested"].includes(order.status);
 
   // Review prompt (double-blind): what I've written, and whether the other side has reviewed (not what they wrote).
   let reviewState: null | { mine: boolean; theirs: boolean; revealed: boolean; open: boolean; closes: Date } = null;
@@ -103,7 +106,10 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
 
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_340px]">
         <div className="flex flex-col gap-6">
-          <OrderActions order={order} isBrand={isBrand} otherName={other?.display_name ?? "the other side"} />
+          {order.status !== "disputed" && <OrderActions order={order} isBrand={isBrand} otherName={other?.display_name ?? "the other side"} />}
+          {(dispute || canDispute) && (
+            <DisputePanel orderId={order.id} dispute={dispute} viewerId={user.id} myRole={isBrand ? "brand" : "creator"} otherName={other?.display_name ?? "the other side"} canOpen={canDispute} />
+          )}
 
           {reviewState && (reviewState.open || reviewState.mine) && (
             <section className="panel flex flex-col gap-3 border-[#F2D58A] p-6 sm:flex-row sm:items-center" aria-labelledby="rev-t">
