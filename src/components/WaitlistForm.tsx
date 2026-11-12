@@ -51,6 +51,9 @@ export default function WaitlistForm({ id, dark = false }: { id: string; dark?: 
       joined = new URLSearchParams(location.search).get("joined");
     } catch {}
     if (joined && /^[a-z0-9]{6,12}$/.test(joined)) save(joined);
+    try {
+      if (new URLSearchParams(location.search).get("waitlist_error")) setForm({ kind: "error", message: "We couldn't save your signup. Please check your email and try again." });
+    } catch {}
     const code = readSaved();
     if (!code) return;
     fetch(`/api/waitlist?code=${encodeURIComponent(code)}`)
