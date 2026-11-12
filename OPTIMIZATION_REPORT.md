@@ -42,7 +42,7 @@ Status: **Fixed** (on the branch) · **Needs approval** (ready, waiting for you)
 |---|---|---|---|---|---|
 | 1 | Critical | Security | Next.js 15.5.9 had published critical advisories (cache poisoning, middleware bypass, DoS, SSRF) | `package.json` | **Fixed**: 15.5.29 |
 | 2 | High | Payments | Stripe Accounts v1 blocked creator payout setup | `src/lib/stripe-v2.ts`, `src/app/api/stripe/onboard/route.ts` | **Fixed** (before this pass, tested in test mode) |
-| 3 | High | Waitlist | One invite moves you up 4 spots, not the promised 5, because ties go to the earlier signup. Tested: #13 → #9 instead of #8. "Exactly once" works: a duplicate email is blocked | `waitlist_status()`; fix in `supabase/migrations/0023_waitlist_rank_fix.sql` | **Needs approval** |
+| 3 | High | Waitlist | One invite moves you up 4 spots, not the promised 5, because ties go to the earlier signup. Tested: #13 → #9 instead of #8. "Exactly once" works: a duplicate email is blocked | `waitlist_status()`; fix in `supabase/migrations/0023_waitlist_rank_fix.sql` | **Fixed** (approved and applied; re-tested: #13 → #8 → #3) |
 | 4 | High | Analytics | No traffic data at all (Analytics was off) | `src/app/layout.tsx` | **Fixed** in code; **You**: click Enable in Vercel (section 6) |
 | 5 | High | Legal | Terms of Use cover only the waitlist, but checkout, payouts, disputes and reviews now exist | `src/app/terms/page.tsx` | **You** + lawyer, before the beta |
 | 6 | High | Legal | Privacy Policy says "When payments launch, Stripe will process…", which is out of date | `src/app/privacy/page.tsx:63` | **You** + lawyer (update with the Terms) |
@@ -51,7 +51,7 @@ Status: **Fixed** (on the branch) · **Needs approval** (ready, waiting for you)
 | 9 | Medium | Security | No rate limits on waitlist, password login, login emails, Stripe or checkout | `src/lib/rate-limit.ts` + routes | **Fixed** |
 | 10 | Medium | Security | No security headers (CSP, frame-ancestors, HSTS, referrer and permissions policies) | `next.config.ts` | **Fixed** |
 | 11 | Medium | Performance | Landing page loaded the whole Supabase library just to choose between "Log in" and "Open Clouta" | `src/components/LandingAuthLinks.tsx` | **Fixed**: 182 → 112 KB JavaScript |
-| 12 | Medium | Security | `waitlist` and `app_config` still have Supabase's default table permissions. Row-level security blocks everything today (checked: visitors get an empty list), but a future rule mistake could expose emails | `supabase/migrations/0024_revoke_default_grants.sql` | **Needs approval** |
+| 12 | Medium | Security | `waitlist` and `app_config` still have Supabase's default table permissions. Row-level security blocks everything today (checked: visitors get an empty list), but a future rule mistake could expose emails | `supabase/migrations/0024_revoke_default_grants.sql` | **Fixed** (approved and applied) |
 | 13 | Medium | Auth | Leaked-password protection is off in Supabase | Supabase dashboard | **You**: Authentication → Sign In / Providers → Email → turn on leaked password protection |
 | 14 | Medium | Testing | Preview deployments have no Supabase or Stripe settings, so database features can't be tested before merging | Vercel → Settings → Environment Variables | **Recommended**: add Preview values (Stripe **test** keys only) |
 | 15 | Medium | Promise | "Invite 3 friends to get into the first beta wave": nothing invites people automatically yet. The Metrics page shows who has 3+ invites | `src/components/WaitlistForm.tsx` | **You**: invite those people by hand when the beta opens |
@@ -262,8 +262,8 @@ The site says creators can join from age 13, with a parent or guardian handling 
 
 ## 9. Open questions and decisions for you
 
-1. **Approve migration 0023** (waitlist rank fix: 1 invite = exactly 5 spots)? **(Recommended: yes)**
-2. **Approve migration 0024** (remove default table permissions on `waitlist` and `app_config`)? **(Recommended: yes)**
+1. ~~Approve migration 0023~~ Done: applied.
+2. ~~Approve migration 0024~~ Done: applied.
 3. **Merge `optimize-pass-1` into `main`?** After merging, enable Analytics and Speed Insights in Vercel.
 4. **Turn on leaked-password protection** in Supabase (issue 13).
 5. **Age rule:** keep 13+ or require 18+ for the beta? (section 8, lawyer)

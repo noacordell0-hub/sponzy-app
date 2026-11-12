@@ -1,4 +1,4 @@
--- PENDING APPROVAL. Fix: "each friend moves you up 5 spots" moved people up only 4 when scores tied,
+-- Applied (approved Nov 2026). Fix: "each friend moves you up 5 spots" moved people up only 4 when scores tied,
 -- because ties went to the earlier signup. Ties now go to the person with more invites, so one invite = exactly 5 spots.
 create or replace function public.waitlist_status(p_code text)
  returns table(position_in_line bigint, referrals bigint, total bigint)
