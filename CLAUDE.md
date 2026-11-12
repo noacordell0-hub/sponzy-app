@@ -15,7 +15,9 @@ Nov 11, 2026 · @noah
   Social verification (migrations 0008-0010): creators tap Verify to get a code (e.g. clouta-1BB3) to put in their bio; admins review at `/admin/verifications`, enter the real follower count and approve or reject. Editing a verified account's handle or followers removes the ✓; a verified handle can't be claimed by another account. Admins are `profiles.is_admin` (set by hand in SQL; never user-editable). Later: replace the manual check with official "Connect YouTube/TikTok/Instagram" logins.
   Profile pictures: any image the browser can open is center-cropped to 512px WebP before upload (`src/lib/image.ts`); GIFs up to 5 MB are kept animated.
   Supabase setup needed by hand: Authentication > URL Configuration (Site URL https://clouta.vercel.app; redirect URLs https://clouta.vercel.app/** and http://localhost:3000/**). Supabase's built-in email only sends a few emails an hour; add custom SMTP (e.g. Resend) before the beta. Social accounts are self-reported and show "Unverified" until real verification is built.
-- [ ] Layers 2 to 5 (see Build order).
+- [x] Layer 2 code: `/post/edit` (pitch, platforms, up to 10 services with templates, reorder, publish), public `/c/[handle]` (theme banner, badges, audience, socials with verified marks, services; Book shows "opens soon" until Layer 4), `/browse` (search, niche, platform, price, verified-follower tiers, badges, sort, paging; all in the URL), public `/b/[handle]` (website, budget, about, trust score "New"), `/brand` dashboard (stats, recommendations by niche, saved creators). Migration 0011: `posts`, `services`, `saved_creators`, profile `website`/`budget`, and `search_creators()` (security invoker, so RLS applies). Follower tiers count verified followers only. Header nav adapts to visitor, creator or brand. Tested end to end against the real database.
+  Still to do later: account page polish (requested), comments (Layer 5), ratings/Top Rated/On-Time Pro filters (Layer 5).
+- [ ] Layers 3 to 5 (see Build order).
 
 Working notes for Claude Code:
 - Prototype screens live in `design/prototype/` (10 of 25 so far, including Landing). Use them as the visual reference. The logo is in `src/components/Logo.tsx`, the space backdrop in `src/components/Backdrop.tsx`, icons into `src/components/Icons.tsx`. The landing page matches `Landing.html`; its Deep space toggle comes in Layer 1 as a saved per-user setting.
@@ -205,7 +207,7 @@ Build one layer at a time, test it, commit to GitHub, then start the next.
 
 - [x] Layer 0, project and waitlist: "Read CLAUDE.md. Create a Next.js + TypeScript + Tailwind app connected to Supabase. Build the waitlist landing page from the prototype, saving emails to a waitlist table, and deploy it to Vercel. Explain each step as you go."
 - [x] Layer 1, accounts: "Add Supabase Auth sign up and log in, the onboarding flow, profiles and social_accounts tables with Row Level Security, and the Account and Settings pages."
-- [ ] Layer 2, marketplace: "Add posts and services, the creator profile, brand profiles and dashboard, and Browse with search and filters."
+- [x] Layer 2, marketplace: "Add posts and services, the creator profile, brand profiles and dashboard, and Browse with search and filters."
 - [ ] Layer 3, messages: "Add order and direct message threads using Supabase Realtime, with offer and system messages."
 - [ ] Layer 4, payments: "Add Stripe Connect Express onboarding, Checkout with funds held on the platform, the order statuses, Submit proof, a 3-day auto-approve job, transfers on approval, refunds, and the Earnings page. Use Stripe test mode and webhooks with signature checks."
 - [ ] Layer 5, trust and safety: "Add double-blind reviews, trust score, badges, streaks, leaderboard, community comments, reports, disputes, and the admin panel."

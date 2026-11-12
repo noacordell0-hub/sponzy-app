@@ -211,7 +211,7 @@ export default function OnboardingFlow({ userId, email }: { userId: string; emai
             </p>
           </div>
           <SocialsEditor userId={userId} initial={[]} />
-          <button type="button" className="btn min-h-12 text-base" onClick={() => router.push("/settings/account?welcome=1")}>
+          <button type="button" className="btn min-h-12 text-base" onClick={() => router.push(role === "brand" ? "/brand?welcome=1" : "/post/edit?welcome=1")}>
             Finish setup
           </button>
         </div>

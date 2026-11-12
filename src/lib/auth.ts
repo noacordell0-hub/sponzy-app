@@ -26,6 +26,8 @@ export type Profile = {
   is_founding: boolean;
   is_admin: boolean;
   onboarded_at: string | null;
+  website: string | null;
+  budget: string | null;
 };
 
 export type Social = {
@@ -52,4 +54,15 @@ export async function requireProfile({ allowUnonboarded = false } = {}) {
   if (!profile.onboarded_at && !allowUnonboarded) redirect("/onboarding");
 
   return { supabase, user, profile };
+}
+
+/** Signed-in, onboarded profile if there is one; null for visitors. Never redirects. */
+export async function getOptionalProfile() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { supabase, user: null, profile: null };
+  const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).single<Profile>();
+  return { supabase, user, profile: profile?.onboarded_at ? profile : null };
 }

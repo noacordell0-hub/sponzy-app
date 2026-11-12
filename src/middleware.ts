@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const SIGNED_IN_ONLY = ["/settings", "/onboarding", "/admin"];
+const SIGNED_IN_ONLY = ["/settings", "/onboarding", "/admin", "/post", "/brand"];
 
 /** Refreshes the login session on every request and guards signed-in pages. */
 export async function middleware(request: NextRequest) {

@@ -92,6 +92,7 @@ export default function Home() {
           <div className="flex-1" />
           <nav aria-label="Page sections" className="hidden items-center gap-7 md:flex">
             {[
+              ["/browse", "Browse creators"],
               ["#how", "How it works"],
               ["#trust", "Trust & safety"],
               ["#faq", "FAQ"],

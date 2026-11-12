@@ -15,7 +15,7 @@ type Draft = { display_name: string; handle: string } & Pick<
   Profile,
   | "tagline" | "bio" | "audience" | "location" | "theme" | "avatar_source" | "avatar_pattern"
   | "avatar_url" | "taking_bookings" | "show_badges" | "show_audience" | "show_comments" | "show_rank" | "young_tag"
-> & { niches: string };
+> & { niches: string; website: string; budget: string };
 
 export default function AccountForm({ profile, socials, isMinor }: { profile: Profile; socials: Social[]; isMinor: boolean }) {
   const router = useRouter();
@@ -39,6 +39,8 @@ export default function AccountForm({ profile, socials, isMinor }: { profile: Pr
     show_rank: profile.show_rank,
     young_tag: profile.young_tag,
     niches: profile.niches.join(", "),
+    website: profile.website ?? "",
+    budget: profile.budget ?? "",
   });
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -78,6 +80,9 @@ export default function AccountForm({ profile, socials, isMinor }: { profile: Pr
     if (!d.display_name.trim()) return setMsg({ ok: false, text: "Display name can't be empty." });
     if (!/^[a-z0-9_]{3,30}$/.test(d.handle)) return setMsg({ ok: false, text: "Handles use 3 to 30 lowercase letters, numbers or underscores." });
     const niches = d.niches.split(",").map((n) => n.trim()).filter(Boolean).slice(0, 8);
+    let website = d.website.trim();
+    if (website && !/^https?:\/\//i.test(website)) website = `https://${website}`;
+    if (website && !/^https?:\/\/[^\s.]+\.[^\s]+$/i.test(website)) return setMsg({ ok: false, text: "Enter a valid website, like glowlabs.com." });
     setSaving(true);
     const { error } = await supabase
       .from("profiles")
@@ -99,6 +104,7 @@ export default function AccountForm({ profile, socials, isMinor }: { profile: Pr
         show_comments: d.show_comments,
         show_rank: d.show_rank,
         young_tag: d.young_tag,
+        ...(isCreator ? {} : { website: website || null, budget: d.budget.trim() || null }),
       })
       .eq("id", profile.id);
     setSaving(false);
@@ -236,6 +242,12 @@ export default function AccountForm({ profile, socials, isMinor }: { profile: Pr
             <TextField id="f-niches" label="Vibe tags" value={d.niches} onChange={(v) => set("niches", v)} max={200} placeholder="Fitness, Wellness" hint="Separate with commas, up to 8" />
             <TextField id="f-audience" label={isCreator ? "Target audience" : "Who you want to reach"} value={d.audience ?? ""} onChange={(v) => set("audience", v)} max={160} placeholder="Women 20-35, home workouts" />
           </div>
+          {!isCreator && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <TextField id="f-website" label="Website" value={d.website} onChange={(v) => set("website", v)} max={200} placeholder="glowlabs.com" />
+              <TextField id="f-budget" label="Typical budget per collab" value={d.budget} onChange={(v) => set("budget", v)} max={40} placeholder="$50–$200" />
+            </div>
+          )}
           <TextField id="f-location" label="Location" value={d.location ?? ""} onChange={(v) => set("location", v)} max={80} placeholder={isMinor ? "Shown publicly, so keep it general, e.g. a country" : "City or country"} />
           <div className="flex flex-col gap-1.5">
             <label htmlFor="f-bio" className="text-sm font-semibold">
