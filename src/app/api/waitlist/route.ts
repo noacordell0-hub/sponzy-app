@@ -2,6 +2,7 @@ import { logError } from "@/lib/log";
 import { randomBytes } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const CODE_RE = /^[a-z0-9]{6,12}$/;
@@ -24,6 +25,7 @@ async function statusFor(code: string): Promise<Status | null> {
 
 /** GET /api/waitlist?code=abc123 → place in line for a saved invite code. */
 export async function GET(request: Request) {
+  if (!rateLimit(`wlget:${clientIp(request)}`, 30, 60_000).ok) return NextResponse.json({ error: "Too many requests." }, { status: 429 });
   const code = new URL(request.url).searchParams.get("code") ?? "";
   if (!CODE_RE.test(code)) return NextResponse.json({ error: "Invalid code." }, { status: 400 });
   const status = await statusFor(code);
@@ -32,12 +34,30 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  // A person joins once; 5 tries a minute per visitor is plenty and stops scripted floods.
+  const lim = rateLimit(`wl:${clientIp(request)}`, 5, 60_000);
+  if (!lim.ok) return NextResponse.json({ error: "Too many tries. Please wait a minute and try again." }, { status: 429, headers: { "Retry-After": String(lim.retryAfter) } });
   let body: Record<string, unknown>;
+  // Without JavaScript the browser posts a normal form; answer with a redirect back to the page instead of JSON.
+  const isForm = (request.headers.get("content-type") ?? "").includes("application/x-www-form-urlencoded");
   try {
-    body = await request.json();
+    body = isForm ? Object.fromEntries((await request.formData()).entries()) : await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
+  if (isForm) {
+    const res = await handleSignup(body);
+    const json = await res.json().catch(() => ({}));
+    const back = new URL("/", request.url);
+    if (json.code) back.searchParams.set("joined", json.code);
+    else back.searchParams.set("waitlist_error", "1");
+    back.hash = "join";
+    return NextResponse.redirect(back, 303);
+  }
+  return handleSignup(body);
+}
+
+async function handleSignup(body: Record<string, unknown>) {
 
   // Honeypot: real people never fill this hidden field.
   if (typeof body.company === "string" && body.company.length > 0) {
@@ -70,6 +90,13 @@ export async function POST(request: Request) {
   if (existing?.referral_code) {
     const status = await statusFor(existing.referral_code);
     return NextResponse.json({ ok: true, returning: true, ...status });
+  }
+
+  // Burst guard across all servers: an unusual flood of new signups in one minute is almost always a bot.
+  const { count: lastMinute } = await supabase.from("waitlist").select("id", { count: "exact", head: true }).gte("created_at", new Date(Date.now() - 60_000).toISOString());
+  if ((lastMinute ?? 0) >= 60) {
+    await logError("Waitlist burst guard triggered", { route: "POST /api/waitlist", level: "warn", lastMinute });
+    return NextResponse.json({ error: "Lots of people are joining right now. Please try again in a minute." }, { status: 429, headers: { "Retry-After": "60" } });
   }
 
   let referredBy: number | null = null;

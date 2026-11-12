@@ -44,7 +44,13 @@ export default function WaitlistForm({ id, dark = false }: { id: string; dark?: 
   const [status, setStatus] = useState<Status | null>(null);
 
   // Returning visitor on the same device: show their current place in line.
+  // (Also picks up ?joined=CODE after a signup made without JavaScript.)
   useEffect(() => {
+    let joined: string | null = null;
+    try {
+      joined = new URLSearchParams(location.search).get("joined");
+    } catch {}
+    if (joined && /^[a-z0-9]{6,12}$/.test(joined)) save(joined);
     const code = readSaved();
     if (!code) return;
     fetch(`/api/waitlist?code=${encodeURIComponent(code)}`)
@@ -97,7 +103,8 @@ export default function WaitlistForm({ id, dark = false }: { id: string; dark?: 
   if (status) return <ReferralCard status={status} dark={dark} />;
 
   return (
-    <form onSubmit={onSubmit} noValidate className="flex max-w-[560px] flex-col gap-2">
+    <form onSubmit={onSubmit} method="post" action="/api/waitlist" noValidate className="flex max-w-[560px] flex-col gap-2">
+      <input type="hidden" name="role" value="creator" />
       <div className="flex flex-col gap-2.5 sm:flex-row">
         <label htmlFor={id} className="sr-only">
           Your email
