@@ -13,16 +13,22 @@ import { money } from "@/lib/format";
 export async function POST(request: Request) {
   const stripe = getStripe();
   const admin = getSupabaseAdmin();
-  const secret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!stripe || !admin || !secret) return NextResponse.json({ error: "Not configured" }, { status: 503 });
+  // Two endpoints in Stripe: platform events (payments, refunds) and Connect events (creator accounts).
+  const secrets = [process.env.STRIPE_WEBHOOK_SECRET, process.env.STRIPE_CONNECT_WEBHOOK_SECRET].filter(Boolean) as string[];
+  if (!stripe || !admin || secrets.length === 0) return NextResponse.json({ error: "Not configured" }, { status: 503 });
 
   const body = await request.text();
-  let event: Stripe.Event;
-  try {
-    event = stripe.webhooks.constructEvent(body, request.headers.get("stripe-signature") ?? "", secret);
-  } catch {
-    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+  const signature = request.headers.get("stripe-signature") ?? "";
+  let event: Stripe.Event | null = null;
+  for (const secret of secrets) {
+    try {
+      event = stripe.webhooks.constructEvent(body, signature, secret);
+      break;
+    } catch {
+      /* try the next secret */
+    }
   }
+  if (!event) return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
 
   try {
     switch (event.type) {

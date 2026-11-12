@@ -5,9 +5,14 @@ let client: Stripe | null = null;
 
 /** Server-only Stripe client. Returns null until STRIPE_SECRET_KEY is set. */
 export function getStripe(): Stripe | null {
-  const key = process.env.STRIPE_SECRET_KEY;
+  // Accept the lowercase name too (that's how it was first saved in Vercel).
+  const key = process.env.STRIPE_SECRET_KEY || process.env.stripe_secret_key;
   if (!key) return null;
-  client ??= new Stripe(key, { apiVersion: "2025-02-24.acacia", appInfo: { name: "Clouta" } });
+  client ??= new Stripe(key, {
+    apiVersion: "2025-02-24.acacia",
+    appInfo: { name: "Clouta" },
+    httpClient: Stripe.createFetchHttpClient(), // fetch works everywhere (Vercel, proxies)
+  });
   return client;
 }
 
