@@ -37,7 +37,7 @@ export default function EarningsCalculator() {
             step={5}
             value={price}
             onChange={(e) => { touched.current = true; setPrice(Number(e.target.value)); }}
-            className="mt-3 w-full accent-[#5B3DF5]"
+            className="mt-1 h-11 w-full cursor-pointer accent-[#5B3DF5]"
           />
         </div>
         <div>
@@ -55,7 +55,7 @@ export default function EarningsCalculator() {
             step={1}
             value={perMonth}
             onChange={(e) => { touched.current = true; setPerMonth(Number(e.target.value)); }}
-            className="mt-3 w-full accent-[#5B3DF5]"
+            className="mt-1 h-11 w-full cursor-pointer accent-[#5B3DF5]"
           />
         </div>
       </div>

@@ -94,7 +94,7 @@ export default function Home() {
       <ShootingStars />
       <header className="sticky top-0 z-20 border-b border-black/[.06] bg-[#fbfaff]/80 backdrop-blur-md">
         <div className={`${wrap} flex h-16 items-center gap-6`}>
-          <Link href="/" className="flex items-center gap-2.5 text-[22px] font-extrabold tracking-[-0.03em]">
+          <Link href="/" className="flex min-h-11 items-center gap-2.5 text-[22px] font-extrabold tracking-[-0.03em]">
             <LogoMark size={30} />
             Clouta
           </Link>
@@ -358,10 +358,10 @@ export default function Home() {
           </span>
           <span>© {new Date().getFullYear()}</span>
           <div className="flex-1" />
-          <Link href="/terms" data-track="nav_click" data-track-target="terms" className="py-2 hover:text-ink">
+          <Link href="/terms" data-track="nav_click" data-track-target="terms" className="inline-flex min-h-11 items-center hover:text-ink">
             Terms
           </Link>
-          <Link href="/privacy" data-track="nav_click" data-track-target="privacy" className="py-2 hover:text-ink">
+          <Link href="/privacy" data-track="nav_click" data-track-target="privacy" className="inline-flex min-h-11 items-center hover:text-ink">
             Privacy
           </Link>
         </div>
