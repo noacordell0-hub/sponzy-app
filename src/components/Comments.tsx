@@ -98,8 +98,8 @@ export default function Comments({ creatorId, creatorName, viewerId, initial, li
           {!isReply && replies(c.id).map((r) => <One key={r.id} c={r} isReply />)}
           {replyTo === c.id && (
             <form onSubmit={(e) => { e.preventDefault(); post(replyText, c.id); }} className="mt-2 flex gap-2">
-              <label htmlFor={`rep-${c.id}`} className="sr-only">Reply</label>
-              <input id={`rep-${c.id}`} value={replyText} onChange={(e) => setReplyText(e.target.value)} maxLength={500} className="input flex-1 py-2 text-sm" placeholder="Write a reply…" autoFocus />
+              <label htmlFor={`creply-${c.id}`} className="sr-only">Reply</label>
+              <input id={`creply-${c.id}`} value={replyText} onChange={(e) => setReplyText(e.target.value)} maxLength={500} className="input flex-1 py-2 text-sm" placeholder="Write a reply…" autoFocus />
               <button type="submit" disabled={busy || !replyText.trim()} className="btn min-h-10 px-4 text-sm">Reply</button>
             </form>
           )}
