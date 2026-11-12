@@ -1,6 +1,7 @@
 "use client";
 
 import { track as vercelTrack } from "@vercel/analytics";
+import { activeExperiments } from "@/lib/experiments";
 
 /**
  * One place for every analytics event, so names stay consistent.
@@ -38,6 +39,7 @@ function visitorId() {
 
 export function track(name: EventName, props: Props = {}) {
   captureUtm(); // make sure the first event of a visit already knows where it came from
+  props = { ...activeExperiments(), ...props }; // which A/B variant this visitor sees (only for running tests)
   try {
     vercelTrack(name, props);
   } catch {

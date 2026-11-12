@@ -8,6 +8,7 @@ import EarningsCalculator from "@/components/EarningsCalculator";
 import { FOUNDING_SPOTS } from "@/lib/site";
 import LandingAuthLinks from "@/components/LandingAuthLinks";
 import TrackView from "@/components/TrackView";
+import { SpotsLeft, StickyMobileCta } from "@/components/LandingExperiments";
 import { SITE_URL } from "@/lib/site";
 import type { Metadata } from "next";
 
@@ -67,7 +68,7 @@ const faqs: { id: string; q: string; a: string }[] = [
   {
     id: "payments",
     q: "How do brands pay?",
-    a: "Brands pay inside Clouta through Stripe. The money is held and released after the creator delivers and the brand approves.",
+    a: "Brands pay inside Clouta through Stripe, plus a payment processing fee of 3% + 30¢ shown at checkout. The money is held and released after the creator delivers and the brand approves.",
   },
   {
     id: "problems",
@@ -138,7 +139,7 @@ export default function Home() {
         <section className={`${wrap} grid items-center gap-12 pb-16 pt-14 lg:grid-cols-[1.05fr_1fr] lg:gap-16 lg:pb-24 lg:pt-24`}>
           <div className="rise flex flex-col gap-6">
             <span className="badge-violet self-start rounded-full px-3 py-1 text-[13px] font-semibold">
-              Private beta · {spots} Founding Creator spots
+              <SpotsLeft fallback={`Private beta · ${spots} Founding Creator spots`} />
             </span>
             <h1 className="text-[clamp(40px,6vw,64px)] font-extrabold leading-[1.04] tracking-[-0.04em]">
               Sell brand deals from <span className="text-violet-deep">one link.</span>
@@ -155,6 +156,7 @@ export default function Home() {
 
           {/* Product preview */}
           <div className="rise rise-2 relative mx-auto w-full max-w-[440px]" aria-label="Example creator storefront">
+            <span className="absolute -top-3 right-4 z-[1] rounded-full bg-ink px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">Example</span>
             <div className="panel overflow-hidden">
               <div className="h-24 bg-[linear-gradient(120deg,#2A1B6E,#6C47FF_60%,#9B5CFF)]" />
               <div className="flex flex-col gap-4 px-6 pb-6">
@@ -365,6 +367,7 @@ export default function Home() {
         </section>
       </main>
 
+      <StickyMobileCta />
       <footer className="border-t border-black/[.06]">
         <div className={`${wrap} flex flex-wrap items-center gap-x-6 gap-y-3 py-8 text-sm text-ink-2`}>
           <span className="flex items-center gap-2 font-semibold text-ink">
