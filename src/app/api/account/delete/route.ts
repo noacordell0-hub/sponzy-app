@@ -1,3 +1,4 @@
+import { logError } from "@/lib/log";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
 
   const { error } = await admin.auth.admin.deleteUser(user.id); // cascades to profile and socials
   if (error) {
-    console.error("[account/delete]", error.message);
+    await logError(error.message, { route: "POST /api/account/delete", userId: user.id });
     return NextResponse.json({ error: "We couldn't delete your account. Please contact us." }, { status: 500 });
   }
   await supabase.auth.signOut();

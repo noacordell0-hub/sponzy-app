@@ -1,3 +1,4 @@
+import { logError } from "@/lib/log";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
@@ -49,7 +50,7 @@ export async function POST(request: Request) {
     if (error.status === 429 || /rate limit/i.test(error.message)) {
       return NextResponse.json({ error: "Too many login emails were sent. Please wait a few minutes and try again." }, { status: 429 });
     }
-    console.error("[auth/start]", error.message);
+    await logError(error.message, { route: "POST /api/auth/start" });
     return NextResponse.json({ error: "We couldn't send the email. Please try again." }, { status: 500 });
   }
   return NextResponse.json({ ok: true });

@@ -1,3 +1,4 @@
+import { logError } from "@/lib/log";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
@@ -52,7 +53,7 @@ export async function POST(request: Request) {
     } else {
       const { error } = await admin.auth.admin.createUser({ email, password, email_confirm: true });
       if (error) {
-        console.error("[auth/password] createUser", error.message);
+        await logError(error.message, { route: "POST /api/auth/password", step: "createUser" });
         return NextResponse.json({ error: "Couldn't create your account. Please try again." }, { status: 500 });
       }
     }

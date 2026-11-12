@@ -1,3 +1,4 @@
+import { logError } from "@/lib/log";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
@@ -36,7 +37,7 @@ export async function POST(request: Request) {
     const link = await onboardingLink(accountId, new URL(request.url).origin);
     return NextResponse.json({ url: link.url });
   } catch (err) {
-    console.error("[stripe onboard]", err);
+    await logError(err, { route: "POST /api/stripe/onboard", userId: user.id });
     return NextResponse.json({ error: "Couldn't reach Stripe. Please try again." }, { status: 502 });
   }
 }

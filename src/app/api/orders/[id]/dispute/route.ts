@@ -1,3 +1,4 @@
+import { logError } from "@/lib/log";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
@@ -30,7 +31,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     }
   } catch (err) {
     if (err instanceof UserError) return NextResponse.json({ error: err.message }, { status: 409 });
-    console.error("[dispute]", err);
+    await logError(err, { route: "POST /api/orders/[id]/dispute", userId: user.id, orderId: order.id, action: b.action });
     return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }
   return NextResponse.json({ ok: true });

@@ -1,3 +1,4 @@
+import { logError } from "@/lib/log";
 import { refreshCreatorPayouts } from "@/lib/payouts";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
@@ -91,7 +92,7 @@ export async function POST(request: Request) {
     .single();
   if (error || !order) {
     if (error?.code === "23505") return NextResponse.json({ error: "This offer already has an order." }, { status: 409 });
-    console.error("[checkout] insert", error?.message);
+    await logError(error?.message ?? "Order insert failed", { route: "POST /api/checkout", userId: user.id });
     return NextResponse.json({ error: "Couldn't create the order." }, { status: 500 });
   }
 

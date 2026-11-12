@@ -1,3 +1,4 @@
+import { logError } from "@/lib/log";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
@@ -26,7 +27,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
     await decideDispute(admin, order!, dispute, user.id, b.decision, Number(b.split_pct ?? 50), String(b.note ?? ""));
   } catch (err) {
     if (err instanceof UserError) return NextResponse.json({ error: err.message }, { status: 409 });
-    console.error("[admin dispute]", err);
+    await logError(err, { route: "POST /api/admin/disputes/[id]", userId: user.id, disputeId: dispute.id, decision: b.decision });
     return NextResponse.json({ error: "Couldn't complete the decision. Check Stripe and try again." }, { status: 500 });
   }
   return NextResponse.json({ ok: true });
