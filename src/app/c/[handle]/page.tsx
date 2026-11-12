@@ -13,6 +13,7 @@ import { loadReviews, loadTrust } from "@/lib/review-data";
 import { BadgeRow, TrustPanel } from "@/components/TrustPanel";
 import ReviewCard from "@/components/ReviewCard";
 import ReportButton from "@/components/ReportButton";
+import Comments, { type CommentRow } from "@/components/Comments";
 import { Stars } from "@/components/Stars";
 
 type Params = { params: Promise<{ handle: string }> };
@@ -50,6 +51,17 @@ export default async function CreatorPage({ params }: Params) {
 
   const [{ trust, badges }, reviews] = await Promise.all([loadTrust(supabase, creator.id), loadReviews(supabase, creator.id, user?.id ?? null, 3)]);
   const { data: blockRow } = user && !isOwner ? await supabase.from("blocks").select("blocked_id").eq("blocker_id", user.id).eq("blocked_id", creator.id).maybeSingle() : { data: null };
+  // Community comments (hidden if the creator switched them off).
+  let comments: CommentRow[] = [];
+  let liked: number[] = [];
+  if (creator.show_comments) {
+    const { data: cs } = await supabase.from("comments").select("id, parent_id, author_id, body, like_count, created_at, author:profiles!comments_author_id_fkey(display_name, handle, role, avatar_source, avatar_pattern, avatar_url)").eq("creator_id", creator.id).order("created_at", { ascending: false }).limit(100);
+    comments = (cs as unknown as CommentRow[]) ?? [];
+    if (user && comments.length) {
+      const { data: ls } = await supabase.from("comment_likes").select("comment_id").eq("profile_id", user.id).in("comment_id", comments.map((c) => c.id));
+      liked = (ls ?? []).map((l) => l.comment_id as number);
+    }
+  }
   const shownBadges = creator.show_badges ? badges : badges.filter((b) => b === "verified_socials");
   const services = (servicesData as Service[]) ?? [];
   const socials = (socialsData as Social[]) ?? [];
@@ -236,6 +248,8 @@ export default async function CreatorPage({ params }: Params) {
               </ul>
             </section>
           )}
+
+          {creator.show_comments && <Comments creatorId={creator.id} creatorName={creator.display_name ?? "this creator"} viewerId={user?.id ?? null} initial={comments} liked={liked} />}
 
           <section className="panel p-6" aria-labelledby="rev-title">
             <div className="flex items-center justify-between">

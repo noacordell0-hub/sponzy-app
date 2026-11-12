@@ -60,9 +60,12 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
 
   return (
     <AppShell profile={profile} active="browse" wide>
-      <div className="mb-8">
-        <h1 className="on-bg text-3xl font-extrabold tracking-[-0.03em]">Discover creators</h1>
-        <p className="on-bg-muted mt-1.5 text-[15px] text-body">Clear prices, verified reach, and payment held until the work is approved.</p>
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="on-bg text-3xl font-extrabold tracking-[-0.03em]">Discover creators</h1>
+          <p className="on-bg-muted mt-1.5 text-[15px] text-body">Clear prices, verified reach, and payment held until the work is approved.</p>
+        </div>
+        <Link href="/leaderboard" className="btn btn-ghost min-h-10 px-4 text-sm">🏆 Leaderboard</Link>
       </div>
       <div className="grid items-start gap-6 lg:grid-cols-[280px_1fr]">
         <Suspense fallback={<div className="panel h-40" />}>
