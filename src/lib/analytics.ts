@@ -38,6 +38,8 @@ function visitorId() {
 }
 
 export function track(name: EventName, props: Props = {}) {
+  // Automated browsers (test runs, scrapers) announce themselves; don't count them as visitors.
+  if (typeof navigator !== "undefined" && navigator.webdriver) return;
   captureUtm(); // make sure the first event of a visit already knows where it came from
   props = { ...activeExperiments(), ...props }; // which A/B variant this visitor sees (only for running tests)
   try {
