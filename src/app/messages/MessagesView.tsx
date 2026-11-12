@@ -1,5 +1,6 @@
 "use client";
 
+import ReportButton from "@/components/ReportButton";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -186,6 +187,7 @@ function Conversation({
             </span>
           </span>
         </Link>
+        <ReportButton targetType="profile" targetId={other.id} ownerId={other.id} ownerName={other.display_name ?? "them"} viewerId={me} />
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto bg-[#FBFAFF] px-4 py-5" aria-live="polite">

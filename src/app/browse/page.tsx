@@ -37,6 +37,8 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
     p_young_only: sp.young === "1",
     p_bookable_only: sp.bookable === "1",
     p_sort: sp.sort || "recommended",
+    p_top_rated: sp.top === "1",
+    p_on_time_pro: sp.ontime === "1",
     p_limit: PAGE + 1,
     p_offset: (page - 1) * PAGE,
   });

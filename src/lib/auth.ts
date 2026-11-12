@@ -29,6 +29,8 @@ export type Profile = {
   website: string | null;
   budget: string | null;
   payouts_ready: boolean;
+  banned_at: string | null;
+  ban_until: string | null;
 };
 
 export type Social = {

@@ -16,5 +16,6 @@ export async function GET(request: Request) {
   // Reveal reviews whose 14-day window passed, then recompute every trust score (streaks, badges, levels).
   const { data: revealed } = await admin.rpc("reveal_due_reviews");
   const { data: refreshed } = await admin.rpc("refresh_all_trust");
-  return NextResponse.json({ approved, payoutsConfirmed, revealed, refreshed });
+  const { data: unsuspended } = await admin.rpc("lift_expired_suspensions");
+  return NextResponse.json({ approved, payoutsConfirmed, revealed, refreshed, unsuspended });
 }

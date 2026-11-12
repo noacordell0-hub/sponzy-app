@@ -6,6 +6,7 @@ import { Icon, type IconName } from "@/components/Icons";
 import AccountMenu from "@/components/AccountMenu";
 import type { Profile } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import WarningNotice from "@/components/WarningNotice";
 
 type Tab = { href: string; label: string; short: string; key: string; icon: IconName };
 
@@ -46,11 +47,17 @@ export async function AppShell({
 }) {
   const tabs = tabsFor(profile);
   let unread = 0;
+  let warning: { id: number; note: string | null; created_at: string } | null = null;
   if (profile) {
     const supabase = await createClient();
-    const { data } = await supabase.rpc("unread_total");
+    const [{ data }, { data: warn }] = await Promise.all([
+      supabase.rpc("unread_total"),
+      supabase.from("moderation_actions").select("id, note, created_at").eq("profile_id", profile.id).eq("action", "warning").is("acknowledged_at", null).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+    ]);
     unread = Number(data) || 0;
+    warning = warn;
   }
+  const until = profile?.ban_until ? new Date(profile.ban_until).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : null;
   const width = wide ? "max-w-[1200px]" : "max-w-[1100px]";
   const menuItems: { href: string; label: string; icon: IconName }[] = [
     { href: "/settings/account", label: "Account and profile", icon: "user" },
@@ -109,7 +116,16 @@ export async function AppShell({
           </div>
         </header>
 
-        <main className={`page-in mx-auto ${width} px-4 pb-28 pt-8 sm:px-8 md:pb-12 md:pt-10`}>{children}</main>
+        <main className={`page-in mx-auto ${width} px-4 pb-28 pt-8 sm:px-8 md:pb-12 md:pt-10`}>
+          {profile?.banned_at && (
+            <div role="alert" className="mb-6 rounded-2xl border border-[#F2B8C6] bg-[#FFF5F7] px-5 py-4 text-sm text-[#7A1236]">
+              <b>{until ? `Your account is suspended until ${until}.` : "Your account has been removed from Clouta."}</b>{" "}
+              Your profile is hidden and you can&apos;t message, book or sell{until ? " until then" : ""}. Any active orders were refunded. If you think this is a mistake, contact the Clouta team.
+            </div>
+          )}
+          {warning && !profile?.banned_at && <WarningNotice id={warning.id} note={warning.note} />}
+          {children}
+        </main>
 
         {/* Phone tab bar */}
         {profile && (

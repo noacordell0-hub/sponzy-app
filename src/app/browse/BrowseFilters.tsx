@@ -61,6 +61,7 @@ export default function BrowseFilters() {
           <option value="recommended">Recommended</option>
           <option value="price_asc">Price: low to high</option>
           <option value="price_desc">Price: high to low</option>
+          <option value="rating">Highest rated</option>
           <option value="followers">Most verified followers</option>
           <option value="newest">Newest</option>
         </select>
@@ -119,6 +120,8 @@ export default function BrowseFilters() {
         <legend className="mb-1 text-xs font-bold uppercase tracking-[0.08em] text-ink-2">Badges</legend>
         {(
           [
+            ["top", "Top Rated (4.8+, 10+ reviews)"],
+            ["ontime", "On-Time Pro"],
             ["verified", "Verified socials"],
             ["founding", "Founding Creator"],
             ["young", "Young entrepreneur"],

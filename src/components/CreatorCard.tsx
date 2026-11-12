@@ -20,10 +20,20 @@ export function CreatorCard({ c, saved, viewerId }: { c: CreatorResult; saved: b
         </div>
         <div className="min-w-0">
           <p className="truncate text-[17px] font-bold group-hover:text-violet-deep">{c.display_name}</p>
-          <p className="truncate text-[13px] text-ink-2">@{c.handle}</p>
+          <p className="truncate text-[13px] text-ink-2">
+            @{c.handle}
+            {c.review_count > 0 && (
+              <span className="ml-1.5 font-semibold text-ink">
+                <span className="text-[#F5B400]" aria-hidden="true">★</span> {Number(c.avg_rating).toFixed(1)}
+                <span className="font-normal text-ink-2"> ({c.review_count})</span>
+              </span>
+            )}
+          </p>
         </div>
         {c.tagline && <p className="line-clamp-2 text-sm leading-relaxed text-body">{c.tagline}</p>}
         <div className="flex flex-wrap gap-1.5">
+          {c.badges?.includes("top_rated") && <span className="badge-gold rounded-md px-2 py-0.5 text-[11px] font-semibold">♛ Top Rated</span>}
+          {c.badges?.includes("on_time_pro") && <span className="rounded-md bg-ok-bg px-2 py-0.5 text-[11px] font-semibold text-ok">⏱ On-Time Pro</span>}
           {c.is_founding && <span className="badge-gold rounded-md px-2 py-0.5 text-[11px] font-semibold">Founding</span>}
           {c.has_verified && <span className="rounded-md bg-ok-bg px-2 py-0.5 text-[11px] font-semibold text-ok">✓ Verified</span>}
           {c.young_tag && <span className="badge-violet rounded-md px-2 py-0.5 text-[11px] font-semibold">Young entrepreneur</span>}

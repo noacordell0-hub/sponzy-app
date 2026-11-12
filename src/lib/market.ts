@@ -22,6 +22,9 @@ export type CreatorResult = {
   has_verified: boolean;
   main_platform: PlatformKey | null;
   published_at: string;
+  avg_rating: number | null;
+  review_count: number;
+  badges: string[];
 };
 
 export type Service = {

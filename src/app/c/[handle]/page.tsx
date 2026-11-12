@@ -12,6 +12,7 @@ import type { Post, Service } from "@/lib/market";
 import { loadReviews, loadTrust } from "@/lib/review-data";
 import { BadgeRow, TrustPanel } from "@/components/TrustPanel";
 import ReviewCard from "@/components/ReviewCard";
+import ReportButton from "@/components/ReportButton";
 import { Stars } from "@/components/Stars";
 
 type Params = { params: Promise<{ handle: string }> };
@@ -48,6 +49,7 @@ export default async function CreatorPage({ params }: Params) {
     : { data: [] as Service[] };
 
   const [{ trust, badges }, reviews] = await Promise.all([loadTrust(supabase, creator.id), loadReviews(supabase, creator.id, user?.id ?? null, 3)]);
+  const { data: blockRow } = user && !isOwner ? await supabase.from("blocks").select("blocked_id").eq("blocker_id", user.id).eq("blocked_id", creator.id).maybeSingle() : { data: null };
   const shownBadges = creator.show_badges ? badges : badges.filter((b) => b === "verified_socials");
   const services = (servicesData as Service[]) ?? [];
   const socials = (socialsData as Social[]) ?? [];
@@ -111,6 +113,12 @@ export default async function CreatorPage({ params }: Params) {
           </div>
         </div>
       </section>
+
+      {!isOwner && (
+        <div className="mt-2 flex justify-end">
+          <ReportButton targetType="profile" targetId={creator.id} ownerId={creator.id} ownerName={creator.display_name} viewerId={user?.id ?? null} blocked={Boolean(blockRow)} />
+        </div>
+      )}
 
       <div className="mt-6 grid items-start gap-6 lg:grid-cols-[1fr_400px]">
         {/* Services */}

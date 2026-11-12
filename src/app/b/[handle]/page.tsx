@@ -9,6 +9,7 @@ import { PLATFORMS, formatFollowers, profileUrl } from "@/lib/platforms";
 import { loadReviews, loadTrust } from "@/lib/review-data";
 import { TrustPanel } from "@/components/TrustPanel";
 import ReviewCard from "@/components/ReviewCard";
+import ReportButton from "@/components/ReportButton";
 
 type Params = { params: Promise<{ handle: string }> };
 
@@ -31,6 +32,7 @@ export default async function BrandPage({ params }: Params) {
   const isOwner = user?.id === brand.id;
   const { data: socialsData } = await supabase.from("social_accounts").select("*").eq("profile_id", brand.id).order("followers", { ascending: false });
   const socials = (socialsData as Social[]) ?? [];
+  const { data: blockRow } = user && !isOwner ? await supabase.from("blocks").select("blocked_id").eq("blocker_id", user.id).eq("blocked_id", brand.id).maybeSingle() : { data: null };
   const [{ trust }, reviews] = await Promise.all([loadTrust(supabase, brand.id), loadReviews(supabase, brand.id, user?.id ?? null, 5)]);
   const theme = THEMES[brand.theme] ?? THEMES.violet;
   let site: string | null = null;
@@ -75,6 +77,12 @@ export default async function BrandPage({ params }: Params) {
           )}
         </div>
       </section>
+
+      {!isOwner && (
+        <div className="mt-2 flex justify-end">
+          <ReportButton targetType="profile" targetId={brand.id} ownerId={brand.id} ownerName={brand.display_name} viewerId={user?.id ?? null} blocked={Boolean(blockRow)} />
+        </div>
+      )}
 
       <div className="mt-6 grid items-start gap-6 lg:grid-cols-[1fr_320px]">
         <div className="flex flex-col gap-6">

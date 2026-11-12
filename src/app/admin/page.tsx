@@ -14,13 +14,15 @@ export default async function AdminHome() {
   const admin = getSupabaseAdmin();
   if (!admin) notFound();
   const count = async (q: PromiseLike<{ count: number | null }>) => (await q).count ?? 0;
-  const [disputes, verifications, users, activeOrders] = await Promise.all([
+  const [reports, disputes, verifications, users, activeOrders] = await Promise.all([
+    count(admin.from("reports").select("id", { count: "exact", head: true }).eq("status", "open")),
     count(admin.from("disputes").select("id", { count: "exact", head: true }).eq("status", "open")),
     count(admin.from("social_accounts").select("id", { count: "exact", head: true }).eq("verified", false).not("verify_requested_at", "is", null)),
     count(admin.from("profiles").select("id", { count: "exact", head: true }).not("onboarded_at", "is", null)),
     count(admin.from("orders").select("id", { count: "exact", head: true }).in("status", ["funded", "in_progress", "proof_submitted", "revision_requested", "disputed"])),
   ]);
   const cards = [
+    { label: "Open reports", value: reports, href: "/admin/reports", urgent: reports > 0 },
     { label: "Open disputes", value: disputes, href: "/admin/disputes", urgent: disputes > 0 },
     { label: "Verifications waiting", value: verifications, href: "/admin/verifications", urgent: verifications > 0 },
     { label: "Active orders", value: activeOrders, href: null, urgent: false },
@@ -29,7 +31,7 @@ export default async function AdminHome() {
   return (
     <AppShell profile={profile} active="admin">
       <AdminHeader title="Admin" active="overview" />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {cards.map((c) => {
           const inner = (
             <>

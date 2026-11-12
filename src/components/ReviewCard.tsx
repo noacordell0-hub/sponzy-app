@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Stars } from "@/components/Stars";
 import type { Review } from "@/lib/trust";
+import ReportButton from "@/components/ReportButton";
 
 type Props = {
   review: Review;
@@ -106,6 +107,9 @@ export default function ReviewCard({ review, authorName, reply, subjectName, vie
         ) : (
           count > 0 && <span className="text-ink-2">{count} found this helpful</span>
         )}
+        <span className="ml-auto">
+          <ReportButton targetType="review" targetId={review.id} ownerId={review.author_id} ownerName={authorName} viewerId={viewerId} />
+        </span>
         {isSubject && !reply && !replying && (
           <button type="button" onClick={() => setReplying(true)} className="font-semibold text-violet-deep">
             Reply publicly
