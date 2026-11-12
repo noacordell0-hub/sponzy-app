@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { SITE_URL } from "@/lib/site";
-import { Plus_Jakarta_Sans } from "next/font/google";
+import { Instrument_Serif, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
 import { Intro } from "@/components/Intro";
@@ -8,6 +8,9 @@ import NavProgress from "@/components/NavProgress";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import AnalyticsProvider from "@/components/AnalyticsProvider";
+
+// Editorial serif for big headlines; Plus Jakarta Sans stays for everything else.
+const serif = Instrument_Serif({ variable: "--font-serif", subsets: ["latin"], weight: "400", style: ["normal", "italic"] });
 
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -42,7 +45,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           }}
         />
       </head>
-      <body className={`${jakarta.variable} antialiased`}>
+      <body className={`${jakarta.variable} ${serif.variable} antialiased`}>
         <Intro />
         <Suspense fallback={null}>
           <NavProgress />

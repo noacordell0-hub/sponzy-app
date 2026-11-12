@@ -28,6 +28,7 @@
   --color-err: var(--err);
   --color-err-bg: var(--err-bg);
   --font-sans: var(--font-jakarta), system-ui, sans-serif;
+  --font-serif: var(--font-serif), Georgia, "Times New Roman", serif;
   --radius-card: 20px;
   --radius-row: 14px;
   --radius-btn: 12px;
@@ -66,20 +67,35 @@ body {
   border-radius: var(--radius-btn);
   font-weight: 700;
   color: #fff;
-  background: linear-gradient(180deg, #7655ff, #5b3df5);
-  box-shadow: 0 1px 2px rgba(21, 19, 31, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s;
+  /* Flat colour with a solid "pressable" edge instead of a glossy gradient. */
+  background: var(--violet-deep);
+  border: 1px solid #3f25c9;
+  box-shadow: 0 2px 0 #2c1896;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.15s;
   cursor: pointer;
 }
-.btn:hover { filter: brightness(1.08); }
-.btn:active { transform: scale(0.97); }
+.btn:hover { background: #4f31ec; }
+.btn:active { transform: translateY(2px); box-shadow: 0 0 0 #2c1896; }
 .btn:disabled { opacity: 0.6; cursor: progress; }
 .btn-ghost {
   background: #fff;
   color: #4a2fd0;
-  border: 1px solid rgba(21, 19, 31, 0.12);
-  box-shadow: none;
+  border: 1px solid rgba(21, 19, 31, 0.16);
+  box-shadow: 0 2px 0 rgba(21, 19, 31, 0.08);
 }
+.btn-ghost:hover { background: #f7f5ff; }
+
+/* ---- Landing page: warm paper, ink rules, editorial serif ---- */
+.paper { background: #f7f4ee; }
+.font-display { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.01em; }
+.rule { border-color: rgba(21, 19, 31, 0.14); }
+/* Hand-drawn underline under a headline word */
+.scribble { position: relative; white-space: nowrap; }
+.scribble svg { position: absolute; left: -2%; bottom: -0.12em; width: 104%; height: 0.32em; overflow: visible; }
+/* Slightly tilted "sticker" */
+.sticker { transform: rotate(-3deg); }
+/* Dashed-edge ticket for the Founding offer */
+.ticket { background: #fff; border: 1.5px dashed rgba(21, 19, 31, 0.28); border-radius: 18px; }
 
 
 /* Page rise-in */

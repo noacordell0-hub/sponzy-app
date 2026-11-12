@@ -20,7 +20,7 @@ export default function EarningsCalculator() {
   }, [price, perMonth, yearly]);
 
   return (
-    <div className="panel grid gap-8 p-6 sm:p-8 md:grid-cols-[1.2fr_1fr] md:items-center">
+    <div className="grid gap-8 rounded-2xl border border-black/[.14] bg-white p-6 sm:p-8 md:grid-cols-[1.2fr_1fr] md:items-center">
       <div className="flex flex-col gap-7">
         <div>
           <div className="flex items-baseline justify-between">
@@ -59,9 +59,9 @@ export default function EarningsCalculator() {
           />
         </div>
       </div>
-      <div className="rounded-2xl bg-[linear-gradient(135deg,#1B1446,#3A26A8)] p-6 text-white" aria-live="polite">
+      <div className="rounded-2xl bg-ink p-6 text-white" aria-live="polite">
         <p className="text-sm font-semibold text-[#D9D3FF]">You could earn</p>
-        <p className="mt-1 text-[clamp(36px,5vw,48px)] font-extrabold leading-none tracking-[-0.03em]">
+        <p className="font-display mt-1 text-[clamp(48px,7vw,64px)] leading-none">
           ${yearly.toLocaleString()}
         </p>
         <p className="mt-1 text-sm text-[#D9D3FF]">a year from brand deals, before fees</p>
