@@ -28,6 +28,7 @@ export type Profile = {
   onboarded_at: string | null;
   website: string | null;
   budget: string | null;
+  payouts_ready: boolean;
 };
 
 export type Social = {

@@ -197,7 +197,7 @@ function Conversation({
         </div>
         <div className="flex flex-col gap-2.5">
           {messages.map((m) => (
-            <Bubble key={m.id} m={m} me={me} />
+            <Bubble key={m.id} m={m} me={me} iAmBrand={other.role === "creator"} />
           ))}
         </div>
         <div ref={endRef} />
@@ -247,12 +247,12 @@ function Conversation({
   );
 }
 
-function Bubble({ m, me }: { m: Message; me: string }) {
+function Bubble({ m, me, iAmBrand }: { m: Message; me: string; iAmBrand: boolean }) {
   if (m.kind === "system") {
     return <p className="mx-auto max-w-md rounded-full bg-ok-bg px-3 py-1.5 text-center text-xs font-semibold text-ok">{m.body}</p>;
   }
   const mine = m.sender_id === me;
-  if (m.kind === "offer" && m.offer) return <OfferCard m={m} mine={mine} />;
+  if (m.kind === "offer" && m.offer) return <OfferCard m={m} mine={mine} iAmBrand={iAmBrand} />;
   return (
     <div className={`flex flex-col ${mine ? "items-end" : "items-start"}`}>
       <p
@@ -267,7 +267,7 @@ function Bubble({ m, me }: { m: Message; me: string }) {
   );
 }
 
-function OfferCard({ m, mine }: { m: Message; mine: boolean }) {
+function OfferCard({ m, mine, iAmBrand }: { m: Message; mine: boolean; iAmBrand: boolean }) {
   const supabase = useMemo(() => createClient(), []);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -318,7 +318,14 @@ function OfferCard({ m, mine }: { m: Message; mine: boolean }) {
             )}
           </div>
         )}
-        {m.offer_status === "accepted" && <p className="mt-3 rounded-lg bg-ok-bg px-3 py-2 text-xs font-semibold text-ok">Accepted. Checkout opens when payments launch.</p>}
+        {m.offer_status === "accepted" &&
+          (iAmBrand ? (
+            <Link href={`/checkout/offer/${m.id}`} className="btn mt-3 min-h-10 w-full text-sm">
+              Check out · {money(o.price_cents)}
+            </Link>
+          ) : (
+            <p className="mt-3 rounded-lg bg-ok-bg px-3 py-2 text-xs font-semibold text-ok">Accepted. The brand can now check out, and you&apos;ll see the order in Orders.</p>
+          ))}
         {error && (
           <p role="alert" className="mt-2 text-xs font-semibold text-err">
             {error}

@@ -12,7 +12,8 @@ function tabsFor(profile: Profile | null): Tab[] {
   if (!profile) return tabs;
   if (profile.role === "creator") tabs.push({ href: "/post/edit", label: "My shop", key: "shop" });
   if (profile.role === "brand") tabs.push({ href: "/brand", label: "Dashboard", key: "dashboard" });
-  tabs.push({ href: "/messages", label: "Messages", key: "messages" });
+  tabs.push({ href: "/messages", label: "Messages", key: "messages" }, { href: "/orders", label: "Orders", key: "orders" });
+  if (profile.role === "creator") tabs.push({ href: "/earnings", label: "Earnings", key: "earnings" });
   tabs.push({ href: "/settings/account", label: "Account", key: "account" }, { href: "/settings", label: "Settings", key: "settings" });
   if (profile.is_admin) tabs.push({ href: "/admin/verifications", label: "Admin", key: "admin" });
   return tabs;

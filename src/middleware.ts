@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const SIGNED_IN_ONLY = ["/settings", "/onboarding", "/admin", "/post", "/brand", "/messages"];
+const SIGNED_IN_ONLY = ["/settings", "/onboarding", "/admin", "/post", "/brand", "/messages", "/checkout", "/orders", "/earnings"];
 
 /** Refreshes the login session on every request and guards signed-in pages. */
 export async function middleware(request: NextRequest) {
@@ -36,5 +36,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/waitlist|.*\\.(?:png|jpg|jpeg|svg|webp|ico)$).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api/waitlist|api/stripe/webhook|api/cron|.*\\.(?:png|jpg|jpeg|svg|webp|ico)$).*)"],
 };

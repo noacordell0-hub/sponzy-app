@@ -122,9 +122,15 @@ export default async function CreatorPage({ params }: Params) {
                 </div>
                 {s.is_bundle && <span className="badge-violet self-start rounded-md px-2 py-0.5 text-[11px] font-semibold">Bundle</span>}
                 {s.includes && <p className="text-sm leading-relaxed text-body">{s.includes}</p>}
-                <button type="button" disabled className="btn min-h-11 text-sm" title="Booking opens when payments launch">
-                  Book · opens soon
-                </button>
+                {isOwner ? null : creator.payouts_ready && creator.taking_bookings ? (
+                  <Link href={`/checkout/${s.id}`} className="btn min-h-11 text-sm" style={{ background: theme.button, color: theme.text }}>
+                    Book · {money(s.price_cents)}
+                  </Link>
+                ) : (
+                  <button type="button" disabled className="btn min-h-11 text-sm" title={creator.taking_bookings ? "This creator hasn't finished payout setup yet" : "Fully booked right now"}>
+                    {creator.taking_bookings ? "Booking opens soon" : "Fully booked"}
+                  </button>
+                )}
               </div>
             ))
           )}
