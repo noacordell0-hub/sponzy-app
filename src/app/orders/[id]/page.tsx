@@ -9,6 +9,7 @@ import { money } from "@/lib/format";
 import { autoApproveDue, type Order } from "@/lib/orders";
 import { STATUS_LABEL, STATUS_STYLE } from "@/lib/order-status";
 import OrderActions from "./OrderActions";
+import { REVIEW_WINDOW_DAYS } from "@/lib/trust";
 
 export const metadata: Metadata = { title: "Order · Clouta" };
 
@@ -21,7 +22,7 @@ const STEPS = [
 ];
 const RANK: Record<string, number> = { awaiting_payment: -1, funded: 0, in_progress: 1, revision_requested: 1, proof_submitted: 2, approved: 3, paid: 4 };
 
-export default async function OrderPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ paid?: string; checkout?: string }> }) {
+export default async function OrderPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ paid?: string; checkout?: string; reviewed?: string }> }) {
   const { id } = await params;
   const sp = await searchParams;
   const { supabase, user, profile } = await requireProfile();
@@ -39,6 +40,21 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
     supabase.from("order_events").select("kind, note, created_at").eq("order_id", order.id).order("created_at"),
   ]);
   const rank = RANK[order.status] ?? -1;
+
+  // Review prompt (double-blind): what I've written, and whether the other side has reviewed (not what they wrote).
+  let reviewState: null | { mine: boolean; theirs: boolean; revealed: boolean; open: boolean; closes: Date } = null;
+  if (["approved", "paid"].includes(order.status) && order.approved_at && admin) {
+    const { data: rs } = await admin.from("reviews").select("author_id, revealed_at").eq("order_id", order.id);
+    const closes = new Date(new Date(order.approved_at).getTime() + REVIEW_WINDOW_DAYS * 864e5);
+    const mine = (rs ?? []).find((r) => r.author_id === user.id);
+    reviewState = {
+      mine: Boolean(mine),
+      theirs: (rs ?? []).some((r) => r.author_id !== user.id),
+      revealed: Boolean(mine?.revealed_at),
+      open: Date.now() < closes.getTime(),
+      closes,
+    };
+  }
   const closed = ["cancelled", "refunded", "disputed"].includes(order.status);
   const payout = order.price_cents - order.creator_fee_cents;
   const fmtDate = (d: string) => new Date(d.length === 10 ? d + "T00:00:00" : d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
@@ -53,6 +69,11 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
       {sp.paid && order.status !== "awaiting_payment" && !closed && (
         <p role="status" className="mb-5 rounded-2xl bg-ok-bg px-5 py-4 text-sm font-semibold text-ok">
           Paid! Your money is held by Clouta until you approve the work.
+        </p>
+      )}
+      {sp.reviewed && (
+        <p role="status" className="mb-5 rounded-2xl bg-ok-bg px-5 py-4 text-sm font-semibold text-ok">
+          {sp.reviewed === "revealed" ? "Thanks! Both reviews are now public." : "Thanks! Your review is saved and stays hidden until the other side leaves theirs."}
         </p>
       )}
       {sp.checkout === "cancelled" && order.status === "awaiting_payment" && (
@@ -83,6 +104,34 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_340px]">
         <div className="flex flex-col gap-6">
           <OrderActions order={order} isBrand={isBrand} otherName={other?.display_name ?? "the other side"} />
+
+          {reviewState && (reviewState.open || reviewState.mine) && (
+            <section className="panel flex flex-col gap-3 border-[#F2D58A] p-6 sm:flex-row sm:items-center" aria-labelledby="rev-t">
+              <div className="flex-1">
+                <h2 id="rev-t" className="text-lg font-bold">
+                  {!reviewState.mine ? `How was working with ${other?.display_name ?? "them"}?` : reviewState.revealed ? "Reviews are public" : "Your review is in"}
+                </h2>
+                <p className="mt-1 text-sm text-body">
+                  {!reviewState.mine
+                    ? reviewState.theirs
+                      ? `${other?.display_name ?? "They"} already left a review. Leave yours and both go public.`
+                      : `Reviews are double-blind: neither of you sees the other's until both are in. Open until ${fmtDate(reviewState.closes.toISOString())}.`
+                    : reviewState.revealed
+                      ? "Both reviews are visible on your profiles."
+                      : `It stays hidden until ${other?.display_name ?? "they"} reviews you, or until ${fmtDate(reviewState.closes.toISOString())}.`}
+                </p>
+              </div>
+              {!reviewState.mine ? (
+                <Link href={`/orders/${order.id}/review`} className="btn min-h-11 px-5 text-sm">
+                  ⭐ Leave a review
+                </Link>
+              ) : reviewState.revealed && other ? (
+                <Link href={other.role === "brand" ? `/b/${other.handle}/reviews` : `/c/${other.handle}/reviews`} className="btn btn-ghost min-h-11 px-5 text-sm">
+                  See reviews
+                </Link>
+              ) : null}
+            </section>
+          )}
 
           {order.proof_links.length > 0 && (
             <section className="panel p-6" aria-labelledby="proof-t">

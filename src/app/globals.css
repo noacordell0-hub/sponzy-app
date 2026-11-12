@@ -352,3 +352,6 @@ textarea.input { padding: 12px 16px; min-height: 96px; line-height: 1.5; }
 @media (prefers-reduced-motion: reduce) {
   .sk, .menu-pop, .page-in { animation: none !important; }
 }
+
+/* Flat hexagon badge icon (static gradient, no animation). */
+.hex { clip-path: polygon(25% 4%, 75% 4%, 100% 50%, 75% 96%, 25% 96%, 0 50%); background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.4)); }

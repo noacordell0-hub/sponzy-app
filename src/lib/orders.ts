@@ -2,6 +2,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getStripe, FEES } from "@/lib/stripe";
 import { money } from "@/lib/format";
+import { refreshOrderTrust } from "@/lib/reviews";
 
 export type OrderStatus =
   | "awaiting_payment" | "funded" | "in_progress" | "proof_submitted" | "revision_requested"
@@ -110,8 +111,10 @@ export async function approveOrder(admin: SupabaseClient, order: Order, actorId:
   if (!updated) return { ok: false };
   await logOrder(admin, updated, auto ? "auto_approved" : "approved", actorId,
     auto ? `No response within ${FEES.reviewWindowDays} days, so the work was approved automatically.` : "The brand approved the work.",
-    auto ? `The ${FEES.reviewWindowDays}-day review window ended, so the work was approved automatically.` : "The brand approved the work. 🎉");
+    (auto ? `The ${FEES.reviewWindowDays}-day review window ended, so the work was approved automatically.` : "The brand approved the work. 🎉") +
+      ` You can both leave a review from the order page within 14 days. Reviews stay hidden until you've both left one.`);
   await payCreator(admin, updated, actorId);
+  await refreshOrderTrust(admin, updated);
   return { ok: true };
 }
 

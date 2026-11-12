@@ -6,6 +6,9 @@ import { AppShell } from "@/components/AppShell";
 import { Avatar } from "@/components/Avatar";
 import { THEMES } from "@/lib/look";
 import { PLATFORMS, formatFollowers, profileUrl } from "@/lib/platforms";
+import { loadReviews, loadTrust } from "@/lib/review-data";
+import { TrustPanel } from "@/components/TrustPanel";
+import ReviewCard from "@/components/ReviewCard";
 
 type Params = { params: Promise<{ handle: string }> };
 
@@ -28,6 +31,7 @@ export default async function BrandPage({ params }: Params) {
   const isOwner = user?.id === brand.id;
   const { data: socialsData } = await supabase.from("social_accounts").select("*").eq("profile_id", brand.id).order("followers", { ascending: false });
   const socials = (socialsData as Social[]) ?? [];
+  const [{ trust }, reviews] = await Promise.all([loadTrust(supabase, brand.id), loadReviews(supabase, brand.id, user?.id ?? null, 5)]);
   const theme = THEMES[brand.theme] ?? THEMES.violet;
   let site: string | null = null;
   try {
@@ -95,23 +99,29 @@ export default async function BrandPage({ params }: Params) {
             )}
           </section>
           <section className="panel p-6" aria-labelledby="b-reviews">
-            <h2 id="b-reviews" className="eyebrow">
-              What creators say
-            </h2>
-            <p className="mt-3 text-sm text-body">Reviews appear here after this brand completes paid collabs on Clouta.</p>
+            <div className="flex items-center justify-between">
+              <h2 id="b-reviews" className="eyebrow">
+                What creators say
+              </h2>
+              {trust && trust.review_count > 5 && (
+                <Link href={`/b/${brand.handle}/reviews`} className="text-sm font-semibold text-violet-deep">
+                  See all {trust.review_count} →
+                </Link>
+              )}
+            </div>
+            {reviews.length === 0 ? (
+              <p className="mt-3 text-sm text-body">Reviews appear here after this brand completes paid collabs on Clouta.</p>
+            ) : (
+              <div className="divide-y divide-black/[.06]">
+                {reviews.map((r) => (
+                  <ReviewCard key={r.review.id} review={r.review} authorName={r.authorName} reply={r.reply} subjectName={brand.display_name} viewerId={user?.id ?? null} votedInitially={r.voted} />
+                ))}
+              </div>
+            )}
           </section>
         </div>
         <div className="flex flex-col gap-6">
-          <section className="panel p-6" aria-labelledby="b-trust">
-            <h2 id="b-trust" className="eyebrow">
-              Brand trust score
-            </h2>
-            <div className="mt-3 flex items-center gap-3">
-              <b className="text-3xl tracking-[-0.03em]">New</b>
-              <span className="badge-violet rounded-full px-2.5 py-1 text-xs font-semibold">No orders yet</span>
-            </div>
-            <p className="mt-2 text-xs text-ink-2">Scores start after 3 completed orders, from paying on time, approval speed and disputes.</p>
-          </section>
+          <TrustPanel trust={trust} role="brand" reviewsHref={`/b/${brand.handle}/reviews`} />
           {socials.length > 0 && (
             <section className="panel p-6" aria-labelledby="b-socials">
               <h2 id="b-socials" className="eyebrow">

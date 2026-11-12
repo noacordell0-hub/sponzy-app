@@ -9,6 +9,10 @@ import { THEMES } from "@/lib/look";
 import { PLATFORMS, formatFollowers, profileUrl } from "@/lib/platforms";
 import { money } from "@/lib/format";
 import type { Post, Service } from "@/lib/market";
+import { loadReviews, loadTrust } from "@/lib/review-data";
+import { BadgeRow, TrustPanel } from "@/components/TrustPanel";
+import ReviewCard from "@/components/ReviewCard";
+import { Stars } from "@/components/Stars";
 
 type Params = { params: Promise<{ handle: string }> };
 
@@ -43,6 +47,8 @@ export default async function CreatorPage({ params }: Params) {
     ? await supabase.from("services").select("*").eq("post_id", post.id).order("position").order("id")
     : { data: [] as Service[] };
 
+  const [{ trust, badges }, reviews] = await Promise.all([loadTrust(supabase, creator.id), loadReviews(supabase, creator.id, user?.id ?? null, 3)]);
+  const shownBadges = creator.show_badges ? badges : badges.filter((b) => b === "verified_socials");
   const services = (servicesData as Service[]) ?? [];
   const socials = (socialsData as Social[]) ?? [];
   const main = socials.find((s) => s.is_main);
@@ -75,10 +81,16 @@ export default async function CreatorPage({ params }: Params) {
               @{creator.handle}
               {creator.location ? ` · ${creator.location}` : ""}
             </p>
+            {trust && trust.review_count > 0 && (
+              <Link href={`/c/${creator.handle}/reviews`} className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold hover:text-violet-deep">
+                <Stars value={Number(trust.avg_rating)} />
+                {Number(trust.avg_rating).toFixed(1)} <span className="font-normal text-ink-2">({trust.review_count})</span>
+              </Link>
+            )}
             {creator.tagline && <p className="mt-2 max-w-2xl text-[15px] text-body">{creator.tagline}</p>}
             <div className="mt-3 flex flex-wrap gap-1.5">
-              {creator.is_founding && creator.show_badges && <span className="badge-gold rounded-md px-2 py-0.5 text-xs font-semibold">Founding Creator</span>}
-              {verifiedFollowers > 0 && <span className="rounded-md bg-ok-bg px-2 py-0.5 text-xs font-semibold text-ok">✓ Verified socials</span>}
+              <BadgeRow codes={shownBadges} />
+              {verifiedFollowers > 0 && !shownBadges.includes("verified_socials") && <span className="rounded-md bg-ok-bg px-2 py-0.5 text-xs font-semibold text-ok">✓ Verified socials</span>}
               {creator.young_tag && <span className="badge-violet rounded-md px-2 py-0.5 text-xs font-semibold">Young entrepreneur</span>}
               {!creator.taking_bookings && <span className="rounded-md bg-[#FFF4D6] px-2 py-0.5 text-xs font-semibold text-[#7A5200]">Fully booked</span>}
             </div>
@@ -144,6 +156,7 @@ export default async function CreatorPage({ params }: Params) {
 
         {/* About, audience, socials */}
         <div className="flex flex-col gap-6 lg:order-1">
+          <TrustPanel trust={trust} role="creator" reviewsHref={`/c/${creator.handle}/reviews`} />
           {about && (
             <section className="panel p-6" aria-labelledby="about-title">
               <h2 id="about-title" className="eyebrow">
@@ -215,6 +228,28 @@ export default async function CreatorPage({ params }: Params) {
               </ul>
             </section>
           )}
+
+          <section className="panel p-6" aria-labelledby="rev-title">
+            <div className="flex items-center justify-between">
+              <h2 id="rev-title" className="eyebrow">
+                Reviews from brands
+              </h2>
+              {trust && trust.review_count > 3 && (
+                <Link href={`/c/${creator.handle}/reviews`} className="text-sm font-semibold text-violet-deep">
+                  See all {trust.review_count} →
+                </Link>
+              )}
+            </div>
+            {reviews.length === 0 ? (
+              <p className="mt-3 text-sm text-body">No reviews yet. Reviews appear after paid collabs, once both sides have left one.</p>
+            ) : (
+              <div className="divide-y divide-black/[.06]">
+                {reviews.map((r) => (
+                  <ReviewCard key={r.review.id} review={r.review} authorName={r.authorName} reply={r.reply} subjectName={creator.display_name} viewerId={user?.id ?? null} votedInitially={r.voted} />
+                ))}
+              </div>
+            )}
+          </section>
         </div>
       </div>
     </AppShell>
