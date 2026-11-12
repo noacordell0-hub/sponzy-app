@@ -110,7 +110,7 @@ export default function BrowseFilters() {
           {TIERS.map((t) => (
             <button key={t.key} type="button" aria-pressed={params.get("tier") === t.key} onClick={() => toggle("tier", t.key)} className={`${chip(params.get("tier") === t.key)} !rounded-xl py-1.5 text-left`}>
               <span className="block">{t.label}</span>
-              <span className="block text-[11px] font-medium opacity-70">{t.range}</span>
+              <span className="block text-[11px] font-medium">{t.range}</span>
             </button>
           ))}
         </div>

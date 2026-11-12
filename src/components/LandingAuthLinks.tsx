@@ -2,18 +2,16 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-
-/** Landing page header buttons: "Log in" for visitors, "Open Clouta" for people already signed in. */
+/**
+ * Landing page header buttons: "Log in" for visitors, "Open Clouta" for people already signed in.
+ * Checks for Supabase's login cookie instead of loading the Supabase library, which keeps
+ * about 75 KB of JavaScript off the landing page. (If the cookie is stale, /browse still works for visitors.)
+ */
 export default function LandingAuthLinks() {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Reads the saved session locally; no network request needed.
-    createClient()
-      .auth.getSession()
-      .then(({ data }) => setSignedIn(Boolean(data.session)))
-      .catch(() => setSignedIn(false));
+    setSignedIn(/(?:^|;\s*)sb-[^=]+-auth-token(?:\.0)?=/.test(document.cookie));
   }, []);
 
   if (signedIn) {
