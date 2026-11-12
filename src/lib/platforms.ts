@@ -7,6 +7,18 @@ export const PLATFORMS = {
   facebook: { label: "Facebook", short: "FB", color: "#1877F2" },
 } as const;
 
+export function profileUrl(platform: PlatformKey, handle: string) {
+  const h = encodeURIComponent(handle);
+  return {
+    tiktok: `https://www.tiktok.com/@${h}`,
+    instagram: `https://www.instagram.com/${h}/`,
+    youtube: `https://www.youtube.com/@${h}`,
+    x: `https://x.com/${h}`,
+    twitch: `https://www.twitch.tv/${h}`,
+    facebook: `https://www.facebook.com/${h}`,
+  }[platform];
+}
+
 export type PlatformKey = keyof typeof PLATFORMS;
 export const PLATFORM_KEYS = Object.keys(PLATFORMS) as PlatformKey[];
 

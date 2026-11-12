@@ -5,11 +5,12 @@ import { ShootingStars } from "@/components/Backdrop";
 import type { Profile } from "@/lib/auth";
 
 /** Header and background for signed-in pages. Deep space mode is a saved per-user setting. */
-export function AppShell({ profile, active, children }: { profile: Profile; active: "account" | "settings"; children: React.ReactNode }) {
+export function AppShell({ profile, active, children }: { profile: Profile; active: "account" | "settings" | "admin"; children: React.ReactNode }) {
   const tabs = [
     { href: "/settings/account", label: "Account", key: "account" },
     { href: "/settings", label: "Settings", key: "settings" },
-  ] as const;
+    ...(profile.is_admin ? ([{ href: "/admin/verifications", label: "Admin", key: "admin" }] as const) : []),
+  ];
   return (
     <div className={profile.deep_space ? "deep-space" : ""}>
       <ShootingStars />

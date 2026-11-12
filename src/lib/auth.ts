@@ -24,6 +24,7 @@ export type Profile = {
   show_rank: boolean;
   young_tag: boolean;
   is_founding: boolean;
+  is_admin: boolean;
   onboarded_at: string | null;
 };
 
@@ -34,6 +35,8 @@ export type Social = {
   followers: number;
   verified: boolean;
   is_main: boolean;
+  verify_code: string | null;
+  verify_requested_at: string | null;
 };
 
 /** Signed-in user plus profile. Redirects to login, or to onboarding if it isn't finished. */

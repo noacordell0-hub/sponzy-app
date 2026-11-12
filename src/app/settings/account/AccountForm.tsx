@@ -8,6 +8,7 @@ import SocialsEditor from "@/components/SocialsEditor";
 import { ToggleRow } from "@/components/Toggle";
 import { AVATAR_PATTERNS, THEMES, type ThemeKey } from "@/lib/look";
 import { PLATFORMS, formatFollowers } from "@/lib/platforms";
+import { prepareAvatar } from "@/lib/image";
 import type { Profile, Social } from "@/lib/auth";
 
 type Draft = { display_name: string; handle: string } & Pick<
@@ -51,17 +52,25 @@ export default function AccountForm({ profile, socials, isMinor }: { profile: Pr
   const isCreator = profile.role === "creator";
 
   async function upload(file: File) {
-    if (!["image/png", "image/jpeg", "image/webp"].includes(file.type)) return setMsg({ ok: false, text: "Use a PNG, JPG or WebP image." });
-    if (file.size > 2 * 1024 * 1024) return setMsg({ ok: false, text: "Images must be 2 MB or smaller." });
+    if (!file.type.startsWith("image/") && !/\.(heic|heif|avif|webp|jpe?g|png|gif|bmp)$/i.test(file.name)) {
+      return setMsg({ ok: false, text: "That file isn't an image." });
+    }
+    if (file.size > 25 * 1024 * 1024) return setMsg({ ok: false, text: "That image is over 25 MB. Try a smaller one." });
     setUploading(true);
-    const ext = file.type.split("/")[1].replace("jpeg", "jpg");
-    const path = `${profile.id}/avatar-${Date.now()}.${ext}`;
-    const { error } = await supabase.storage.from("avatars").upload(path, file, { upsert: true, contentType: file.type });
+    let prepared: Awaited<ReturnType<typeof prepareAvatar>>;
+    try {
+      prepared = await prepareAvatar(file);
+    } catch {
+      setUploading(false);
+      return setMsg({ ok: false, text: "Your browser can't open this image type. Try saving it as a JPG or PNG first." });
+    }
+    const path = `${profile.id}/avatar-${Date.now()}.${prepared.ext}`;
+    const { error } = await supabase.storage.from("avatars").upload(path, prepared.blob, { upsert: false, contentType: prepared.type });
     setUploading(false);
     if (error) return setMsg({ ok: false, text: "Upload failed. Please try again." });
     const { data } = supabase.storage.from("avatars").getPublicUrl(path);
     setD((prev) => ({ ...prev, avatar_source: "upload", avatar_url: data.publicUrl }));
-    setMsg({ ok: true, text: "Photo uploaded. Save changes to use it." });
+    setMsg({ ok: true, text: "Photo ready. Save changes to use it." });
   }
 
   async function save() {
@@ -104,7 +113,7 @@ export default function AccountForm({ profile, socials, isMinor }: { profile: Pr
   const sourceOptions = [
     { key: "auto" as const, title: "Auto: your top platform", sub: main ? `${PLATFORMS[main.platform].label} · ${formatFollowers(main.followers)} followers` : "Link a social account to use this" },
     { key: "pattern" as const, title: "Clouta pattern", sub: "A pattern avatar made for you" },
-    { key: "upload" as const, title: "Upload a photo", sub: "PNG, JPG or WebP, up to 2 MB" },
+    { key: "upload" as const, title: "Upload a photo", sub: "Any photo or GIF. We crop and resize it for you" },
   ];
 
   return (
@@ -154,7 +163,7 @@ export default function AccountForm({ profile, socials, isMinor }: { profile: Pr
             ))}
           </div>
         )}
-        <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
+        <input ref={fileRef} type="file" accept="image/*,.heic,.heif" className="hidden" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} />
         <button type="button" onClick={() => fileRef.current?.click()} className="btn btn-ghost min-h-11 w-full text-sm" disabled={uploading}>
           {uploading ? "Uploading…" : d.avatar_url ? "Upload a different photo" : "Upload a photo"}
         </button>
@@ -242,7 +251,7 @@ export default function AccountForm({ profile, socials, isMinor }: { profile: Pr
           <h2 id="linked-title" className="eyebrow">
             Linked accounts
           </h2>
-          <SocialsEditor userId={profile.id} initial={socials} />
+          <SocialsEditor userId={profile.id} initial={socials} onChange={() => router.refresh()} />
         </section>
 
         <div className="panel sticky bottom-4 z-10 flex flex-col gap-2 p-3 sm:flex-row sm:items-center">
