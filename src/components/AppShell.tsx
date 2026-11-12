@@ -69,7 +69,7 @@ export async function AppShell({
     <div className={profile?.deep_space ? "deep-space" : ""}>
       <ShootingStars />
       <div className="relative z-[1] min-h-screen">
-        <header className="app-header sticky top-0 z-20 border-b border-black/[.06] bg-white/85 backdrop-blur-md">
+        <header className="app-header sticky top-0 z-20 border-b border-black/[.12] bg-[#f7f4ee]/85 backdrop-blur-md">
           <div className={`mx-auto flex h-16 ${width} items-center gap-2 px-4 sm:px-8`}>
             <Link href={profile ? "/browse" : "/"} className="mr-2 flex flex-none items-center gap-2.5 text-[20px] font-extrabold tracking-[-0.03em]" aria-label={profile ? "Clouta, go to Browse" : "Clouta home"}>
               <LogoMark size={28} />
@@ -116,7 +116,7 @@ export async function AppShell({
           </div>
         </header>
 
-        <main className={`page-in mx-auto ${width} px-4 pb-28 pt-8 sm:px-8 md:pb-12 md:pt-10`}>
+        <main className={`app-main page-in mx-auto ${width} px-4 pb-28 pt-8 sm:px-8 md:pb-12 md:pt-10`}>
           {profile?.banned_at && (
             <div role="alert" className="mb-6 rounded-2xl border border-[#F2B8C6] bg-[#FFF5F7] px-5 py-4 text-sm text-[#7A1236]">
               <b>{until ? `Your account is suspended until ${until}.` : "Your account has been removed from Clouta."}</b>{" "}
@@ -129,7 +129,7 @@ export async function AppShell({
 
         {/* Phone tab bar */}
         {profile && (
-          <nav aria-label="Main" className="app-header fixed inset-x-0 bottom-0 z-20 border-t border-black/[.06] bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden">
+          <nav aria-label="Main" className="app-header fixed inset-x-0 bottom-0 z-20 border-t border-black/[.12] bg-[#f7f4ee]/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md md:hidden">
             <ul className="mx-auto flex max-w-md">
               {tabs.map((t) => {
                 const on = active === t.key;

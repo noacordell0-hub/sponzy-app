@@ -1,3 +1,4 @@
+import { logError } from "@/lib/log";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
@@ -31,7 +32,7 @@ export async function POST(request: Request) {
     });
     return NextResponse.json({ ok: true, ...r });
   } catch (err) {
-    console.error("[moderation]", err);
+    await logError(err, { route: "POST /api/admin/moderation", userId: user.id, action: b.action });
     return NextResponse.json({ error: "Couldn't complete that action." }, { status: 500 });
   }
 }

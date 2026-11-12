@@ -1,3 +1,5 @@
+import { rateLimit } from "@/lib/rate-limit";
+import { logError } from "@/lib/log";
 import { refreshCreatorPayouts } from "@/lib/payouts";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
@@ -17,6 +19,8 @@ export async function POST(request: Request) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Please log in to book." }, { status: 401 });
+  const lim = rateLimit(`checkout:${user.id}`, 10, 60000);
+  if (!lim.ok) return NextResponse.json({ error: "Too many checkout attempts. Please wait a minute." }, { status: 429, headers: { "Retry-After": String(lim.retryAfter) } });
 
   const admin = getSupabaseAdmin();
   const stripe = getStripe();
@@ -91,7 +95,7 @@ export async function POST(request: Request) {
     .single();
   if (error || !order) {
     if (error?.code === "23505") return NextResponse.json({ error: "This offer already has an order." }, { status: 409 });
-    console.error("[checkout] insert", error?.message);
+    await logError(error?.message ?? "Order insert failed", { route: "POST /api/checkout", userId: user.id });
     return NextResponse.json({ error: "Couldn't create the order." }, { status: 500 });
   }
 

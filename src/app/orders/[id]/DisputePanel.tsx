@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { DISPUTE_REASONS } from "@/lib/dispute-labels";
@@ -47,6 +48,7 @@ export default function DisputePanel({ orderId, dispute, viewerId, myRole, other
     const data = await res.json().catch(() => ({}));
     setBusy(false);
     if (!res.ok) return setErr(data.error ?? "Something went wrong.");
+    if ((body as { action?: string }).action === "open") track("dispute_opened", { role: myRole, reason: (body as { reason?: string }).reason ?? "" });
     setOpen(false);
     setText("");
     setLinks("");
@@ -83,7 +85,7 @@ export default function DisputePanel({ orderId, dispute, viewerId, myRole, other
           </p>
         </div>
         <div className="rounded-xl bg-[#FFF5F7] p-4">
-          <p className="text-xs font-bold uppercase tracking-[0.06em] text-[#A3134A]">
+          <p className="text-sm font-bold text-[#A3134A]">
             {iOpened ? "Your dispute" : `${otherName}'s dispute`} · {DISPUTE_REASONS[active.reason]?.label ?? active.reason}
           </p>
           <p className="mt-2 whitespace-pre-line text-sm text-ink">{active.statement}</p>
@@ -91,7 +93,7 @@ export default function DisputePanel({ orderId, dispute, viewerId, myRole, other
         </div>
         {active.response && (
           <div className="rounded-xl bg-[#F7F5FF] p-4">
-            <p className="text-xs font-bold uppercase tracking-[0.06em] text-violet-deep">{iOpened ? `${otherName}'s response` : "Your response"}</p>
+            <p className="text-sm font-bold text-violet-deep">{iOpened ? `${otherName}'s response` : "Your response"}</p>
             <p className="mt-2 whitespace-pre-line text-sm text-ink">{active.response}</p>
             <Links links={active.response_evidence} />
           </div>

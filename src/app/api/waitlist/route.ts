@@ -1,6 +1,8 @@
+import { logError } from "@/lib/log";
 import { randomBytes } from "node:crypto";
 import { NextResponse } from "next/server";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 const CODE_RE = /^[a-z0-9]{6,12}$/;
@@ -23,6 +25,7 @@ async function statusFor(code: string): Promise<Status | null> {
 
 /** GET /api/waitlist?code=abc123 → place in line for a saved invite code. */
 export async function GET(request: Request) {
+  if (!rateLimit(`wlget:${clientIp(request)}`, 30, 60_000).ok) return NextResponse.json({ error: "Too many requests." }, { status: 429 });
   const code = new URL(request.url).searchParams.get("code") ?? "";
   if (!CODE_RE.test(code)) return NextResponse.json({ error: "Invalid code." }, { status: 400 });
   const status = await statusFor(code);
@@ -31,12 +34,30 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  // A person joins once; 5 tries a minute per visitor is plenty and stops scripted floods.
+  const lim = rateLimit(`wl:${clientIp(request)}`, 5, 60_000);
+  if (!lim.ok) return NextResponse.json({ error: "Too many tries. Please wait a minute and try again." }, { status: 429, headers: { "Retry-After": String(lim.retryAfter) } });
   let body: Record<string, unknown>;
+  // Without JavaScript the browser posts a normal form; answer with a redirect back to the page instead of JSON.
+  const isForm = (request.headers.get("content-type") ?? "").includes("application/x-www-form-urlencoded");
   try {
-    body = await request.json();
+    body = isForm ? Object.fromEntries((await request.formData()).entries()) : await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
+  if (isForm) {
+    const res = await handleSignup(body);
+    const json = await res.json().catch(() => ({}));
+    const back = new URL("/", request.url);
+    if (json.code) back.searchParams.set("joined", json.code);
+    else back.searchParams.set("waitlist_error", "1");
+    back.hash = "join";
+    return NextResponse.redirect(back, 303);
+  }
+  return handleSignup(body);
+}
+
+async function handleSignup(body: Record<string, unknown>) {
 
   // Honeypot: real people never fill this hidden field.
   if (typeof body.company === "string" && body.company.length > 0) {
@@ -46,6 +67,10 @@ export async function POST(request: Request) {
   const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
   const role = body.role === "brand" ? "brand" : "creator";
   const ref = typeof body.ref === "string" && CODE_RE.test(body.ref) ? body.ref : null;
+
+  // Where they came from (first visit). Plain text only, trimmed; never trusted for anything but reporting.
+  const tag = (v: unknown) => (typeof v === "string" && v.trim() ? v.trim().replace(/[^\w.\-/ ]/g, "").slice(0, 100) || null : null);
+  const attribution = { utm_source: tag(body.utm_source), utm_medium: tag(body.utm_medium), utm_campaign: tag(body.utm_campaign), landing_page: tag(body.landing_page) };
 
   if (!EMAIL_RE.test(email) || email.length > 254) {
     return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
@@ -67,6 +92,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, returning: true, ...status });
   }
 
+  // Burst guard across all servers: an unusual flood of new signups in one minute is almost always a bot.
+  const { count: lastMinute } = await supabase.from("waitlist").select("id", { count: "exact", head: true }).gte("created_at", new Date(Date.now() - 60_000).toISOString());
+  if ((lastMinute ?? 0) >= 60) {
+    await logError("Waitlist burst guard triggered", { route: "POST /api/waitlist", level: "warn", lastMinute });
+    return NextResponse.json({ error: "Lots of people are joining right now. Please try again in a minute." }, { status: 429, headers: { "Retry-After": "60" } });
+  }
+
   let referredBy: number | null = null;
   if (ref) {
     const { data: referrer } = await supabase.from("waitlist").select("id").eq("referral_code", ref).maybeSingle();
@@ -78,7 +110,7 @@ export async function POST(request: Request) {
     const code = newCode();
     const { error } = await supabase
       .from("waitlist")
-      .insert({ email, role, source: ref ? "referral" : "landing", referral_code: code, referred_by: referredBy });
+      .insert({ email, role, source: ref ? "referral" : "landing", referral_code: code, referred_by: referredBy, ...attribution });
 
     if (!error) {
       const status = await statusFor(code);
@@ -91,7 +123,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, returning: true, ...status });
     }
     if (error.code !== "23505") {
-      console.error("[waitlist] insert failed:", error.message);
+      await logError(error.message, { route: "POST /api/waitlist", code: error.code });
       break;
     }
   }

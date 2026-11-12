@@ -10,6 +10,7 @@ import { money } from "@/lib/format";
 import { STATUS_LABEL, STATUS_STYLE } from "@/lib/order-status";
 import type { Order } from "@/lib/orders";
 import PayoutButtons from "./PayoutButtons";
+import TrackView from "@/components/TrackView";
 
 export const metadata: Metadata = { title: "Earnings · Clouta" };
 
@@ -43,6 +44,8 @@ export default async function EarningsPage({ searchParams }: { searchParams: Pro
   return (
     <AppShell profile={profile} active="earnings">
       <h1 className="on-bg mb-8 text-3xl font-extrabold tracking-[-0.03em]">Earnings</h1>
+      {setup === "done" && <TrackView name={payoutsEnabled ? "stripe_onboard_success" : "stripe_onboard_error"} props={{ stage: payoutsEnabled ? "active" : detailsSubmitted ? "pending_review" : "incomplete" }} />}
+      {setup === "retry" && <TrackView name="stripe_onboard_error" props={{ stage: "link_expired" }} />}
 
       {/* Payout setup */}
       <section className={`panel mb-6 flex flex-col gap-4 p-6 sm:flex-row sm:items-center ${payoutsEnabled ? "" : "border-[#F2D58A]"}`} aria-labelledby="payout-t">
@@ -78,7 +81,7 @@ export default async function EarningsPage({ searchParams }: { searchParams: Pro
           ["Clouta fees", money(fees), profile.is_founding ? "5% Founding Creator rate" : "10% of each order"],
         ].map(([l, v, n]) => (
           <div key={l} className="panel p-5">
-            <p className="text-xs font-bold uppercase tracking-[0.08em] text-ink-2">{l}</p>
+            <p className="text-sm font-bold text-ink">{l}</p>
             <p className="mt-1 text-3xl font-extrabold tracking-[-0.03em]">{v}</p>
             <p className="text-xs text-ink-2">{n}</p>
           </div>
@@ -95,7 +98,7 @@ export default async function EarningsPage({ searchParams }: { searchParams: Pro
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-xs uppercase tracking-[0.06em] text-ink-2">
+                <tr className="text-left text-xs text-ink-2">
                   <th className="px-5 py-3 font-bold">Order</th>
                   <th className="px-3 py-3 font-bold">Price</th>
                   <th className="px-3 py-3 font-bold">Fee</th>

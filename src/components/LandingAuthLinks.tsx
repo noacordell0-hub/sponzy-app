@@ -2,34 +2,33 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
-
-/** Landing page header buttons: "Log in" for visitors, "Open Clouta" for people already signed in. */
+/**
+ * Landing page header buttons: "Log in" for visitors, "Open Clouta" for people already signed in.
+ * Checks for Supabase's login cookie instead of loading the Supabase library, which keeps
+ * about 75 KB of JavaScript off the landing page. (If the cookie is stale, /browse still works for visitors.)
+ */
 export default function LandingAuthLinks() {
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Reads the saved session locally; no network request needed.
-    createClient()
-      .auth.getSession()
-      .then(({ data }) => setSignedIn(Boolean(data.session)))
-      .catch(() => setSignedIn(false));
+    setSignedIn(/(?:^|;\s*)sb-[^=]+-auth-token(?:\.0)?=/.test(document.cookie));
   }, []);
 
   if (signedIn) {
     return (
-      <Link href="/browse" className="btn min-h-10 px-4 text-sm">
+      <Link href="/browse" data-track="cta_click" data-track-location="nav" data-track-target="open_app" className="btn min-h-10 px-4 text-sm">
         Open Clouta
       </Link>
     );
   }
   return (
     <>
-      <Link href="/login" className="px-2 py-3 text-[15px] font-semibold text-body hover:text-ink">
+      <Link href="/login" data-track="nav_click" data-track-target="login" className="whitespace-nowrap px-2 py-3 text-[15px] font-semibold text-body hover:text-ink">
         Log in
       </Link>
-      <a href="#join" className="btn min-h-10 px-4 text-sm">
-        Join the waitlist
+      <a href="#join" data-track="cta_click" data-track-location="nav" className="btn min-h-10 whitespace-nowrap px-4 text-sm">
+        <span className="sm:hidden">Join</span>
+        <span className="hidden sm:inline">Join the waitlist</span>
       </a>
     </>
   );

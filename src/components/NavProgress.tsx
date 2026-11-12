@@ -75,7 +75,7 @@ export default function NavProgress() {
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-x-0 top-0 z-[90] h-[3px]">
       <div
-        className="h-full rounded-r-full bg-[linear-gradient(90deg,#7655FF,#C04FD8)] shadow-[0_0_10px_rgba(118,85,255,.6)]"
+        className="h-full rounded-r-full bg-[#5B3DF5]"
         style={{ width: `${progress}%`, opacity: visible ? 1 : 0, transition: `width ${progress === 100 ? 200 : 400}ms ease, opacity 250ms ease` }}
       />
     </div>

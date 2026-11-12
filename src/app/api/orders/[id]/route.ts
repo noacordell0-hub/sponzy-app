@@ -1,3 +1,4 @@
+import { logError } from "@/lib/log";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
@@ -104,7 +105,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         return fail("Unknown action.");
     }
   } catch (err) {
-    console.error("[orders action]", body.action, err);
+    await logError(err, { route: "POST /api/orders/[id]", userId: user.id, orderId: order.id, action: body.action });
     return fail("Something went wrong with the payment provider. Please try again.", 502);
   }
   return NextResponse.json({ ok: true });

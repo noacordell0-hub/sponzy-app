@@ -1,3 +1,4 @@
+import { logError } from "@/lib/log";
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { getStripe } from "@/lib/stripe";
@@ -33,7 +34,7 @@ export async function banProfile(admin: SupabaseClient, profileId: string, admin
         await refundOrder(admin, o, adminId, "One of the accounts on this order was removed from Clouta for breaking the rules.");
       }
     } catch (err) {
-      console.error("[ban] order", o.id, err);
+      await logError(err, { route: "banProfile", orderId: o.id, profileId });
     }
   }
 

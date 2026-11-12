@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { track } from "@/lib/analytics";
 
 export default function PayoutButtons({ hasAccount, payoutsEnabled }: { hasAccount: boolean; payoutsEnabled: boolean }) {
   const [busy, setBusy] = useState(false);
@@ -9,11 +10,14 @@ export default function PayoutButtons({ hasAccount, payoutsEnabled }: { hasAccou
   async function go(path: string) {
     setBusy(true);
     setError(null);
+    const onboarding = path.endsWith("/onboard");
+    if (onboarding) track("stripe_onboard_start", { resume: hasAccount });
     const res = await fetch(path, { method: "POST" }).catch(() => null);
     const json = res ? await res.json().catch(() => ({})) : {};
     if (!res?.ok || !json.url) {
       setBusy(false);
-      return setError(json.error || "Couldn't reach Stripe. Please try again.");
+      if (onboarding) track("stripe_onboard_error", { status: res?.status ?? 0 });
+      return setError(json.error || "Couldn't reach Stripe. Check your connection and try again.");
     }
     window.location.href = json.url;
   }

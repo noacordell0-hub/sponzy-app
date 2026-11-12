@@ -87,7 +87,7 @@ export default function SettingsForm(props: { userId: string; email: string; dee
       </section>
 
       <section className="panel flex flex-col gap-3 border-err/30 p-6" aria-labelledby="danger">
-        <h2 id="danger" className="text-sm font-bold uppercase tracking-[0.08em] text-err">
+        <h2 id="danger" className="text-base font-bold text-err">
           Delete account
         </h2>
         <p className="text-sm text-body">

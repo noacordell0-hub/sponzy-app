@@ -127,7 +127,7 @@ export default function OrderActions({ order, isBrand, otherName }: { order: Ord
       </div>
       {buttons.length > 0 && <div className="flex flex-wrap items-center gap-2">{buttons}</div>}
       {revisionOpen && (
-        <div className="flex flex-col gap-2 rounded-xl bg-[#FBFAFF] p-4">
+        <div className="flex flex-col gap-2 rounded-xl bg-[#FAF8F3] p-4">
           <label htmlFor="rev-note" className="text-sm font-semibold">
             What should they change?
           </label>
@@ -138,7 +138,7 @@ export default function OrderActions({ order, isBrand, otherName }: { order: Ord
         </div>
       )}
       {extendOpen && (
-        <div className="flex flex-wrap items-end gap-2 rounded-xl bg-[#FBFAFF] p-4">
+        <div className="flex flex-wrap items-end gap-2 rounded-xl bg-[#FAF8F3] p-4">
           <div className="flex flex-col gap-1">
             <label htmlFor="new-date" className="text-sm font-semibold">
               New post-by date

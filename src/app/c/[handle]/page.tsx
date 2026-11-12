@@ -28,9 +28,14 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { handle } = await params;
   const { creator } = await load(handle);
   if (!creator) return { title: "Creator not found · Clouta" };
+  const title = `${creator.display_name} (@${creator.handle}) · Clouta`;
+  const description = creator.tagline ?? `Book ${creator.display_name} for brand collabs on Clouta.`;
   return {
-    title: `${creator.display_name} (@${creator.handle}) · Clouta`,
-    description: creator.tagline ?? `Book ${creator.display_name} for brand collabs on Clouta.`,
+    title,
+    description,
+    alternates: { canonical: `/c/${creator.handle}` },
+    openGraph: { type: "profile", title, description, url: `/c/${creator.handle}` },
+    twitter: { card: "summary_large_image", title, description },
   };
 }
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/lib/analytics";
 import { useState } from "react";
 import { money } from "@/lib/format";
 
@@ -31,6 +32,7 @@ export default function CheckoutForm(p: Props) {
     setError(null);
     if (brief.trim().length < 10) return setError("Write a brief of at least 10 characters so the creator knows what you need.");
     setBusy(true);
+    track("checkout_start", { from: p.serviceId ? "service" : "offer" });
     const res = await fetch("/api/checkout", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

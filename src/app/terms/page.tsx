@@ -5,6 +5,7 @@ import { FOUNDING_SPOTS } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Terms of Use · Clouta",
   description: "The terms for using the Clouta website and waitlist.",
+  alternates: { canonical: "/terms" },
 };
 
 export default function TermsPage() {

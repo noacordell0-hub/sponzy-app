@@ -86,7 +86,7 @@ export function TrustPanel({ trust, role, reviewsHref }: { trust: Trust | null; 
             <span className="text-ink-2">{lvl.next ? `${lvl.toNext} pts to ${lvl.next.name}` : "Max level"}</span>
           </div>
           <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-black/[.06]" role="progressbar" aria-valuenow={Math.round(lvl.pct * 100)} aria-valuemin={0} aria-valuemax={100} aria-label="Progress to next orbit level">
-            <div className="h-full rounded-full bg-gradient-to-r from-[#7B5CFF] to-[#C04CFF]" style={{ width: `${Math.max(4, lvl.pct * 100)}%` }} />
+            <div className="h-full rounded-full bg-[#5B3DF5]" style={{ width: `${Math.max(4, lvl.pct * 100)}%` }} />
           </div>
         </div>
       )}

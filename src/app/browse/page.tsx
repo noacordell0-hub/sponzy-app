@@ -1,3 +1,4 @@
+import TrackView from "@/components/TrackView";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
@@ -10,6 +11,7 @@ import type { CreatorResult } from "@/lib/market";
 export const metadata: Metadata = {
   title: "Browse creators · Clouta",
   description: "Find creators with clear prices, verified reach and protected payments.",
+  alternates: { canonical: "/browse" },
 };
 
 type SP = Record<string, string | undefined>;
@@ -60,6 +62,7 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
 
   return (
     <AppShell profile={profile} active="browse" wide>
+      <TrackView name="browse_view" props={{ filtered, results: rows.length, signed_in: Boolean(user) }} />
       <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="on-bg text-3xl font-extrabold tracking-[-0.03em]">Discover creators</h1>

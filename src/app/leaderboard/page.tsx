@@ -5,7 +5,7 @@ import { AppShell } from "@/components/AppShell";
 import { Avatar } from "@/components/Avatar";
 import { LEVELS } from "@/lib/trust";
 
-export const metadata: Metadata = { title: "Leaderboard · Clouta", description: "Top rated creators, longest on-time streaks and rising stars on Clouta." };
+export const metadata: Metadata = { title: "Leaderboard · Clouta", description: "Top rated creators, longest on-time streaks and rising stars on Clouta.", alternates: { canonical: "/leaderboard" } };
 
 const BOARDS = {
   top_rated: { label: "Top rated", blurb: "Highest average rating. Minimum 5 reviews.", unit: (v: number, d: number) => `★ ${v.toFixed(2)} · ${d} review${d === 1 ? "" : "s"}` },

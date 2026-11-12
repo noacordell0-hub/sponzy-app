@@ -1,3 +1,4 @@
+import { logError } from "@/lib/log";
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
@@ -79,7 +80,7 @@ export async function POST(request: Request) {
       }
     }
   } catch (err) {
-    console.error("[stripe webhook]", event.type, err);
+    await logError(err, { route: "POST /api/stripe/webhook", eventType: event.type, eventId: event.id });
     return NextResponse.json({ error: "Handler failed" }, { status: 500 }); // Stripe retries
   }
   return NextResponse.json({ received: true });
