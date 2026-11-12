@@ -20,3 +20,26 @@ export async function syncAccount(admin: SupabaseClient, accountId: string) {
   }
   return status;
 }
+
+/**
+ * Re-check a creator's payout status with Stripe if Clouta still thinks setup isn't finished.
+ * Stripe's newer accounts don't send the "account.updated" webhook, so this is the safety net.
+ */
+export async function refreshCreatorPayouts(admin: SupabaseClient, creatorId: string) {
+  const { data: priv } = await admin.from("profile_private").select("stripe_account_id, payouts_enabled").eq("id", creatorId).maybeSingle();
+  if (!priv?.stripe_account_id) return false;
+  if (priv.payouts_enabled) return true;
+  const status = await syncAccount(admin, priv.stripe_account_id).catch(() => null);
+  return Boolean(status?.ready);
+}
+
+/** Daily: re-check every creator who started payout setup but isn't confirmed yet. */
+export async function refreshPendingPayouts(admin: SupabaseClient) {
+  const { data } = await admin.from("profile_private").select("stripe_account_id").not("stripe_account_id", "is", null).eq("payouts_enabled", false).limit(200);
+  let ready = 0;
+  for (const row of data ?? []) {
+    const status = await syncAccount(admin, row.stripe_account_id as string).catch(() => null);
+    if (status?.ready) ready++;
+  }
+  return ready;
+}

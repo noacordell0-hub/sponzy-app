@@ -1,3 +1,5 @@
+import { getSupabaseAdmin } from "@/lib/supabase-server";
+import { refreshCreatorPayouts } from "@/lib/payouts";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -18,6 +20,11 @@ export default async function ServiceCheckout({ params }: { params: Promise<{ se
   const { data: creator } = await supabase.from("profiles").select("*").eq("id", creatorId).single();
   if (!creator) notFound();
 
+  // Stripe may have confirmed their payout setup since Clouta last checked.
+  if (!creator.payouts_ready) {
+    const admin = getSupabaseAdmin();
+    if (admin && (await refreshCreatorPayouts(admin, creator.id))) creator.payouts_ready = true;
+  }
   const p = priceBreakdown(svc.price_cents, creator.is_founding);
   let blocked = "";
   if (profile.role !== "brand") blocked = "Only brand accounts can book creators.";

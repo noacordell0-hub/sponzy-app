@@ -1,3 +1,4 @@
+import { refreshCreatorPayouts } from "@/lib/payouts";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
@@ -52,6 +53,7 @@ export async function POST(request: Request) {
   const { data: creator } = await admin.from("profiles").select("id, role, display_name, is_founding, taking_bookings, payouts_ready, banned_at").eq("id", item.creatorId).single();
   if (!creator || creator.role !== "creator" || creator.banned_at) return NextResponse.json({ error: "That creator isn't available." }, { status: 404 });
   if (!creator.taking_bookings) return NextResponse.json({ error: `${creator.display_name} isn't taking bookings right now.` }, { status: 409 });
+  if (!creator.payouts_ready && (await refreshCreatorPayouts(admin, creator.id))) creator.payouts_ready = true;
   if (!creator.payouts_ready) return NextResponse.json({ error: `${creator.display_name} hasn't finished payout setup yet, so they can't be booked. Message them to let them know!` }, { status: 409 });
 
   const minDate = new Date();

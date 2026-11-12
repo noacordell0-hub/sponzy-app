@@ -1,3 +1,5 @@
+import { getSupabaseAdmin } from "@/lib/supabase-server";
+import { refreshCreatorPayouts } from "@/lib/payouts";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { requireProfile } from "@/lib/auth";
@@ -19,6 +21,11 @@ export default async function OfferCheckout({ params }: { params: Promise<{ mess
   const { data: creator } = await supabase.from("profiles").select("*").eq("id", otherId).single();
   if (!creator) notFound();
   const offer = msg.offer as Offer;
+  // Stripe may have confirmed their payout setup since Clouta last checked.
+  if (!creator.payouts_ready) {
+    const admin = getSupabaseAdmin();
+    if (admin && (await refreshCreatorPayouts(admin, creator.id))) creator.payouts_ready = true;
+  }
   const p = priceBreakdown(offer.price_cents, creator.is_founding);
 
   let blocked = "";
