@@ -71,7 +71,7 @@ export default function MessagesView(props: { me: string; myName: string; inbox:
   const showThread = Boolean(threadId && other);
 
   return (
-    <div className="panel grid h-[calc(100vh-9rem)] min-h-[520px] grid-cols-1 overflow-hidden md:grid-cols-[320px_minmax(0,1fr)]">
+    <div className="panel grid h-[calc(100dvh-11.5rem)] min-h-[460px] md:h-[calc(100vh-9rem)] md:min-h-[520px] grid-cols-1 overflow-hidden md:grid-cols-[320px_minmax(0,1fr)]">
       {/* Inbox */}
       <section aria-label="Conversations" className={`min-h-0 min-w-0 flex-col border-r border-black/[.06] ${showThread ? "hidden md:flex" : "flex"}`}>
         <div className="border-b border-black/[.06] px-5 py-4">

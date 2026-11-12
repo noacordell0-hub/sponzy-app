@@ -6,6 +6,7 @@ import { HeroPlanets, ShootingStars } from "@/components/Backdrop";
 import EarningsCalculator from "@/components/EarningsCalculator";
 
 import { FOUNDING_SPOTS } from "@/lib/site";
+import LandingAuthLinks from "@/components/LandingAuthLinks";
 
 const steps: { icon: IconName; title: string; body: string }[] = [
   { icon: "link", title: "Share your Clouta link", body: "Set up your storefront with your services and prices, then put one link in your bio." },
@@ -102,12 +103,7 @@ export default function Home() {
               </a>
             ))}
           </nav>
-          <Link href="/login" className="px-2 py-3 text-[15px] font-semibold text-body hover:text-ink">
-            Log in
-          </Link>
-          <a href="#join" className="btn min-h-10 px-4 text-sm">
-            Join the waitlist
-          </a>
+          <LandingAuthLinks />
         </div>
       </header>
 

@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { Suspense } from "react";
 import { Intro } from "@/components/Intro";
+import NavProgress from "@/components/NavProgress";
 
 const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
@@ -29,6 +31,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body className={`${jakarta.variable} antialiased`}>
         <Intro />
+        <Suspense fallback={null}>
+          <NavProgress />
+        </Suspense>
         {children}
       </body>
     </html>
