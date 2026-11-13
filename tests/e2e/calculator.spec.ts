@@ -19,6 +19,11 @@ test("default is $120 × 2 a month = $2,880 a year", async ({ page }) => {
   await expect(result(page)).toContainText("$2,880");
 });
 
+test("shows what a Founding Creator keeps after the 5% fee, and the standard 10%", async ({ page }) => {
+  await expect(result(page)).toContainText("$2,736"); // 2,880 × 0.95
+  await expect(result(page)).toContainText("$2,592"); // 2,880 × 0.90
+});
+
 test("minimum and maximum slider values", async ({ page }) => {
   await setRange(page, 0, 25);
   await setRange(page, 1, 1);
