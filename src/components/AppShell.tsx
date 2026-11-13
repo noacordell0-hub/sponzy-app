@@ -14,6 +14,7 @@ type Tab = { href: string; label: string; short: string; key: string; icon: Icon
 function tabsFor(profile: Profile | null): Tab[] {
   const tabs: Tab[] = [{ href: "/browse", label: "Browse", short: "Browse", key: "browse", icon: "search" }];
   if (!profile) return tabs;
+  if (profile.role === "creator") tabs.unshift({ href: "/dashboard", label: "Home", short: "Home", key: "home", icon: "grid" });
   if (profile.role === "creator") tabs.push({ href: "/post/edit", label: "My shop", short: "Shop", key: "shop", icon: "store" });
   if (profile.role === "brand") tabs.push({ href: "/brand", label: "Dashboard", short: "Home", key: "dashboard", icon: "grid" });
   tabs.push(
@@ -72,7 +73,7 @@ export async function AppShell({
         <div className="hero-bg !h-[520px]" aria-hidden="true" />
         <header className="app-header sticky top-0 z-20 border-b border-black/[.12] bg-[#f7f4ee]/85 backdrop-blur-md">
           <div className={`mx-auto flex h-16 ${width} items-center gap-2 px-4 sm:px-8`}>
-            <Link href={profile ? "/browse" : "/"} className="mr-2 flex flex-none items-center gap-2.5 text-[20px] font-extrabold tracking-[-0.03em]" aria-label={profile ? "Clouta, go to Browse" : "Clouta home"}>
+            <Link href={profile ? "/home" : "/"} className="mr-2 flex flex-none items-center gap-2.5 text-[20px] font-extrabold tracking-[-0.03em]" aria-label={profile ? "Clouta, go to your home page" : "Clouta home"}>
               <LogoMark size={28} />
               <span>Clouta</span>
             </Link>

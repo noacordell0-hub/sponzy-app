@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     email,
     options: {
       shouldCreateUser: mode === "signup",
-      emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next ?? (mode === "signup" ? "/onboarding" : "/settings/account"))}`,
+      emailRedirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next ?? (mode === "signup" ? "/onboarding" : "/home"))}`,
     },
   });
 

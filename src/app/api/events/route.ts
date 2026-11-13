@@ -7,7 +7,7 @@ const EVENTS = new Set([
   "landing_view", "cta_click", "nav_click", "faq_opened", "waitlist_submit", "waitlist_success", "waitlist_error",
   "invite_link_copied", "invite_link_shared", "referral_signup", "earnings_calculator_used", "browse_view", "login_view",
   "signup_view", "stripe_onboard_start", "stripe_onboard_success", "stripe_onboard_error", "checkout_start",
-  "review_submitted", "dispute_opened",
+  "review_submitted", "dispute_opened", "profile_view", "book_click", "profile_message_click", "shop_link_copied",
 ]);
 
 function cleanProps(v: unknown) {
