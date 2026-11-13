@@ -23,6 +23,8 @@ export default function ShopEditor(props: {
   initialPost: Post | null;
   initialServices: Service[];
   socialPlatforms: PlatformKey[];
+  /** Publishing needs at least one verified social account (enforced in the database too). */
+  verification: "verified" | "pending" | "none";
 }) {
   const router = useRouter();
   const supabase = useMemo(() => createClient(), []);
@@ -114,12 +116,13 @@ export default function ShopEditor(props: {
     setMsg(null);
     if (value && services.length === 0) return setMsg({ ok: false, text: "Add at least one service before publishing." });
     if (value && !bio.trim()) return setMsg({ ok: false, text: "Write a short pitch before publishing." });
+    if (value && props.verification !== "verified") return setMsg({ ok: false, text: "Verify at least one social account before publishing your shop." });
     setBusy(true);
     const p = await ensurePost();
     if (!p) return setBusy(false);
     const { error } = await supabase.from("posts").update({ published: value, bio: bio.trim() || null, platforms }).eq("id", p.id);
     setBusy(false);
-    if (error) return setMsg({ ok: false, text: "Couldn't update your shop." });
+    if (error) return setMsg({ ok: false, text: /verify/i.test(error.message) ? "Verify at least one social account before publishing your shop." : "Couldn't update your shop." });
     setPost({ ...p, published: value });
     setMsg({ ok: true, text: value ? "Your shop is live! Brands can now find you in Browse." : "Your shop is hidden from Browse." });
     router.refresh();
@@ -132,6 +135,7 @@ export default function ShopEditor(props: {
   }
 
   const published = Boolean(post?.published);
+  const verified = props.verification === "verified";
 
   return (
     <div className="grid items-start gap-6 lg:grid-cols-[1fr_340px]">
@@ -325,8 +329,26 @@ export default function ShopEditor(props: {
           <li className={bio.trim() ? "text-ok" : "text-ink-2"}>{bio.trim() ? "✓" : "○"} Pitch written</li>
           <li className={services.length > 0 ? "text-ok" : "text-ink-2"}>{services.length > 0 ? "✓" : "○"} At least one service</li>
           <li className={platforms.length > 0 ? "text-ok" : "text-ink-2"}>{platforms.length > 0 ? "✓" : "○"} Platforms chosen</li>
+          <li className={verified ? "text-ok" : "text-ink-2"}>
+            {verified ? "✓" : "○"} Social account verified {props.verification === "pending" && <span className="text-xs">(being checked)</span>}
+          </li>
         </ul>
-        <button type="button" onClick={() => setPublished(!published)} disabled={busy} className={`btn min-h-12 text-base ${published ? "btn-ghost" : ""}`}>
+        {!verified && !published && (
+          <div className="rounded-xl border border-[#E8D9A8] bg-[#FFF9E8] px-4 py-3 text-sm">
+            <p className="font-bold text-ink">{props.verification === "pending" ? "We're checking your account" : "Verify an account to go live"}</p>
+            <p className="mt-0.5 text-body">
+              {props.verification === "pending"
+                ? "Usually within a day. Your shop can go live as soon as you see ✓ Verified."
+                : "Every creator on Clouta proves their account is theirs, so brands can trust the follower numbers. It takes 2 minutes."}
+            </p>
+            {props.verification === "none" && (
+              <Link href="/settings/account#socials" className="mt-2 inline-block font-semibold text-violet-deep">
+                Verify my account →
+              </Link>
+            )}
+          </div>
+        )}
+        <button type="button" onClick={() => setPublished(!published)} disabled={busy || (!published && !verified)} className={`btn min-h-12 text-base ${published ? "btn-ghost" : ""}`}>
           {published ? "Unpublish" : "Publish my shop"}
         </button>
         <Link href={`/c/${props.handle}`} className="text-center text-sm font-semibold text-violet-deep">

@@ -49,7 +49,7 @@ export default async function CreatorHome({ searchParams }: { searchParams: Prom
   const checklist: ChecklistItem[] = [
     { done: profile.avatar_source === "upload" || Boolean(profile.bio?.trim()), title: "Add a photo and a short bio", why: "Brands book people they can picture.", href: "/settings/account", cta: "Edit profile" },
     { done: (socials ?? []).length > 0, title: "Add your social accounts", why: "Brands want to see where you post and how many people follow you.", href: "/settings/account", cta: "Add socials" },
-    { done: (socials ?? []).some((s) => s.verified), title: "Verify a social account", why: "A ✓ next to your followers makes brands trust the numbers.", href: "/settings/account", cta: "Verify" },
+    { done: (socials ?? []).some((s) => s.verified), title: "Verify a social account (required)", why: "Your shop can't go live until we've confirmed an account is yours.", href: "/settings/account", cta: "Verify" },
     { done: services.length > 0, title: "Add your first service and price", why: "For example: one TikTok video, $120, 5-day turnaround.", href: "/post/edit", cta: "Add a service" },
     { done: Boolean(post?.published), title: "Publish your shop", why: "Until then, brands can't find you in Browse.", href: "/post/edit", cta: "Publish" },
     { done: Boolean(priv?.payouts_enabled), title: "Set up payouts", why: "Brands can only book you once Stripe can pay you.", href: "/earnings", cta: "Set up" },

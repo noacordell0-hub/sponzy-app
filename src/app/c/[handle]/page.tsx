@@ -70,8 +70,9 @@ export default async function CreatorPage({ params }: Params) {
   }
   const shownBadges = creator.show_badges ? badges : badges.filter((b) => b === "verified_socials");
   const services = (servicesData as Service[]) ?? [];
-  const socials = (socialsData as Social[]) ?? [];
-  const main = socials.find((s) => s.is_main);
+  // Visitors only ever see verified accounts (the database enforces this too); the owner sees all of theirs.
+  const socials = ((socialsData as Social[]) ?? []).filter((s) => isOwner || s.verified);
+  const main = socials.find((s) => s.is_main) ?? socials[0];
   const verifiedFollowers = socials.filter((s) => s.verified).reduce((n, s) => n + s.followers, 0);
   const theme = THEMES[creator.theme] ?? THEMES.violet;
   const published = Boolean(post?.published);
@@ -247,8 +248,8 @@ export default async function CreatorPage({ params }: Params) {
                     {s.verified ? (
                       <span className="rounded-md bg-ok-bg px-2 py-0.5 text-xs font-semibold text-ok">✓ Verified</span>
                     ) : (
-                      <span className="rounded-md bg-black/[.05] px-2 py-0.5 text-xs font-semibold text-ink-2" title="Follower count is self-reported">
-                        Unverified
+                      <span className="rounded-md bg-black/[.05] px-2 py-0.5 text-xs font-semibold text-ink-2" title="Brands can't see this account until it's verified">
+                        Not verified · only you see this
                       </span>
                     )}
                   </li>

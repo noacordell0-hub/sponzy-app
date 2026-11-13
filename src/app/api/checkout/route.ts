@@ -56,6 +56,9 @@ export async function POST(request: Request) {
 
   const { data: creator } = await admin.from("profiles").select("id, role, display_name, is_founding, taking_bookings, payouts_ready, banned_at").eq("id", item.creatorId).single();
   if (!creator || creator.role !== "creator" || creator.banned_at) return NextResponse.json({ error: "That creator isn't available." }, { status: 404 });
+  // Every creator must have at least one verified social account before they can be booked, including through custom offers.
+  const { count: verifiedCount } = await admin.from("social_accounts").select("id", { count: "exact", head: true }).eq("profile_id", creator.id).eq("verified", true);
+  if (!verifiedCount) return NextResponse.json({ error: `${creator.display_name} hasn't verified their social accounts yet, so they can't be booked.` }, { status: 409 });
   if (!creator.taking_bookings) return NextResponse.json({ error: `${creator.display_name} isn't taking bookings right now.` }, { status: 409 });
   if (!creator.payouts_ready && (await refreshCreatorPayouts(admin, creator.id))) creator.payouts_ready = true;
   if (!creator.payouts_ready) return NextResponse.json({ error: `${creator.display_name} hasn't finished payout setup yet, so they can't be booked. Message them to let them know!` }, { status: 409 });
