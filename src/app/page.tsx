@@ -127,6 +127,7 @@ export default function Home() {
       </header>
 
       <main className="relative overflow-hidden">
+        <div className="hero-bg" aria-hidden="true" />
         <HeroPlanets />
 
         {/* Hero */}
@@ -200,7 +201,7 @@ export default function Home() {
         <section aria-label="Protections" className="relative border-y rule bg-white/60">
           <ul className={`${wrap} grid grid-cols-1 gap-y-2 py-5 text-[15px] font-medium text-body sm:flex sm:flex-wrap sm:items-center sm:gap-x-3`}>
             {proof.map((p, i) => (
-              <li key={p} className="flex items-center gap-3">
+              <li key={p} className="reveal flex items-center gap-3">
                 {i > 0 && <span aria-hidden="true" className="hidden text-ink-2 sm:inline">/</span>}
                 {p}
               </li>
@@ -209,7 +210,7 @@ export default function Home() {
         </section>
 
         {/* Where the money goes: the escrow promise, shown step by step */}
-        <section aria-labelledby="flow-t" className={`${wrap} reveal pt-16 lg:pt-24`}>
+        <section aria-labelledby="flow-t" className={`${wrap} reveal relative pt-16 lg:pt-24`}>
           <h2 id="flow-t" className="text-sm font-bold text-ink-2">Where the money goes on a $120 deal</h2>
           <ol className="mt-4 grid gap-3 sm:grid-cols-4">
             {[
@@ -218,7 +219,7 @@ export default function Home() {
               ["Brand approves", "3 days", "or it's approved for them"],
               ["You get paid", "$114", "as a Founding Creator (5% fee)"],
             ].map(([label, big, note], i) => (
-              <li key={label} className="flow-step relative rounded-2xl border border-black/[.14] bg-white p-4">
+              <li key={label} className="flow-step lift relative rounded-2xl border border-black/[.14] bg-white p-4">
                 <span className="text-xs font-semibold text-ink-2">
                   {i + 1}. {label}
                 </span>
@@ -231,7 +232,7 @@ export default function Home() {
 
         {/* How it works */}
         <section id="how" className={`${wrap} scroll-mt-20 grid gap-10 py-20 lg:grid-cols-[0.9fr_1.4fr] lg:py-28`}>
-          <div className="lg:sticky lg:top-28 lg:self-start">
+          <div className="reveal lg:sticky lg:top-28 lg:self-start">
             <h2 className={h2}>How a deal works</h2>
             <p className={`${lead} mt-4 max-w-[380px]`}>Four steps, no invoices to chase. You can see where every order is at any time.</p>
           </div>
@@ -252,8 +253,9 @@ export default function Home() {
 
         {/* Earnings calculator */}
         <section className="relative border-y rule bg-white/60">
+          <div className="grid-fade" aria-hidden="true" />
           <div className={`${wrap} py-20 lg:py-28`}>
-            <div className="max-w-[640px]">
+            <div className="reveal max-w-[640px]">
               <h2 className={h2}>What could your posts earn?</h2>
               <p className={`${lead} mt-4`}>Drag the sliders. It&apos;s rough maths for a year of brand deals, before fees.</p>
             </div>
@@ -264,8 +266,9 @@ export default function Home() {
         </section>
 
         {/* Founding offer: one ticket instead of three cards */}
-        <section className={`${wrap} py-20 lg:py-28`}>
-          <div className="ticket reveal grid gap-10 p-7 sm:p-10 lg:grid-cols-[1fr_1.3fr] lg:gap-14">
+        <section className={`${wrap} relative py-20 lg:py-28`}>
+          <div className="grid-fade" aria-hidden="true" />
+          <div className="ticket reveal relative grid gap-10 p-7 sm:p-10 lg:grid-cols-[1fr_1.3fr] lg:gap-14">
             <div className="flex flex-col gap-4">
               <p className="text-sm font-bold text-[#7A5200]">★ Founding Creator · first {spots} only</p>
               <h2 className={h2}>Get in early and keep the better deal</h2>
@@ -298,7 +301,7 @@ export default function Home() {
                 earn later. It goes to people on the waitlist.
               </p>
             </div>
-            <div className="flex flex-wrap justify-center gap-x-2 gap-y-8 rounded-2xl border rule bg-white px-4 py-10">
+            <div className="reveal flex flex-wrap justify-center gap-x-2 gap-y-8 rounded-2xl border rule bg-white px-4 py-10">
               {badges.map((b) => (
                 <div key={b.name} className={`bgd ${b.locked ? "lk" : ""}`} tabIndex={0}>
                   <div className="hx" style={b.c1 ? ({ "--c1": b.c1, "--c2": b.c2 } as React.CSSProperties) : undefined}>
@@ -316,9 +319,10 @@ export default function Home() {
         </section>
 
         {/* Trust */}
-        <section id="trust" className={`${wrap} scroll-mt-20 py-20 lg:py-28`}>
-          <h2 className={`${h2} max-w-[720px]`}>What keeps it fair for both sides</h2>
-          <div className="mt-12 grid gap-x-14 md:grid-cols-2">
+        <section id="trust" className={`${wrap} relative scroll-mt-20 py-20 lg:py-28`}>
+          <div className="grid-fade" aria-hidden="true" />
+          <h2 className={`reveal relative ${h2} max-w-[720px]`}>What keeps it fair for both sides</h2>
+          <div className="relative mt-12 grid gap-x-14 md:grid-cols-2">
             {trust.map((t) => (
               <div key={t.title} className="reveal border-t rule py-6">
                 <h3 className="text-lg font-bold">{t.title}</h3>
@@ -337,7 +341,7 @@ export default function Home() {
             </div>
             <div className="border-t border-black/10">
               {faqs.map((f) => (
-                <details key={f.id} className="faq" data-faq={f.id}>
+                <details key={f.id} className="faq reveal" data-faq={f.id}>
                   <summary>{f.q}</summary>
                   <p>{f.a}</p>
                 </details>
@@ -348,7 +352,9 @@ export default function Home() {
 
         {/* Final CTA */}
         <section className={`${wrap} py-20 lg:py-24`}>
-          <div className="reveal flex flex-col gap-5 rounded-3xl bg-ink px-6 py-12 text-white sm:px-14 sm:py-16">
+          <div className="reveal relative flex flex-col gap-5 overflow-hidden rounded-3xl bg-ink px-6 py-12 text-white sm:px-14 sm:py-16">
+            <div className="grid-fade grid-fade-dark" aria-hidden="true" />
+            <div className="relative flex flex-col gap-5">
             <h2 className="font-display max-w-[720px] text-[clamp(40px,6vw,64px)] leading-[1]">
               Save your <em className="text-[#B9A6FF]">Founding</em> spot
             </h2>
@@ -356,6 +362,7 @@ export default function Home() {
               Early access, half the usual fee for good, and the Founding badge. Every friend you invite moves you up the line.
             </p>
             <WaitlistForm id="email-bottom" dark />
+            </div>
           </div>
         </section>
       </main>
