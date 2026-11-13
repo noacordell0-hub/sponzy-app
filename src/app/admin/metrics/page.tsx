@@ -5,6 +5,8 @@ import { getSupabaseAdmin } from "@/lib/supabase-server";
 import { AppShell } from "@/components/AppShell";
 import { FOUNDING_SPOTS } from "@/lib/site";
 import { AdminHeader } from "../AdminNav";
+import LinkBuilder from "./LinkBuilder";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Metrics · Clouta Admin", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -143,6 +145,8 @@ export default async function MetricsPage() {
         <Table title="Top referrers" head={["Invite code", "Friends joined"]} rows={top.map(([id, n]) => [codeById.get(id) ?? `#${id}`, n])} empty="No one has invited a friend yet." />
         <Table title="Invites per person" head={["Friends invited", "People", "Share"]} rows={dist.map((d) => [d.n === 3 ? "3+ (first beta wave)" : String(d.n), d.c, pct(d.c, rows.length)])} empty="No signups yet." />
       </div>
+
+      <LinkBuilder siteUrl={SITE_URL} />
 
       <section className="panel mt-6 p-6" aria-labelledby="funnel-t">
         <h2 id="funnel-t" className="eyebrow">Landing funnel · unique visitors, last {DAYS} days</h2>

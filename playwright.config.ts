@@ -13,7 +13,13 @@ export default defineConfig({
   timeout: 45_000,
   retries: 1,
   reporter: [["list"]],
-  use: { baseURL, trace: "off", screenshot: "only-on-failure" },
+  use: {
+    baseURL,
+    trace: "off",
+    screenshot: "only-on-failure",
+    // When testing a remote site from a network that requires a proxy, send requests through it.
+    ...(!local && process.env.HTTPS_PROXY ? { proxy: { server: process.env.HTTPS_PROXY } } : {}),
+  },
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
     // Only Chromium is installed here, so the phone profiles use Chromium with the phone's screen and touch settings.

@@ -40,6 +40,8 @@ export async function POST(request: Request) {
   }
 
   if (b.type !== "event" || !EVENTS.has(b.name)) return new NextResponse(null, { status: 400 });
+  // Skip headless browsers and known bots so test runs and crawlers don't skew the funnel.
+  if (/headless|bot|crawl|spider|playwright|puppeteer|lighthouse/i.test(request.headers.get("user-agent") ?? "")) return new NextResponse(null, { status: 204 });
   const admin = getSupabaseAdmin();
   if (admin) {
     const utm = cleanProps(b.utm);
