@@ -164,6 +164,8 @@ function Conversation({
     setSending(true);
     setError(null);
     const { data, error } = await supabase.from("messages").insert({ thread_id: threadId, sender_id: me, kind: "text", body }).select().single<Message>();
+    // Let the other person know by email (the server sends at most one per unread burst).
+    if (!error) fetch("/api/notify/message", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ thread_id: threadId }), keepalive: true }).catch(() => {});
     setSending(false);
     if (error) return setError(error.message || "Couldn't send that message.");
     setText("");
@@ -369,6 +371,7 @@ function OfferForm({ threadId, me, onClose, onSent }: { threadId: number; me: st
       .single<Message>();
     setBusy(false);
     if (error) return setError(error.message);
+    fetch("/api/notify/message", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ thread_id: threadId }), keepalive: true }).catch(() => {});
     if (data) onSent(data);
     onClose();
   }

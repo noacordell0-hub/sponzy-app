@@ -4,6 +4,7 @@ import { LogoMark } from "@/components/Logo";
 import { Icon, type IconName } from "@/components/Icons";
 import { HeroPlanets, ShootingStars } from "@/components/Backdrop";
 import EarningsCalculator from "@/components/EarningsCalculator";
+import AppPreview from "@/components/AppPreview";
 
 import { FOUNDING_SPOTS } from "@/lib/site";
 import LandingAuthLinks from "@/components/LandingAuthLinks";
@@ -249,6 +250,22 @@ export default function Home() {
               </li>
             ))}
           </ol>
+        </section>
+
+        {/* Inside the app: what members see after signing up */}
+        <section aria-labelledby="app-t" className="relative overflow-hidden border-t rule">
+          <div className="grid-fade" aria-hidden="true" />
+          <div className={`${wrap} grid items-center gap-12 py-20 lg:grid-cols-[0.8fr_1.2fr] lg:py-28`}>
+            <div className="reveal">
+              <h2 id="app-t" className={h2}>One calm place for every deal</h2>
+              <p className={`${lead} mt-4 max-w-[400px]`}>
+                Your Home tells you what to do next. Each order shows exactly where it is and where the money is. No spreadsheets, no chasing invoices.
+              </p>
+            </div>
+            <div className="reveal">
+              <AppPreview />
+            </div>
+          </div>
         </section>
 
         {/* Earnings calculator */}

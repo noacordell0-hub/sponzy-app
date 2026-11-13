@@ -83,12 +83,27 @@ export default async function BrowsePage({ searchParams }: { searchParams: Promi
               <p className="max-w-md text-sm text-body">
                 {filtered
                   ? "Try removing a filter or searching for something broader. Follower filters only count verified accounts."
-                  : "Creators are setting up their shops during the private beta. Check back soon."}
+                  : profile?.role === "creator"
+                    ? "Creators are setting up their shops during the private beta. Publish yours now and brands will see you first."
+                    : "Creators are setting up their shops during the private beta. Get on the list and we'll tell you the moment they're bookable."}
               </p>
-              {filtered && (
+              {filtered ? (
                 <Link href="/browse" className="btn btn-ghost mt-2 min-h-11 px-5 text-sm">
                   Clear filters
                 </Link>
+              ) : profile?.role === "creator" ? (
+                <Link href="/post/edit" className="btn mt-2 min-h-11 px-5 text-sm">
+                  Set up my shop
+                </Link>
+              ) : (
+                <div className="mt-2 flex flex-wrap justify-center gap-2">
+                  <Link href="/#join" className="btn min-h-11 px-5 text-sm">
+                    Join the brand waitlist
+                  </Link>
+                  <Link href="/leaderboard" className="btn btn-ghost min-h-11 px-5 text-sm">
+                    See the leaderboard
+                  </Link>
+                </div>
               )}
             </div>
           ) : (
