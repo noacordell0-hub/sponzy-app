@@ -45,47 +45,72 @@ export default async function BrandPage({ params }: Params) {
     site = null;
   }
 
+  const joined = brand.onboarded_at ? new Date(brand.onboarded_at).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : null;
+  const pct = (n: number | null | undefined) => (n == null ? "—" : `${Math.round(Number(n) * 100)}%`);
+  const stats = [
+    { label: "Collabs completed", value: String(trust?.completed ?? 0) },
+    { label: "Repeat creators", value: String(trust?.repeat_partners ?? 0) },
+    { label: "Creators would rehire", value: (trust?.completed ?? 0) > 0 ? pct(trust?.rehire_rate) : "—" },
+    { label: "Rating", value: trust && trust.review_count > 0 ? `${Number(trust.avg_rating).toFixed(1)} (${trust.review_count})` : "New" },
+  ];
+
   return (
     <AppShell profile={viewer} active="browse">
+      <nav aria-label="Breadcrumb" className="on-bg-muted mb-4 text-sm text-ink-2">
+        <ol className="flex flex-wrap items-center gap-1.5">
+          <li>Brands</li>
+          <li aria-hidden="true">/</li>
+          <li aria-current="page" className="font-semibold text-ink">
+            {brand.display_name}
+          </li>
+        </ol>
+      </nav>
       <section className="panel overflow-hidden">
-        <div className="h-32" style={{ background: theme.banner }} />
-        <div className="flex flex-col gap-4 px-5 pb-6 sm:flex-row sm:items-end sm:px-8">
-          <span className="-mt-12 self-start rounded-[26px] border-[5px] border-white">
-            <Avatar name={brand.display_name} source={brand.avatar_source} pattern={brand.avatar_pattern} url={brand.avatar_url} size={92} rounded={22} />
-          </span>
-          <div className="min-w-0 flex-1">
-            <h1 className="text-2xl font-extrabold tracking-[-0.03em]">{brand.display_name}</h1>
-            <p className="text-sm text-ink-2">
-              @{brand.handle}
-              {site && (
-                <>
-                  {" · "}
-                  <a href={brand.website!} target="_blank" rel="noopener noreferrer nofollow" className="font-semibold text-violet-deep">
-                    {site} ↗
-                  </a>
-                </>
+        <div className="h-20 sm:h-24" style={{ background: theme.banner }} />
+        <div className="px-5 pb-6 sm:px-7">
+          <div className="flex items-end justify-between gap-3">
+            <span className="-mt-10 rounded-[26px] border-[5px] border-white bg-white">
+              <Avatar name={brand.display_name} source={brand.avatar_source} pattern={brand.avatar_pattern} url={brand.avatar_url} size={92} rounded={22} />
+            </span>
+            <div className="flex gap-2 pt-3">
+              {isOwner ? (
+                <Link href="/settings/account" className="btn btn-ghost min-h-10 px-4 text-sm">
+                  Edit profile
+                </Link>
+              ) : (
+                <Link href={`/messages/new?to=${brand.handle}`} className="btn min-h-10 px-4 text-sm" style={{ background: theme.button, color: theme.text }}>
+                  Message
+                </Link>
               )}
-              {brand.budget ? ` · Typical budget ${brand.budget}` : ""}
-            </p>
-            {brand.tagline && <p className="mt-2 max-w-2xl text-[15px] text-body">{brand.tagline}</p>}
+            </div>
           </div>
-          {isOwner ? (
-            <Link href="/settings/account" className="btn btn-ghost min-h-11 px-4 text-sm">
-              Edit profile
-            </Link>
-          ) : (
-            <Link href={`/messages/new?to=${brand.handle}`} className="btn min-h-11 px-4 text-sm" style={{ background: theme.button, color: theme.text }}>
-              Message
-            </Link>
-          )}
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <h1 className="text-2xl font-extrabold tracking-[-0.03em] sm:text-[28px]">{brand.display_name}</h1>
+            <span className="rounded-full border border-black/10 px-2 py-0.5 text-xs font-semibold text-ink-2">Brand</span>
+          </div>
+          <p className="mt-0.5 text-sm text-ink-2">
+            @{brand.handle}
+            {site && (
+              <>
+                {" · "}
+                <a href={brand.website!} target="_blank" rel="noopener noreferrer nofollow" className="font-semibold text-violet-deep">
+                  {site} ↗
+                </a>
+              </>
+            )}
+            {joined ? ` · On Clouta since ${joined}` : ""}
+          </p>
+          {brand.tagline && <p className="mt-3 max-w-2xl text-[16px] leading-relaxed text-body">{brand.tagline}</p>}
         </div>
+        <dl className="grid grid-cols-2 border-t border-black/[.08] sm:grid-cols-4">
+          {stats.map((s, n) => (
+            <div key={s.label} className={`border-black/[.08] px-5 py-4 sm:px-7 ${n % 2 ? "border-l" : ""} ${n > 1 ? "border-t sm:border-t-0" : ""} ${n === 2 ? "sm:border-l" : ""}`}>
+              <dt className="text-xs font-semibold text-ink-2">{s.label}</dt>
+              <dd className="tabular mt-0.5 text-lg font-extrabold tracking-[-0.02em]">{s.value}</dd>
+            </div>
+          ))}
+        </dl>
       </section>
-
-      {!isOwner && (
-        <div className="mt-2 flex justify-end">
-          <ReportButton targetType="profile" targetId={brand.id} ownerId={brand.id} ownerName={brand.display_name} viewerId={user?.id ?? null} blocked={Boolean(blockRow)} />
-        </div>
-      )}
 
       <div className="mt-6 grid items-start gap-6 lg:grid-cols-[1fr_320px]">
         <div className="flex flex-col gap-6">
@@ -102,11 +127,6 @@ export default async function BrandPage({ params }: Params) {
                   </span>
                 ))}
               </div>
-            )}
-            {brand.audience && (
-              <p className="mt-4 text-sm text-body">
-                <b className="text-ink">Wants to reach:</b> {brand.audience}
-              </p>
             )}
           </section>
           <section className="panel p-6" aria-labelledby="b-reviews">
@@ -132,6 +152,27 @@ export default async function BrandPage({ params }: Params) {
           </section>
         </div>
         <div className="flex flex-col gap-6">
+          {(brand.budget || brand.audience) && (
+            <section className="panel p-6 text-sm" aria-labelledby="b-work">
+              <h2 id="b-work" className="eyebrow">
+                Working with {brand.display_name}
+              </h2>
+              <dl className="mt-3 flex flex-col gap-3">
+                {brand.budget && (
+                  <div>
+                    <dt className="text-xs font-semibold text-ink-2">Typical budget</dt>
+                    <dd className="font-semibold">{brand.budget}</dd>
+                  </div>
+                )}
+                {brand.audience && (
+                  <div>
+                    <dt className="text-xs font-semibold text-ink-2">Wants to reach</dt>
+                    <dd className="font-semibold">{brand.audience}</dd>
+                  </div>
+                )}
+              </dl>
+            </section>
+          )}
           <TrustPanel trust={trust} role="brand" reviewsHref={`/b/${brand.handle}/reviews`} />
           {socials.length > 0 && (
             <section className="panel p-6" aria-labelledby="b-socials">
@@ -152,6 +193,11 @@ export default async function BrandPage({ params }: Params) {
                 ))}
               </ul>
             </section>
+          )}
+          {!isOwner && (
+            <div className="flex justify-center">
+              <ReportButton targetType="profile" targetId={brand.id} ownerId={brand.id} ownerName={brand.display_name} viewerId={user?.id ?? null} blocked={Boolean(blockRow)} />
+            </div>
           )}
         </div>
       </div>
