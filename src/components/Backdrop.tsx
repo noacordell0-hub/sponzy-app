@@ -10,6 +10,13 @@ const SHOOTING = [
   { top: "62%", left: "76%", delay: "5.5s", dur: "7s" },
   { top: "78%", left: "96%", delay: "3.2s", dur: "6s" },
   { top: "12%", left: "40%", delay: "6.8s", dur: "7.5s" },
+  { top: "26%", left: "60%", delay: "1s", dur: "5.5s" },
+  { top: "42%", left: "50%", delay: "3.8s", dur: "6.2s" },
+  { top: "56%", left: "92%", delay: "0.2s", dur: "5.8s" },
+  { top: "70%", left: "58%", delay: "2s", dur: "6.6s" },
+  { top: "88%", left: "80%", delay: "4.6s", dur: "5.4s" },
+  { top: "3%", left: "90%", delay: "7.4s", dur: "6.8s" },
+  { top: "95%", left: "45%", delay: "6s", dur: "6s" },
 ];
 
 /** Page-wide starfield: twinkling dots plus frequent shooting stars, fixed behind everything. */
@@ -18,6 +25,7 @@ export function ShootingStars() {
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
       <div className="starfield starfield-a" />
       <div className="starfield starfield-b" />
+      <div className="starfield starfield-c" />
       {SHOOTING.map((s, i) => (
         <i key={i} className="shoot" style={{ top: s.top, left: s.left, animationDelay: s.delay, animationDuration: s.dur }} />
       ))}

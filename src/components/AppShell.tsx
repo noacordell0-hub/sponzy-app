@@ -69,6 +69,7 @@ export async function AppShell({
     <div className={profile?.deep_space ? "deep-space" : ""}>
       <ShootingStars />
       <div className="relative z-[1] min-h-screen">
+        <div className="hero-bg !h-[520px]" aria-hidden="true" />
         <header className="app-header sticky top-0 z-20 border-b border-black/[.12] bg-[#f7f4ee]/85 backdrop-blur-md">
           <div className={`mx-auto flex h-16 ${width} items-center gap-2 px-4 sm:px-8`}>
             <Link href={profile ? "/browse" : "/"} className="mr-2 flex flex-none items-center gap-2.5 text-[20px] font-extrabold tracking-[-0.03em]" aria-label={profile ? "Clouta, go to Browse" : "Clouta home"}>
@@ -116,7 +117,7 @@ export async function AppShell({
           </div>
         </header>
 
-        <main className={`app-main page-in mx-auto ${width} px-4 pb-28 pt-8 sm:px-8 md:pb-12 md:pt-10`}>
+        <main className={`app-main page-in relative mx-auto ${width} px-4 pb-28 pt-8 sm:px-8 md:pb-12 md:pt-10`}>
           {profile?.banned_at && (
             <div role="alert" className="mb-6 rounded-2xl border border-[#F2B8C6] bg-[#FFF5F7] px-5 py-4 text-sm text-[#7A1236]">
               <b>{until ? `Your account is suspended until ${until}.` : "Your account has been removed from Clouta."}</b>{" "}
