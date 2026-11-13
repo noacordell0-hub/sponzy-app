@@ -43,11 +43,11 @@ drop trigger if exists socials_unpublish_if_unverified on public.social_accounts
 create trigger socials_unpublish_if_unverified after update or delete on public.social_accounts
   for each row execute function public.socials_unpublish_if_unverified();
 
--- (3) only verified accounts are public (owners and admins still see everything; brand accounts are not verified, so theirs stay public)
+-- (3) only verified accounts are public (owners still see all of theirs; admins use their own functions;
+--     brand accounts are not verified, so theirs stay public)
 drop policy if exists "socials readable" on public.social_accounts;
 create policy "socials readable" on public.social_accounts for select using (
   profile_id = auth.uid()
-  or public.is_admin()
   or exists (
     select 1 from public.profiles p
     where p.id = profile_id and p.onboarded_at is not null and p.banned_at is null
