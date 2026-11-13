@@ -65,9 +65,16 @@ export default function EarningsCalculator() {
           ${yearly.toLocaleString()}
         </p>
         <p className="mt-1 text-sm text-[#D9D3FF]">a year from brand deals, before fees</p>
-        <p className="mt-4 border-t border-white/15 pt-4 text-sm text-[#E9E5FF]">
-          Founding Creators pay <b className="text-white">half the standard Clouta fee, for life</b>.
-        </p>
+        <dl className="mt-4 grid gap-1.5 border-t border-white/15 pt-4 text-sm">
+          <div className="flex justify-between gap-3">
+            <dt className="text-[#E9E5FF]">You keep as a Founding Creator (5% fee)</dt>
+            <dd className="font-bold text-white">${Math.round(yearly * 0.95).toLocaleString()}</dd>
+          </div>
+          <div className="flex justify-between gap-3">
+            <dt className="text-[#D9D3FF]">At the standard 10% fee</dt>
+            <dd className="text-[#D9D3FF]">${Math.round(yearly * 0.9).toLocaleString()}</dd>
+          </div>
+        </dl>
       </div>
     </div>
   );

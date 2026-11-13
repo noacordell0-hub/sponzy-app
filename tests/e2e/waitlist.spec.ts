@@ -40,7 +40,8 @@ test("valid email shows place in line and an invite link", async ({ page }) => {
   await f.submit.click();
   await expect(page.getByText("You're #412")).toBeVisible();
   await expect(page.locator("input[readonly]").first()).toHaveValue(/\?ref=test1234$/);
-  await expect(page.getByText("Invite 3 friends").first()).toBeVisible();
+  await expect(page.getByText("First beta wave").first()).toBeVisible();
+  await expect(page.getByText("Your first friend moves you up 5 spots.")).toBeVisible();
 });
 
 test("duplicate email returns the existing spot instead of an error", async ({ page }) => {
@@ -114,4 +115,37 @@ test.describe("rate limiting (real API)", () => {
     for (let i = 0; i < 7; i++) last = (await request.post("/api/waitlist", { data: { email: "x" }, headers: { "x-real-ip": "203.0.113.9" } })).status();
     expect(last).toBe(429);
   });
+});
+
+test("after signup: one-tap share buttons carry the invite link and a ready message", async ({ page }) => {
+  await mockWaitlist(page, (_b, r) => r.fulfill({ json: okSignup }));
+  await page.goto("/");
+  await page.locator("#email-hero").fill("share@example.com");
+  await page.locator("form:has(#email-hero) button[type=submit]").click();
+  const wa = page.getByRole("link", { name: "WhatsApp" });
+  await expect(wa).toBeVisible();
+  const href = decodeURIComponent((await wa.getAttribute("href")) ?? "");
+  expect(href).toContain("?ref=test1234");
+  expect(href).toContain("Founding Creators only pay a 5% fee");
+  for (const name of ["Text", "X", "Email"]) await expect(page.getByRole("link", { name, exact: true })).toBeVisible();
+});
+
+test("progress text counts down to the first beta wave", async ({ page }) => {
+  await mockWaitlist(page, (_b, r) => r.fulfill({ json: { ...okSignup, referrals: 2 } }));
+  await page.goto("/");
+  await page.locator("#email-hero").fill("two@example.com");
+  await page.locator("form:has(#email-hero) button[type=submit]").click();
+  await expect(page.getByText("1 more friend and you're in the first beta wave.")).toBeVisible();
+});
+
+test("brands can join the waitlist as a brand", async ({ page }) => {
+  let sent: Record<string, unknown> = {};
+  await mockWaitlist(page, (b, r) => { sent = b; return r.fulfill({ json: okSignup }); });
+  await page.goto("/");
+  await page.locator("form:has(#email-hero)").getByRole("button", { name: /I'm a brand/ }).click();
+  await expect(page.locator("form:has(#email-hero) button[type=submit]")).toHaveText("Get early access");
+  await page.locator("#email-hero").fill("brand@example.com");
+  await page.locator("form:has(#email-hero) button[type=submit]").click();
+  await expect(page.getByText("You're on the brand list.")).toBeVisible();
+  expect(sent.role).toBe("brand");
 });
