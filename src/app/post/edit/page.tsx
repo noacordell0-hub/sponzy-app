@@ -36,6 +36,7 @@ export default async function ShopEditPage({ searchParams }: { searchParams: Pro
         initialPost={post ?? null}
         initialServices={(services as Service[]) ?? []}
         socialPlatforms={((socials as Social[]) ?? []).map((s) => s.platform)}
+        verification={((socials as Social[]) ?? []).some((s) => s.verified) ? "verified" : ((socials as Social[]) ?? []).some((s) => s.verify_requested_at) ? "pending" : "none"}
       />
     </AppShell>
   );

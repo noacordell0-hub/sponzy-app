@@ -259,10 +259,16 @@ export default function AccountForm({ profile, socials, isMinor }: { profile: Pr
         </section>
 
         {/* Linked accounts */}
-        <section className="panel flex flex-col gap-4 p-6" aria-labelledby="linked-title">
+        <section id="socials" className="panel flex scroll-mt-24 flex-col gap-4 p-6" aria-labelledby="linked-title">
           <h2 id="linked-title" className="eyebrow">
             Linked accounts
           </h2>
+          {isCreator && !socials.some((s) => s.verified) && (
+            <p className="rounded-xl border border-[#E8D9A8] bg-[#FFF9E8] px-4 py-3 text-sm text-body">
+              <b className="text-ink">Verification is required.</b> Your shop can only go live once at least one account shows ✓ Verified. Until then, your
+              accounts and follower counts are only visible to you.
+            </p>
+          )}
           <SocialsEditor userId={profile.id} initial={socials} onChange={() => router.refresh()} />
         </section>
 

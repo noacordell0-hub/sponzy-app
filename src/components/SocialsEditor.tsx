@@ -146,8 +146,9 @@ export default function SocialsEditor({ userId, initial, onChange }: { userId: s
         </p>
       )}
       <p className="text-xs text-ink-2">
-        Your account with the most followers becomes your main one. Tap Verify to prove an account is yours. Verified accounts get a ✓
-        that brands see, and changing a verified account&apos;s handle or followers removes the ✓ until it&apos;s checked again.
+        Your account with the most followers becomes your main one. Tap Verify to prove an account is yours: we check the code in your bio
+        and confirm the real follower count. For creators, only verified accounts are shown to others, and you need at least one to publish your shop.
+        Changing a verified account&apos;s handle or followers removes the ✓ until it&apos;s checked again.
       </p>
     </div>
   );
