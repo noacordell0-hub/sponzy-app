@@ -61,7 +61,7 @@ export default function EarningsCalculator() {
       </div>
       <div className="rounded-2xl bg-ink p-6 text-white" aria-live="polite">
         <p className="text-sm font-semibold text-[#D9D3FF]">You could earn</p>
-        <p className="font-display mt-1 text-[clamp(48px,7vw,64px)] leading-none">
+        <p className="font-display tabular mt-1 text-[clamp(48px,7vw,64px)] leading-none">
           ${yearly.toLocaleString()}
         </p>
         <p className="mt-1 text-sm text-[#D9D3FF]">a year from brand deals, before fees</p>

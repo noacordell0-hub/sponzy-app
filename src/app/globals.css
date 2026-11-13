@@ -34,7 +34,12 @@
   --radius-btn: 12px;
 }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+::selection { background: rgba(91, 61, 245, 0.18); color: var(--ink); }
+/* Balanced headline breaks and fewer lonely last words in paragraphs */
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+.tabular { font-variant-numeric: tabular-nums; }
 
 body {
   color: var(--ink);
@@ -87,6 +92,34 @@ body {
 
 /* ---- Landing page: warm paper, ink rules, editorial serif ---- */
 .paper { background: #f7f4ee; }
+/* Faint paper grain over the whole page: one tiny inline SVG, no image download */
+.grain::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* Sections fade up gently as they scroll into view (browsers that support it; otherwise they simply show) */
+@supports (animation-timeline: view()) {
+  .reveal { animation: reveal-up linear both; animation-timeline: view(); animation-range: entry 0% entry 40%; }
+  @keyframes reveal-up { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+}
+/* Small, quick lift on hover for cards and rows people can scan */
+.lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+@media (hover: hover) { .lift:hover { transform: translateY(-2px); box-shadow: 0 10px 0 -6px rgba(21, 19, 31, 0.08); } }
+/* Money-flow strip: each step lights up in turn, then the loop restarts */
+.flow-step { animation: flow-on 6s infinite; }
+.flow-step:nth-child(2) { animation-delay: 1.5s; }
+.flow-step:nth-child(3) { animation-delay: 3s; }
+.flow-step:nth-child(4) { animation-delay: 4.5s; }
+@keyframes flow-on { 0%, 100% { border-color: rgba(21, 19, 31, 0.14); background: #fff; } 8%, 30% { border-color: #5b3df5; background: #f3f0ff; } }
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .flow-step { animation: none !important; }
+  .lift { transition: none; }
+}
 .font-display { font-family: var(--font-serif); font-weight: 400; letter-spacing: -0.01em; }
 .rule { border-color: rgba(21, 19, 31, 0.14); }
 /* Hand-drawn underline under a headline word */
