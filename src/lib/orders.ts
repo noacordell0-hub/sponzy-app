@@ -3,6 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { getStripe, FEES } from "@/lib/stripe";
 import { money } from "@/lib/format";
 import { refreshOrderTrust } from "@/lib/reviews";
+import { emailOrderEvent } from "@/lib/email";
 
 export type OrderStatus =
   | "awaiting_payment" | "funded" | "in_progress" | "proof_submitted" | "revision_requested"
@@ -52,6 +53,7 @@ export type Order = {
 /** Record an order event and post a system message into the brand-creator conversation. */
 export async function logOrder(admin: SupabaseClient, order: Pick<Order, "id" | "brand_id" | "creator_id" | "thread_id" | "title">, kind: string, actorId: string | null, note: string, chatText?: string) {
   await admin.from("order_events").insert({ order_id: order.id, actor_id: actorId, kind, note });
+  await emailOrderEvent(admin, order.id, kind, actorId).catch(() => null); // emails are best effort; never block the order
   if (!chatText) return;
   const threadId = order.thread_id ?? (await ensureThread(admin, order));
   if (threadId) await admin.from("messages").insert({ thread_id: threadId, sender_id: null, kind: "system", body: chatText, order_id: order.id });
