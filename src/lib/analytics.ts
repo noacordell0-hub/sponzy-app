@@ -16,7 +16,8 @@ export type EventName =
   | "earnings_calculator_used"
   | "browse_view" | "login_view" | "signup_view"
   | "stripe_onboard_start" | "stripe_onboard_success" | "stripe_onboard_error"
-  | "checkout_start" | "review_submitted" | "dispute_opened";
+  | "checkout_start" | "review_submitted" | "dispute_opened"
+  | "profile_view" | "book_click" | "profile_message_click" | "shop_link_copied";
 
 type Props = Record<string, string | number | boolean | null>;
 

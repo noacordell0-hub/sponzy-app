@@ -54,7 +54,7 @@ function PasswordForm({ mode, next }: { mode: "signup" | "login"; next?: string 
       return setError({ text: json.error || "Something went wrong. Please try again.", waitlist: json.waitlist });
     }
     const safeNext = next && /^\/[a-z0-9/_-]*$/i.test(next) ? next : null;
-    window.location.href = json.next ?? safeNext ?? "/settings/account";
+    window.location.href = json.next ?? safeNext ?? "/home";
   }
 
   return (

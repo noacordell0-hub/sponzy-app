@@ -14,6 +14,7 @@ import { BadgeRow, TrustPanel } from "@/components/TrustPanel";
 import ReviewCard from "@/components/ReviewCard";
 import ReportButton from "@/components/ReportButton";
 import Comments, { type CommentRow } from "@/components/Comments";
+import TrackView from "@/components/TrackView";
 import { Stars } from "@/components/Stars";
 
 type Params = { params: Promise<{ handle: string }> };
@@ -78,6 +79,8 @@ export default async function CreatorPage({ params }: Params) {
 
   return (
     <AppShell profile={viewer} active="browse" wide>
+      {/* Counts toward the creator's shop stats (the owner's own visits don't count). */}
+      {!isOwner && published && <TrackView name="profile_view" props={{ creator: creator.id }} />}
       {isOwner && !published && (
         <div role="status" className="mb-5 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#F2D58A] bg-[#FFF9E8] px-5 py-4 text-[#6B4700]">
           <p className="text-sm font-semibold">Your shop is a draft. Only you can see this page until you publish it.</p>
@@ -122,7 +125,7 @@ export default async function CreatorPage({ params }: Params) {
             ) : (
               <>
                 <SaveButton creatorId={creator.id} initialSaved={Boolean(savedRow)} viewerId={user?.id ?? null} />
-                <Link href={`/messages/new?to=${creator.handle}`} className="btn min-h-11 px-4 text-sm" style={{ background: theme.button, color: theme.text }}>
+                <Link href={`/messages/new?to=${creator.handle}`} data-track="profile_message_click" data-track-creator={creator.id} className="btn min-h-11 px-4 text-sm" style={{ background: theme.button, color: theme.text }}>
                   Message
                 </Link>
               </>
@@ -160,7 +163,7 @@ export default async function CreatorPage({ params }: Params) {
                 {s.is_bundle && <span className="badge-violet self-start rounded-md px-2 py-0.5 text-[11px] font-semibold">Bundle</span>}
                 {s.includes && <p className="text-sm leading-relaxed text-body">{s.includes}</p>}
                 {isOwner ? null : creator.payouts_ready && creator.taking_bookings ? (
-                  <Link href={`/checkout/${s.id}`} className="btn min-h-11 text-sm" style={{ background: theme.button, color: theme.text }}>
+                  <Link href={`/checkout/${s.id}`} data-track="book_click" data-track-creator={creator.id} data-track-service={String(s.id)} className="btn min-h-11 text-sm" style={{ background: theme.button, color: theme.text }}>
                     Book · {money(s.price_cents)}
                   </Link>
                 ) : (
