@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Celebrate } from "@/components/Delight";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { requireProfile } from "@/lib/auth";
@@ -43,6 +44,8 @@ export default async function CreatorHome({ searchParams }: { searchParams: Prom
   const orders = (ordersData as Order[]) ?? [];
   const events = ((evRes as { data: Ev[] | null }).data ?? []) as Ev[];
   const unread = Number(unreadData) || 0;
+  // Most recent payout in the last 2 weeks (celebrated once).
+  const latestPaid = orders.find((o) => o.status === "paid" && o.paid_at && Date.now() - new Date(o.paid_at).getTime() < 14 * 864e5);
 
   // ---- Checklist ----
   const shopViewsEver = events.filter((e) => e.name === "profile_view").length;
@@ -100,6 +103,10 @@ export default async function CreatorHome({ searchParams }: { searchParams: Prom
 
   return (
     <AppShell profile={profile} active="home">
+      {/* Big moments, each celebrated once per browser */}
+      {welcome && <Celebrate id={`welcome:${user.id}`} message={`Welcome to Clouta, ${profile.display_name?.split(" ")[0] ?? "friend"}!`} burst={false} />}
+      {(socials ?? []).some((s) => s.verified) && <Celebrate id={`verified:${user.id}`} message="Your account is verified ✓ Brands can trust your numbers." />}
+      {latestPaid && <Celebrate id={`paid:${latestPaid.id}`} message={`You got paid ${money(latestPaid.payout_cents ?? latestPaid.price_cents - latestPaid.creator_fee_cents)} 🎉`} />}
       {welcome && (
         <div role="status" className="chip-pop mb-6 rounded-2xl border border-black/[.08] bg-ok-bg px-5 py-4 text-ok">
           <p className="font-bold">Welcome to Clouta, {profile.display_name}!</p>
@@ -116,7 +123,7 @@ export default async function CreatorHome({ searchParams }: { searchParams: Prom
 
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_360px]">
         <div className="flex flex-col gap-6">
-          <Checklist items={checklist} />
+          <Checklist items={checklist} doneId={`setup-done:${user.id}`} />
           <ActionList items={actions} empty="You're all caught up. New orders and messages will show up here." />
 
           <section aria-labelledby="stats-t">

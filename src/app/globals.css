@@ -470,3 +470,28 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   @view-transition { navigation: none; }
 }
 .deep-space * { scrollbar-color: rgba(255, 255, 255, 0.25) transparent; }
+
+/* ---- Satisfying feedback (see src/lib/delight.ts and components/Delight.tsx) ---- */
+.toast-in { animation: toast-in 0.32s cubic-bezier(0.2, 0.9, 0.3, 1.2) both; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(12px) scale(0.96); } }
+/* Check marks draw themselves */
+.draw-check { stroke-dasharray: 24; stroke-dashoffset: 24; animation: draw-check 0.42s 0.08s ease-out forwards; }
+@keyframes draw-check { to { stroke-dashoffset: 0; } }
+/* Heart / toggle pop */
+.pop { animation: pop-once 0.38s cubic-bezier(0.3, 1.8, 0.5, 1); }
+@keyframes pop-once { 0% { transform: scale(1); } 40% { transform: scale(1.32); } 100% { transform: scale(1); } }
+/* Bars grow up from the baseline, one after another */
+.bar-grow { transform-origin: bottom; animation: bar-grow 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes bar-grow { from { transform: scaleY(0); } }
+/* Progress bars fill smoothly */
+.fill-bar { transition: width 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); animation: fill-in 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+@keyframes fill-in { from { width: 0; } }
+/* Content swaps (service tabs) fade and lift in */
+.swap-in { animation: swap-in 0.26s ease-out both; }
+@keyframes swap-in { from { opacity: 0; transform: translateY(4px); } }
+/* A finished checklist step pops its tick */
+.tick-pop { animation: pop-once 0.45s cubic-bezier(0.3, 1.8, 0.5, 1) both; }
+@media (prefers-reduced-motion: reduce) {
+  .toast-in, .pop, .bar-grow, .fill-bar, .swap-in, .tick-pop { animation: none !important; transition: none !important; }
+  .draw-check { animation: none; stroke-dashoffset: 0; }
+}

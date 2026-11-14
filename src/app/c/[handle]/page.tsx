@@ -13,6 +13,7 @@ import { loadReviews, loadTrust } from "@/lib/review-data";
 import { BadgeRow, TrustPanel } from "@/components/TrustPanel";
 import ReviewCard from "@/components/ReviewCard";
 import ReportButton from "@/components/ReportButton";
+import { CountUp } from "@/components/Delight";
 import Comments, { type CommentRow } from "@/components/Comments";
 import TrackView from "@/components/TrackView";
 import { Stars } from "@/components/Stars";
@@ -180,7 +181,9 @@ export default async function CreatorPage({ params }: Params) {
               {stats.map((s, n) => (
                 <div key={s.label} className={`px-5 py-4 sm:px-7 ${n % 2 ? "border-l" : ""} ${n > 1 ? "border-t sm:border-t-0" : ""} ${n === 2 ? "sm:border-l" : ""} border-black/[.08]`}>
                   <dt className="text-xs font-semibold text-ink-2">{s.label}</dt>
-                  <dd className="tabular mt-0.5 text-lg font-extrabold tracking-[-0.02em]">{s.value}</dd>
+                  <dd className="tabular mt-0.5 text-lg font-extrabold tracking-[-0.02em]">
+                    <CountUp value={s.value} />
+                  </dd>
                 </div>
               ))}
             </dl>

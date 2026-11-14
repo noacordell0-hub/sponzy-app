@@ -5,6 +5,7 @@ import { Icon, type IconName } from "@/components/Icons";
 import { HeroPlanets, ShootingStars } from "@/components/Backdrop";
 import EarningsCalculator from "@/components/EarningsCalculator";
 import AppPreview from "@/components/AppPreview";
+import { CountUp } from "@/components/Delight";
 
 import { FOUNDING_SPOTS } from "@/lib/site";
 import LandingAuthLinks from "@/components/LandingAuthLinks";
@@ -224,7 +225,9 @@ export default function Home() {
                 <span className="text-xs font-semibold text-ink-2">
                   {i + 1}. {label}
                 </span>
-                <span className="font-display tabular mt-1 block text-[40px] leading-none">{big}</span>
+                <span className="font-display tabular mt-1 block text-[40px] leading-none">
+                  <CountUp value={big} />
+                </span>
                 <span className="mt-1 block text-[13px] leading-snug text-body">{note}</span>
               </li>
             ))}

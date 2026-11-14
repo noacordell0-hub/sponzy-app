@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { Order } from "@/lib/orders";
+import { buzz, confetti, toast } from "@/lib/delight";
 
 /** The next step for whoever is looking at the order, with the actions they're allowed to take. */
 export default function OrderActions({ order, isBrand, otherName }: { order: Order; isBrand: boolean; otherName: string }) {
@@ -22,8 +23,21 @@ export default function OrderActions({ order, isBrand, otherName }: { order: Ord
     const res = await fetch(`/api/orders/${order.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, ...extra }) }).catch(() => null);
     const json = res ? await res.json().catch(() => ({})) : {};
     setBusy(null);
-    if (!res?.ok) return setError(json.error || "Something went wrong.");
+    if (!res?.ok) {
+      toast(json.error || "Something went wrong.", "error");
+      return setError(json.error || "Something went wrong.");
+    }
     if (json.url) return (window.location.href = json.url);
+    const done: Record<string, string> = {
+      approve: `Approved! ${otherName} is being paid.`,
+      start: "Work started. The brand has been told.",
+      revision: "Revision request sent",
+      extend: "New date saved",
+      cancel: "Order cancelled",
+    };
+    if (done[action]) toast(done[action], action === "cancel" ? "info" : "success");
+    if (action === "approve") confetti();
+    buzz(action === "approve" ? [10, 40, 10] : 12);
     setRevisionOpen(false);
     setExtendOpen(false);
     router.refresh();

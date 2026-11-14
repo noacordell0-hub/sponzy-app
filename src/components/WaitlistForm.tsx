@@ -3,6 +3,7 @@
 import { useEffect, useId, useState } from "react";
 import { Icon } from "@/components/Icons";
 import { getUtm, track } from "@/lib/analytics";
+import { buzz, confetti, toast } from "@/lib/delight";
 
 type Status = { code: string; position: number; referrals: number; total: number };
 type FormState = { kind: "idle" } | { kind: "loading" } | { kind: "error"; message: string };
@@ -107,6 +108,10 @@ export default function WaitlistForm({ id, dark = false }: { id: string; dark?: 
         throw new Error(json.error || "Something went wrong. Please try again.");
       }
       track("waitlist_success", { location: location_(id), returning: Boolean(json.returning), referred: Boolean(ref), role });
+      if (!json.returning) {
+        confetti();
+        buzz([10, 40, 10]);
+      }
       if (ref && !json.returning) track("referral_signup", { referrer: ref });
       if (json.code) {
         save(json.code);
@@ -208,6 +213,8 @@ function ReferralCard({ status, dark, role }: { status: Status; dark: boolean; r
       await navigator.clipboard.writeText(link);
       track("invite_link_copied", { referrals: status.referrals });
       setCopied(true);
+      buzz();
+      toast("Invite link copied");
       setTimeout(() => setCopied(false), 2000);
     } catch {
       /* clipboard blocked: the link is visible and selectable */

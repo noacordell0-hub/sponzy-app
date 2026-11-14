@@ -10,6 +10,7 @@ export default function EarningsCalculator() {
   const priceId = useId();
   const countId = useId();
   const yearly = price * perMonth * 12;
+  const shown = useRolling(yearly);
 
   // Count a "use" once the visitor stops moving the sliders for a moment (not on every pixel).
   const touched = useRef(false);
@@ -62,7 +63,8 @@ export default function EarningsCalculator() {
       <div className="rounded-2xl bg-ink p-6 text-white" aria-live="polite">
         <p className="text-sm font-semibold text-[#D9D3FF]">You could earn</p>
         <p className="font-display tabular mt-1 text-[clamp(48px,7vw,64px)] leading-none">
-          ${yearly.toLocaleString()}
+          <span aria-hidden="true">${shown.toLocaleString()}</span>
+          <span className="sr-only">${yearly.toLocaleString()}</span>
         </p>
         <p className="mt-1 text-sm text-[#D9D3FF]">a year from brand deals, before fees</p>
         <dl className="mt-4 grid gap-1.5 border-t border-white/15 pt-4 text-sm">
@@ -78,4 +80,30 @@ export default function EarningsCalculator() {
       </div>
     </div>
   );
+}
+
+/** Rolls a displayed number smoothly toward its target (like a fuel pump), instead of jumping. */
+function useRolling(target: number) {
+  const [shown, setShown] = useState(target);
+  const from = useRef(target);
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      from.current = target;
+      setShown(target);
+      return;
+    }
+    const start = performance.now();
+    const a = from.current;
+    let raf = 0;
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - start) / 350);
+      const v = Math.round(a + (target - a) * (1 - Math.pow(1 - p, 3)));
+      from.current = v;
+      setShown(v);
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [target]);
+  return shown;
 }

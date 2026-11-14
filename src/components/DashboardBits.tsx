@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { Celebrate, CountUp } from "@/components/Delight";
 
 export type ChecklistItem = { done: boolean; title: string; why: string; href: string; cta: string };
 
 /** "Getting started" list: what's done, and the single next thing to do. Hidden once everything is done. */
-export function Checklist({ items, title = "Getting started" }: { items: ChecklistItem[]; title?: string }) {
+export function Checklist({ items, title = "Getting started", doneId }: { items: ChecklistItem[]; title?: string; /** celebrate once when everything is done */ doneId?: string }) {
   const done = items.filter((i) => i.done).length;
-  if (done === items.length) return null;
+  if (done === items.length) return doneId ? <Celebrate id={doneId} message="Setup complete! You're ready for brand deals 🎉" /> : null;
   const next = items.find((i) => !i.done)!;
   return (
     <section className="panel p-6" aria-labelledby="checklist-t">
@@ -16,7 +17,7 @@ export function Checklist({ items, title = "Getting started" }: { items: Checkli
         </span>
       </div>
       <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-black/[.06]" role="progressbar" aria-valuemin={0} aria-valuemax={items.length} aria-valuenow={done} aria-label="Setup progress">
-        <div className="h-full rounded-full bg-[#5B3DF5]" style={{ width: `${(done / items.length) * 100}%` }} />
+        <div className="fill-bar h-full rounded-full bg-[#5B3DF5]" style={{ width: `${(done / items.length) * 100}%` }} />
       </div>
       <ol className="mt-4 flex flex-col divide-y divide-black/[.08]">
         {items.map((i) => {
@@ -25,9 +26,15 @@ export function Checklist({ items, title = "Getting started" }: { items: Checkli
             <li key={i.title} className="flex items-center gap-3 py-3">
               <span
                 aria-hidden="true"
-                className={`grid size-7 flex-none place-items-center rounded-full text-xs font-bold ${i.done ? "bg-ok text-white" : isNext ? "bg-[#5B3DF5] text-white" : "border border-black/20 text-ink-2"}`}
+                className={`grid size-7 flex-none place-items-center rounded-full text-xs font-bold ${i.done ? "tick-pop bg-ok text-white" : isNext ? "bg-[#5B3DF5] text-white" : "border border-black/20 text-ink-2"}`}
               >
-                {i.done ? "✓" : ""}
+                {i.done ? (
+                  <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round">
+                    <path className="draw-check" d="M5 12.5l4.5 4.5L19 7.5" />
+                  </svg>
+                ) : (
+                  ""
+                )}
               </span>
               <span className="min-w-0 flex-1">
                 <span className={`block text-sm font-semibold ${i.done ? "text-ink-2 line-through" : ""}`}>{i.title}</span>
@@ -53,7 +60,9 @@ export function Stat({ label, value, prev, note, format = (n: number) => n.toLoc
   return (
     <div className="panel p-5">
       <p className="text-sm font-bold text-ink">{label}</p>
-      <p className="tabular mt-1 text-3xl font-extrabold tracking-[-0.03em]">{format(value)}</p>
+      <p className="tabular mt-1 text-3xl font-extrabold tracking-[-0.03em]">
+        <CountUp value={format(value)} />
+      </p>
       <p className="mt-0.5 text-xs text-ink-2">
         {change === "new" ? <span className="font-semibold text-ok">New this period · </span> : change !== null && change !== 0 ? (
           <span className={`font-semibold ${change > 0 ? "text-ok" : "text-err"}`}>{change > 0 ? "▲" : "▼"} {Math.abs(change)}% vs previous · </span>
@@ -73,9 +82,9 @@ export function DailyBars({ days, label }: { days: { d: string; n: number }[]; l
   return (
     <div>
       <div className="flex h-28 items-end gap-[2px] border-b border-black/10" role="img" aria-label={`${label}: ${total} in the last ${days.length} days, best day ${max}`}>
-        {days.map((x) => (
+        {days.map((x, i) => (
           <div key={x.d} className="group relative flex h-full flex-1 items-end">
-            <div className="w-full rounded-t-[4px] bg-[#5B3DF5]" style={{ height: `${(x.n / max) * 100}%`, minHeight: x.n ? 2 : 0 }} />
+            <div className="bar-grow w-full rounded-t-[4px] bg-[#5B3DF5] transition-colors group-hover:bg-[#3f25c9]" style={{ height: `${(x.n / max) * 100}%`, minHeight: x.n ? 2 : 0, animationDelay: `${i * 18}ms` }} />
             <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-1 hidden -translate-x-1/2 whitespace-nowrap rounded-md bg-ink px-2 py-1 text-xs text-white group-hover:block">
               {new Date(x.d + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" })}: {x.n}
             </span>
