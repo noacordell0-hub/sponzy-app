@@ -1,5 +1,6 @@
 "use client";
 
+import { buzz, toast } from "@/lib/delight";
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -108,6 +109,8 @@ export default function AccountForm({ profile, socials, isMinor }: { profile: Pr
       return setMsg({ ok: false, text: "Couldn't save. Check your details and try again." });
     }
     setMsg({ ok: true, text: "Changes saved." });
+    toast("Profile saved");
+    buzz();
     router.refresh();
   }
 

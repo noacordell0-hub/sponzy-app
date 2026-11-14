@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Avatar } from "@/components/Avatar";
 import { money } from "@/lib/format";
 import { hasContactInfo, timeLabel, type InboxRow, type Message } from "@/lib/chat";
+import { messageRisk } from "@/lib/fraud";
 
 type Other = {
   id: string;
@@ -266,8 +267,24 @@ function Bubble({ m, me, iAmBrand }: { m: Message; me: string; iAmBrand: boolean
       >
         {m.body}
       </p>
+      {!mine && <RiskNote text={m.body ?? ""} />}
       <span className="mt-0.5 px-1 text-[11px] text-ink-2">{timeLabel(m.created_at)}</span>
     </div>
+  );
+}
+
+/** Warns the reader (not the sender) when a message asks to pay outside Clouta or looks like phishing. */
+function RiskNote({ text }: { text: string }) {
+  const r = messageRisk(text);
+  if (!r.offPlatform && !r.phishing) return null;
+  return (
+    <p role="note" className="mt-1.5 max-w-[78%] rounded-xl border border-[#F2B8C6] bg-[#FFF5F7] px-3 py-2 text-xs leading-relaxed text-[#8A1538]">
+      <b>⚠ Be careful.</b>{" "}
+      {r.phishing
+        ? "Clouta staff never message you here and never ask for codes, passwords or card details. Don't click links asking you to log in."
+        : "Paying outside Clouta (Venmo, PayPal, Cash App, gift cards, crypto…) means no refund if the work never arrives. Always book through Clouta."}{" "}
+      If something feels off, use Report at the top of this chat.
+    </p>
   );
 }
 

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { Toaster } from "@/components/Delight";
 import { SITE_URL } from "@/lib/site";
 import { Instrument_Serif, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
@@ -51,6 +52,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <NavProgress />
         </Suspense>
         {children}
+        <Toaster />
         <AnalyticsProvider />
         <Analytics />
         <SpeedInsights />

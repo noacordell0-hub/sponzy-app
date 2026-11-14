@@ -4,10 +4,11 @@ import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
 import { getStripe, FEES } from "@/lib/stripe";
 import { approveOrder, logOrder, refundOrder, type Order } from "@/lib/orders";
+import { checkProofLinks } from "@/lib/fraud";
 
 type Action =
   | { action: "start" }
-  | { action: "submit"; links: string[]; note?: string }
+  | { action: "submit"; links: string[]; note?: string; keep_live?: boolean }
   | { action: "revision"; note: string }
   | { action: "approve" }
   | { action: "cancel"; reason?: string }
@@ -48,10 +49,16 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
         const links = (Array.isArray(body.links) ? body.links : []).map((l) => String(l).trim()).filter(Boolean).slice(0, 5);
         if (links.length === 0) return fail("Add at least one link to the live post.");
         if (links.some((l) => !/^https:\/\/[^\s]+\.[^\s]+$/i.test(l) || l.length > 500)) return fail("Links must be full https:// addresses.");
+        // Proof must be a real post on a social platform, and if the link names an account it must be one of the creator's verified ones
+        // (stops "here's someone else's post" and links to look-alike or phishing sites).
+        const { data: verified } = await admin.from("social_accounts").select("platform, handle").eq("profile_id", user.id).eq("verified", true);
+        const linkError = checkProofLinks(links, (verified ?? []) as { platform: string; handle: string }[]);
+        if (linkError) return fail(linkError);
+        if (!body.keep_live) return fail("Confirm you'll keep the post up for at least 30 days.");
         const note = (body.note ?? "").trim().slice(0, 1000) || null;
         const autoAt = new Date(Date.now() + FEES.reviewWindowDays * 86400000).toISOString();
         await admin.from("orders").update({ status: "proof_submitted", proof_links: links, proof_note: note, submitted_at: now, auto_approve_at: autoAt, started_at: order.started_at ?? now }).eq("id", order.id);
-        await logOrder(admin, order, "proof_submitted", user.id, `Submitted ${links.length} link(s).`,
+        await logOrder(admin, order, "proof_submitted", user.id, `Submitted ${links.length} link(s). Creator agreed to keep the post up for 30 days.`,
           `The creator submitted proof. The brand has ${FEES.reviewWindowDays} days to approve or request a revision, after which it's approved automatically.`);
         break;
       }

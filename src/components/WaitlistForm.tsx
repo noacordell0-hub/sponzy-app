@@ -3,6 +3,7 @@
 import { useEffect, useId, useState } from "react";
 import { Icon } from "@/components/Icons";
 import { getUtm, track } from "@/lib/analytics";
+import { buzz, confetti, toast } from "@/lib/delight";
 
 type Status = { code: string; position: number; referrals: number; total: number };
 type FormState = { kind: "idle" } | { kind: "loading" } | { kind: "error"; message: string };
@@ -53,10 +54,12 @@ function location_(id: string) {
 }
 
 /** Waitlist signup. After joining, shows place in line and a personal invite link. */
-export default function WaitlistForm({ id, dark = false }: { id: string; dark?: boolean }) {
+export default function WaitlistForm({ id, dark = false, role: roleProp, onRoleChange }: { id: string; dark?: boolean; /** controlled by the hero's creator/brand switch */ role?: Role; onRoleChange?: (r: Role) => void }) {
   const [form, setForm] = useState<FormState>({ kind: "idle" });
   const [status, setStatus] = useState<Status | null>(null);
-  const [role, setRole] = useState<Role>("creator");
+  const [roleState, setRoleState] = useState<Role>("creator");
+  const role = roleProp ?? roleState;
+  const setRole = (r: Role) => (onRoleChange ? onRoleChange(r) : setRoleState(r));
 
   // Returning visitor on the same device: show their current place in line.
   // (Also picks up ?joined=CODE after a signup made without JavaScript.)
@@ -76,7 +79,7 @@ export default function WaitlistForm({ id, dark = false }: { id: string; dark?: 
       .then((r) => (r.ok ? r.json() : null))
       .then((s: Status | null) => s && setStatus(s))
       .catch(() => {});
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps -- runs once on mount
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -107,6 +110,10 @@ export default function WaitlistForm({ id, dark = false }: { id: string; dark?: 
         throw new Error(json.error || "Something went wrong. Please try again.");
       }
       track("waitlist_success", { location: location_(id), returning: Boolean(json.returning), referred: Boolean(ref), role });
+      if (!json.returning) {
+        confetti();
+        buzz([10, 40, 10]);
+      }
       if (ref && !json.returning) track("referral_signup", { referrer: ref });
       if (json.code) {
         save(json.code);
@@ -208,6 +215,8 @@ function ReferralCard({ status, dark, role }: { status: Status; dark: boolean; r
       await navigator.clipboard.writeText(link);
       track("invite_link_copied", { referrals: status.referrals });
       setCopied(true);
+      buzz();
+      toast("Invite link copied");
       setTimeout(() => setCopied(false), 2000);
     } catch {
       /* clipboard blocked: the link is visible and selectable */

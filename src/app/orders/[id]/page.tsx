@@ -10,6 +10,8 @@ import { autoApproveDue, type Order } from "@/lib/orders";
 import { STATUS_LABEL, STATUS_STYLE } from "@/lib/order-status";
 import OrderActions from "./OrderActions";
 import DisputePanel from "./DisputePanel";
+import ReportButton from "@/components/ReportButton";
+import { Celebrate } from "@/components/Delight";
 import { REVIEW_WINDOW_DAYS } from "@/lib/trust";
 
 export const metadata: Metadata = { title: "Order · Clouta" };
@@ -64,6 +66,11 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
 
   return (
     <AppShell profile={profile} active="orders">
+      {/* Big moments, celebrated once per browser */}
+      {!isBrand && order.status === "paid" && <Celebrate id={`paid:${order.id}`} message={`You got paid ${money(order.payout_cents ?? payout)} 🎉`} />}
+      {!isBrand && order.status === "funded" && <Celebrate id={`booked:${order.id}`} message="You've been booked! The money is held for you." />}
+      {isBrand && sp.paid && order.status !== "awaiting_payment" && !closed && <Celebrate id={`ordered:${order.id}`} message="Order placed. Your money is safe with Clouta." burst={false} />}
+      {sp.reviewed && <Celebrate id={`reviewed:${order.id}`} message="Review saved. Thank you!" burst={false} />}
       {sp.paid && order.status === "awaiting_payment" && (
         <p role="status" className="mb-5 rounded-2xl bg-[#F3F0FF] px-5 py-4 text-sm font-semibold text-violet-deep">
           Payment received by Stripe. Confirming… refresh in a few seconds if this doesn&apos;t update.
@@ -107,6 +114,15 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_340px]">
         <div className="flex flex-col gap-6">
           {order.status !== "disputed" && <OrderActions order={order} isBrand={isBrand} otherName={other?.display_name ?? "the other side"} />}
+          {/* After payment: creators promise to keep the post up for 30 days. Give brands an obvious way to report a take-down. */}
+          {isBrand && ["approved", "paid"].includes(order.status) && otherId && (order.approved_at ? Date.now() - new Date(order.approved_at).getTime() < 45 * 864e5 : true) && (
+            <section className="panel flex flex-wrap items-center justify-between gap-3 p-5 text-sm">
+              <p className="text-body">
+                <b className="text-ink">Post taken down or edited?</b> Creators agree to keep posts up for 30 days. Tell us and we&apos;ll step in.
+              </p>
+              <ReportButton targetType="profile" targetId={otherId} ownerId={otherId} ownerName={other?.display_name ?? "this creator"} viewerId={user.id} variant="button" />
+            </section>
+          )}
           {(dispute || canDispute) && (
             <DisputePanel orderId={order.id} dispute={dispute} viewerId={user.id} myRole={isBrand ? "brand" : "creator"} otherName={other?.display_name ?? "the other side"} canOpen={canDispute} />
           )}

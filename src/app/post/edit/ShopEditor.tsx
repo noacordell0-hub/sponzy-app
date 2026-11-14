@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { PLATFORMS, PLATFORM_KEYS, type PlatformKey } from "@/lib/platforms";
 import { money } from "@/lib/format";
+import { buzz, confetti, toast } from "@/lib/delight";
 import type { Post, Service } from "@/lib/market";
 
 type Draft = { name: string; price: string; turnaround: string; revisions: number; includes: string; is_bundle: boolean };
@@ -92,6 +93,8 @@ export default function ShopEditor(props: {
     setEditingId(null);
     setFormOpen(false);
     setMsg({ ok: true, text: editingId ? "Service updated." : "Service added." });
+    toast(editingId ? "Service updated" : "Service added");
+    buzz();
   }
 
   async function removeService(id: number) {
@@ -125,6 +128,11 @@ export default function ShopEditor(props: {
     if (error) return setMsg({ ok: false, text: /verify/i.test(error.message) ? "Verify at least one social account before publishing your shop." : "Couldn't update your shop." });
     setPost({ ...p, published: value });
     setMsg({ ok: true, text: value ? "Your shop is live! Brands can now find you in Browse." : "Your shop is hidden from Browse." });
+    if (value) {
+      confetti();
+      buzz([10, 40, 10]);
+      toast("You're live! 🎉 Brands can find you now.");
+    } else toast("Your shop is hidden", "info");
     router.refresh();
   }
 

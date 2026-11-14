@@ -1,6 +1,7 @@
 import { logError } from "@/lib/log";
 import { randomBytes } from "node:crypto";
 import { NextResponse } from "next/server";
+import { isDisposableEmail, normalizeEmail } from "@/lib/fraud";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
 import { clientIp, rateLimit } from "@/lib/rate-limit";
 
@@ -85,8 +86,17 @@ async function handleSignup(body: Record<string, unknown>) {
     return NextResponse.json({ error: "Signups are temporarily unavailable." }, { status: 503 });
   }
 
+  // Throwaway inboxes are how people fake signups to climb the list.
+  if (isDisposableEmail(email)) {
+    return NextResponse.json({ error: "Please use your real email address. Temporary inboxes can't join." }, { status: 400 });
+  }
+
   // Already on the list? Return their existing place and link instead of an error.
-  const { data: existing } = await supabase.from("waitlist").select("referral_code").eq("email", email).maybeSingle();
+  // "Same inbox, different spelling" (joe+2@gmail.com, j.o.e@gmail.com) counts as already on the list.
+  const normalized = normalizeEmail(email);
+  const { data: exact } = await supabase.from("waitlist").select("referral_code").eq("email", email).maybeSingle();
+  const { data: alias } = exact ? { data: null } : await supabase.from("waitlist").select("referral_code").eq("email_normalized", normalized).limit(1).maybeSingle();
+  const existing = exact ?? alias;
   if (existing?.referral_code) {
     const status = await statusFor(existing.referral_code);
     return NextResponse.json({ ok: true, returning: true, ...status });
@@ -101,8 +111,9 @@ async function handleSignup(body: Record<string, unknown>) {
 
   let referredBy: number | null = null;
   if (ref) {
-    const { data: referrer } = await supabase.from("waitlist").select("id").eq("referral_code", ref).maybeSingle();
-    referredBy = referrer?.id ?? null;
+    const { data: referrer } = await supabase.from("waitlist").select("id, email").eq("referral_code", ref).maybeSingle();
+    // Referring yourself (another spelling of your own inbox) earns nothing.
+    referredBy = referrer && normalizeEmail(referrer.email) !== normalized ? referrer.id : null;
   }
 
   // Retry on the (very unlikely) chance of a duplicate invite code.

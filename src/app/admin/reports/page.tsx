@@ -68,7 +68,7 @@ export default async function AdminReports() {
                     const c = content.get(`${r.target_type}:${r.target_id}`);
                     return (
                       <li key={r.id} className="rounded-xl bg-black/[.03] p-3 text-sm">
-                        <p className="font-semibold">{REPORT_REASONS[r.reason] ?? r.reason} <span className="font-normal text-ink-2">· {r.target_type} · by {person.get(r.reporter_id ?? "")?.display_name ?? "someone"} · {new Date(r.created_at).toLocaleDateString()}</span></p>
+                        <p className="font-semibold">{REPORT_REASONS[r.reason] ?? r.reason} <span className="font-normal text-ink-2">· {r.target_type} · by {r.reporter_id ? (person.get(r.reporter_id)?.display_name ?? "someone") : "Clouta (automatic)"} · {new Date(r.created_at).toLocaleDateString()}</span></p>
                         {r.details && <p className="mt-1 whitespace-pre-line text-body">{r.details}</p>}
                         {r.screenshot_url && <a href={r.screenshot_url} target="_blank" rel="noopener noreferrer nofollow" className="mt-1 block break-all text-xs font-semibold text-violet-deep underline">Screenshot ↗</a>}
                         {c && <p className="mt-2 rounded-lg border border-black/[.06] bg-white px-3 py-2 text-body">&ldquo;{c.text.slice(0, 400)}&rdquo;{c.hidden && <span className="ml-2 text-xs font-semibold text-err">(hidden)</span>}</p>}
