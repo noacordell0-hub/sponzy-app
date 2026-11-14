@@ -1,5 +1,6 @@
 import Link from "next/link";
 import WaitlistForm from "@/components/WaitlistForm";
+import LandingHero from "@/components/LandingHero";
 import { LogoMark } from "@/components/Logo";
 import { Icon, type IconName } from "@/components/Icons";
 import { HeroPlanets, ShootingStars } from "@/components/Backdrop";
@@ -52,6 +53,11 @@ const faqs: { id: string; q: string; a: string }[] = [
     q: "Is it free to join?",
     a: "Yes. Joining the waitlist and listing your services are free. Clouta only takes a fee when a paid collab is completed.",
   },
+  {
+    id: "different",
+    q: "How is Clouta different from other creator marketplaces?",
+    a: "Creators keep more: 10% fee, or 5% for Founding Creators, where marketplaces often take up to 15% and agencies 15–30%. Brands pay no platform fee or subscription, just card processing. Every creator's follower count is verified before their shop goes live, and the money is held until the brand approves the post.",
+  },
   { id: "launch", q: "When does Clouta launch?", a: "We're opening a private beta soon. Waitlist members are invited first." },
   {
     id: "payments",
@@ -79,14 +85,6 @@ const wrap = "relative mx-auto w-full max-w-[1200px] px-4 sm:px-8";
 const h2 = "font-display text-[clamp(36px,5vw,56px)] leading-[1.02]";
 const lead = "text-[17px] leading-[1.65] text-body";
 
-/** A loose, hand-drawn underline for one headline word. */
-function Scribble() {
-  return (
-    <svg viewBox="0 0 200 16" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M3 11 C 40 4, 80 4, 118 8 S 175 13, 197 5" fill="none" stroke="#5B3DF5" strokeWidth="5" strokeLinecap="round" />
-    </svg>
-  );
-}
 
 export default function Home() {
   const spots = FOUNDING_SPOTS.toLocaleString();
@@ -116,6 +114,7 @@ export default function Home() {
             {[
               ["/browse", "Browse creators"],
               ["#how", "How it works"],
+              ["#brands", "For brands"],
               ["#trust", "Trust & safety"],
               ["#faq", "FAQ"],
             ].map(([href, label]) => (
@@ -132,28 +131,13 @@ export default function Home() {
         <div className="hero-bg" aria-hidden="true" />
         <HeroPlanets />
 
-        {/* Hero */}
-        <section className={`${wrap} grid items-center gap-14 pb-16 pt-12 lg:grid-cols-[1.15fr_1fr] lg:gap-10 lg:pb-24 lg:pt-20`}>
-          <div className="rise flex flex-col gap-6">
-            <span className="self-start rounded-full border rule bg-white px-3 py-1 text-[13px] font-semibold text-ink">
-              <span className="mr-1.5 inline-block size-2 rounded-full bg-[#5B3DF5] align-middle" aria-hidden="true" />
-              <SpotsLeft fallback={`Private beta · ${spots} Founding Creator spots`} />
-            </span>
-            <h1 className="font-display text-[clamp(52px,8vw,92px)] leading-[0.95]">
-              Sell brand deals from <em className="scribble">one link.<Scribble /></em>
-            </h1>
-            <p className={`${lead} max-w-[520px] sm:text-lg`}>
-              Put your prices on one page and share it. Brands pick what they want and pay before you start. We hold the money and send it to you once
-              they approve the post.
-            </p>
-            <div id="join" className="scroll-mt-24">
-              <WaitlistForm id="email-hero" />
-            </div>
-            <p className="text-sm text-ink-2">Free to join. The first {spots} creators pay half the usual fee, for good.</p>
-          </div>
-
-          {/* Product preview: what a creator's shop looks like (example data, labelled as such) */}
-          <div className="rise rise-2 relative mx-auto w-full max-w-[400px] lg:mr-0" aria-label="Example creator storefront">
+        {/* Hero: switches between the creator and brand pitch (see components/LandingHero.tsx) */}
+        <LandingHero
+          spots={spots}
+          creatorBadge={<SpotsLeft fallback={`Private beta · ${spots} Founding Creator spots`} />}
+          // Product previews use example data and are labelled as such.
+          creatorVisual={
+          <div className="relative" aria-label="Example creator storefront">
             <span className="sticker absolute -left-3 -top-4 z-[2] rounded-md bg-[#FFC83D] px-2.5 py-1 text-[12px] font-extrabold uppercase tracking-wide text-ink shadow-[0_2px_0_rgba(21,19,31,.25)]">
               Example
             </span>
@@ -197,7 +181,52 @@ export default function Home() {
               </p>
             </div>
           </div>
-        </section>
+          }
+          brandVisual={
+            <div className="relative" aria-label="Example: finding and booking creators">
+              <span className="sticker absolute -left-3 -top-4 z-[2] rounded-md bg-[#FFC83D] px-2.5 py-1 text-[12px] font-extrabold uppercase tracking-wide text-ink shadow-[0_2px_0_rgba(21,19,31,.25)]">
+                Example
+              </span>
+              <div className="relative -rotate-[1.2deg] rounded-[28px] border-[6px] border-ink bg-white p-5 shadow-[10px_12px_0_rgba(21,19,31,.08)]">
+                <div className="flex items-center gap-2 rounded-xl border border-black/10 bg-[#FAF8F3] px-3 py-2.5 text-sm text-ink-2">
+                  <Icon name="search" size={16} />
+                  Fitness creators under $200
+                </div>
+                <div className="mt-2.5 flex flex-wrap gap-1.5 text-[11px] font-semibold">
+                  {["TikTok", "10K–100K", "✓ Verified", "Delivers in 5 days"].map((c) => (
+                    <span key={c} className="rounded-full border border-black/10 px-2 py-0.5 text-body">{c}</span>
+                  ))}
+                </div>
+                <ul className="mt-3 divide-y divide-black/10">
+                  {[
+                    ["MR", "#5B3DF5", "Maya R.", "Fitness · 48K", "$120"],
+                    ["JT", "#0E8F86", "Jordan T.", "Wellness · 31K", "$95"],
+                    ["AS", "#E8590C", "Ava S.", "Home workouts · 72K", "$180"],
+                  ].map(([ini, bg, name, meta, price]) => (
+                    <li key={name} className="flex items-center gap-3 py-3">
+                      <span aria-hidden="true" className="grid size-10 flex-none place-items-center rounded-xl text-sm font-extrabold text-white" style={{ background: bg }}>{ini}</span>
+                      <span className="min-w-0 flex-1">
+                        <span className="flex items-center gap-1 text-sm font-semibold">{name} <span className="text-ok" aria-label="verified">✓</span></span>
+                        <span className="block text-xs text-ink-2">{meta}</span>
+                      </span>
+                      <span className="text-right">
+                        <span className="block text-[10px] font-semibold uppercase tracking-wide text-ink-2">from</span>
+                        <span className="font-display text-[22px] leading-none">{price}</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-3 grid grid-cols-[1fr_auto] items-center gap-3 rounded-xl bg-ok-bg px-3 py-2.5">
+                  <p className="flex items-center gap-2 text-[13px] font-semibold text-ok">
+                    <Icon name="lock" size={15} />
+                    You pay $120. It&apos;s released when you approve.
+                  </p>
+                  <span className="rounded-lg bg-[#5B3DF5] px-3 py-1.5 text-xs font-bold text-white">Book</span>
+                </div>
+              </div>
+            </div>
+          }
+        />
 
         {/* Proof line */}
         <section aria-label="Protections" className="relative border-y rule bg-white/60">
@@ -232,6 +261,52 @@ export default function Home() {
               </li>
             ))}
           </ol>
+        </section>
+
+
+        {/* Why Clouta: honest comparison with the usual ways creators and brands work together */}
+        <section aria-labelledby="compare-t" className={`${wrap} reveal relative pt-20 lg:pt-28`}>
+          <div className="max-w-[680px]">
+            <h2 id="compare-t" className={h2}>Keep more of every deal</h2>
+            <p className={`${lead} mt-4`}>The usual options either take a big cut or leave you chasing invoices. Clouta keeps the fee small and the money safe.</p>
+          </div>
+          <div className="mt-10 overflow-x-auto rounded-2xl border border-black/[.12] bg-white" tabIndex={0} role="region" aria-label="Comparison table (scroll sideways on small screens)">
+            <table className="w-full min-w-[720px] text-left text-sm">
+              <caption className="sr-only">Clouta compared with marketplaces, agencies and DMs</caption>
+              <thead>
+                <tr className="border-b border-black/[.08] text-xs font-semibold text-ink-2">
+                  <th scope="col" className="w-[24%] px-5 py-4 font-semibold"></th>
+                  <th scope="col" className="bg-[#F3F0FF] px-5 py-4 text-sm font-extrabold text-ink">Clouta</th>
+                  <th scope="col" className="px-5 py-4">Typical creator marketplace</th>
+                  <th scope="col" className="px-5 py-4">Talent agency</th>
+                  <th scope="col" className="px-5 py-4">DMs &amp; invoices</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-black/[.08]">
+                {[
+                  ["Fee taken from creators", ["10% (5% for Founding)", true], ["Often up to 15%", false], ["Usually 15–30%", false], ["None", true]],
+                  ["Cost for brands", ["Card processing only", true], ["Extra fee, sometimes a monthly plan", false], ["Agency markup", false], ["None", true]],
+                  ["Money held until the post is approved", ["Yes", true], ["Usually", true], ["No", false], ["No", false]],
+                  ["Follower counts verified", ["Every creator", true], ["Varies", false], ["Varies", false], ["No", false]],
+                  ["Contracts, minimums or exclusivity", ["None", true], ["Some lock you in", false], ["Often exclusive", false], ["None", true]],
+                  ["Getting paid", ["When the brand approves", true], ["After the order completes", true], ["When the agency pays you", false], ["Whenever they pay the invoice", false]],
+                ].map(([label, ...cells]) => (
+                  <tr key={label as string}>
+                    <th scope="row" className="px-5 py-4 font-semibold text-ink">{label as string}</th>
+                    {(cells as [string, boolean][]).map(([text, good], i) => (
+                      <td key={i} className={`px-5 py-4 ${i === 0 ? "bg-[#F3F0FF]/60 font-bold text-ink" : "text-body"}`}>
+                        <span className="flex items-start gap-2">
+                          <span aria-hidden="true" className={good ? "text-ok" : "text-ink-2/70"}>{good ? "✓" : "–"}</span>
+                          {text}
+                        </span>
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-3 text-xs text-ink-2">Typical ranges from public pricing pages and industry guides, November 2026. Individual platforms and agencies vary.</p>
         </section>
 
         {/* How it works */}
@@ -339,6 +414,38 @@ export default function Home() {
         </section>
 
         {/* Trust */}
+
+        {/* For brands */}
+        <section id="brands" aria-labelledby="brands-t" className="relative scroll-mt-20 overflow-hidden bg-ink text-white">
+          <div className="grid-fade grid-fade-dark" aria-hidden="true" />
+          <div className={`${wrap} grid gap-12 py-20 lg:grid-cols-[0.9fr_1.1fr] lg:py-28`}>
+            <div className="reveal">
+              <p className="text-sm font-bold text-[#C9BFFF]">For brands</p>
+              <h2 id="brands-t" className={`${h2} mt-3`}>Hire creators without the agency</h2>
+              <p className="mt-4 max-w-[440px] text-[17px] leading-[1.65] text-[#D9D3FF]">
+                Browse creators with real prices and verified reach, book in a couple of minutes, and only release the money when the post is live and right.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <a href="?for=brands#join" data-track="cta_click" data-track-location="brands_section" className="btn min-h-12 px-6">Get brand early access</a>
+                <Link href="/browse" className="btn btn-ghost min-h-12 px-6">Browse creators</Link>
+              </div>
+            </div>
+            <ul className="reveal grid gap-4 sm:grid-cols-2">
+              {[
+                ["Prices up front", "Every creator lists what they charge and how fast they deliver. No back-and-forth to get a quote."],
+                ["Verified reach", "Follower counts are checked by our team before a creator can go live. No made-up numbers."],
+                ["Pay only for posts that happen", "Your money is held until you approve. Missed deadline? Full refund."],
+                ["No platform fee", "No subscription and no markup. Just 3% + 30¢ card processing at checkout."],
+              ].map(([t, b]) => (
+                <li key={t} className="rounded-2xl border border-white/10 bg-white/[.04] p-5">
+                  <p className="font-bold">{t}</p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-[#D9D3FF]">{b}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
         <section id="trust" className={`${wrap} relative scroll-mt-20 py-20 lg:py-28`}>
           <div className="grid-fade" aria-hidden="true" />
           <h2 className={`reveal relative ${h2} max-w-[720px]`}>What keeps it fair for both sides</h2>
