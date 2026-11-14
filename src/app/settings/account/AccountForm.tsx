@@ -77,8 +77,6 @@ export default function AccountForm({ profile, socials, isMinor }: { profile: Pr
 
   async function save() {
     setMsg(null);
-    if (!d.display_name.trim()) return setMsg({ ok: false, text: "Display name can't be empty." });
-    if (!/^[a-z0-9_]{3,30}$/.test(d.handle)) return setMsg({ ok: false, text: "Handles use 3 to 30 lowercase letters, numbers or underscores." });
     const niches = d.niches.split(",").map((n) => n.trim()).filter(Boolean).slice(0, 8);
     let website = d.website.trim();
     if (website && !/^https?:\/\//i.test(website)) website = `https://${website}`;
@@ -87,8 +85,6 @@ export default function AccountForm({ profile, socials, isMinor }: { profile: Pr
     const { error } = await supabase
       .from("profiles")
       .update({
-        display_name: d.display_name.trim(),
-        handle: d.handle,
         tagline: (d.tagline ?? "").trim() || null,
         bio: (d.bio ?? "").trim() || null,
         audience: (d.audience ?? "").trim() || null,
@@ -109,7 +105,7 @@ export default function AccountForm({ profile, socials, isMinor }: { profile: Pr
       .eq("id", profile.id);
     setSaving(false);
     if (error) {
-      return setMsg({ ok: false, text: error.code === "23505" ? "That handle is taken." : "Couldn't save. Check your details and try again." });
+      return setMsg({ ok: false, text: "Couldn't save. Check your details and try again." });
     }
     setMsg({ ok: true, text: "Changes saved." });
     router.refresh();
@@ -233,10 +229,22 @@ export default function AccountForm({ profile, socials, isMinor }: { profile: Pr
           <h2 id="details-title" className="eyebrow">
             Details
           </h2>
+          {/* Name and handle are permanent after sign-up (enforced in the database), so people always know who they're dealing with. */}
           <div className="grid gap-4 sm:grid-cols-2">
-            <TextField id="f-name" label="Display name" value={d.display_name} onChange={(v) => set("display_name", v)} max={60} />
-            <TextField id="f-handle" label="Handle" value={d.handle} onChange={(v) => set("handle", v.toLowerCase().replace(/[^a-z0-9_]/g, ""))} max={30} prefix="@" />
+            <div>
+              <p className="text-sm font-semibold">{isCreator ? "Name" : "Brand name"}</p>
+              <p className="mt-1.5 flex min-h-12 items-center rounded-[12px] border border-black/10 bg-black/[.03] px-4 text-ink-2" aria-readonly="true">
+                {d.display_name}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm font-semibold">Handle</p>
+              <p className="mt-1.5 flex min-h-12 items-center rounded-[12px] border border-black/10 bg-black/[.03] px-4 text-ink-2" aria-readonly="true">
+                @{d.handle}
+              </p>
+            </div>
           </div>
+          <p className="-mt-2 text-xs text-ink-2">🔒 Your name and handle are permanent. If there&apos;s a genuine typo, contact the Clouta team and we can correct it.</p>
           <TextField id="f-tagline" label="Tagline" value={d.tagline ?? ""} onChange={(v) => set("tagline", v)} max={120} placeholder="Quick, honest workout content for busy people" />
           <div className="grid gap-4 sm:grid-cols-2">
             <TextField id="f-niches" label="Vibe tags" value={d.niches} onChange={(v) => set("niches", v)} max={200} placeholder="Fitness, Wellness" hint="Separate with commas, up to 8" />

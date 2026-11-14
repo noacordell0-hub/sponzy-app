@@ -16,6 +16,7 @@ import ReportButton from "@/components/ReportButton";
 import Comments, { type CommentRow } from "@/components/Comments";
 import TrackView from "@/components/TrackView";
 import { Stars } from "@/components/Stars";
+import ServicePicker from "./ServicePicker";
 
 type Params = { params: Promise<{ handle: string }> };
 
@@ -78,6 +79,22 @@ export default async function CreatorPage({ params }: Params) {
   const published = Boolean(post?.published);
   const about = post?.bio || creator.bio;
 
+  const bookable = Boolean(creator.payouts_ready && creator.taking_bookings);
+  const joined = creator.onboarded_at ? new Date(creator.onboarded_at).toLocaleDateString("en-US", { month: "short", year: "numeric" }) : null;
+  const fromPrice = services.length ? Math.min(...services.map((s) => s.price_cents)) : null;
+  const stats: { label: string; value: string }[] = [
+    { label: "Verified reach", value: verifiedFollowers > 0 ? formatFollowers(verifiedFollowers) : "—" },
+    { label: "Orders completed", value: String(trust?.completed ?? 0) },
+    { label: "On-time delivery", value: trust?.on_time_rate != null && (trust?.completed ?? 0) > 0 ? `${Math.round(Number(trust.on_time_rate) * 100)}%` : "—" },
+    { label: "Rating", value: trust && trust.review_count > 0 ? `${Number(trust.avg_rating).toFixed(1)} (${trust.review_count})` : "New" },
+  ];
+  const sections = [
+    { id: "overview", label: "Overview" },
+    ...(socials.length ? [{ id: "socials", label: "Platforms" }] : []),
+    { id: "reviews", label: "Reviews" },
+    ...(creator.show_comments ? [{ id: "community", label: "Community" }] : []),
+  ];
+
   return (
     <AppShell profile={viewer} active="browse" wide>
       {/* Counts toward the creator's shop stats (the owner's own visits don't count). */}
@@ -91,160 +108,159 @@ export default async function CreatorPage({ params }: Params) {
         </div>
       )}
 
-      {/* Header */}
-      <section className="panel overflow-hidden">
-        <div className="h-32 sm:h-40" style={{ background: theme.banner }} />
-        <div className="flex flex-col gap-4 px-5 pb-6 sm:flex-row sm:items-end sm:px-8">
-          <span className="-mt-12 self-start rounded-[30px] border-[5px] border-white sm:-mt-14">
-            <Avatar name={creator.display_name} source={creator.avatar_source} pattern={creator.avatar_pattern} url={creator.avatar_url} mainPlatform={main?.platform} size={104} rounded={26} />
-          </span>
-          <div className="min-w-0 flex-1">
-            <h1 className="text-2xl font-extrabold tracking-[-0.03em] sm:text-3xl">{creator.display_name}</h1>
-            <p className="text-sm text-ink-2">
-              @{creator.handle}
-              {creator.location ? ` · ${creator.location}` : ""}
-            </p>
-            {trust && trust.review_count > 0 && (
-              <Link href={`/c/${creator.handle}/reviews`} className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold hover:text-violet-deep">
-                <Stars value={Number(trust.avg_rating)} />
-                {Number(trust.avg_rating).toFixed(1)} <span className="font-normal text-ink-2">({trust.review_count})</span>
-              </Link>
-            )}
-            {creator.tagline && <p className="mt-2 max-w-2xl text-[15px] text-body">{creator.tagline}</p>}
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              <BadgeRow codes={shownBadges} />
-              {verifiedFollowers > 0 && !shownBadges.includes("verified_socials") && <span className="rounded-md bg-ok-bg px-2 py-0.5 text-xs font-semibold text-ok">✓ Verified socials</span>}
-              {creator.young_tag && <span className="badge-violet rounded-md px-2 py-0.5 text-xs font-semibold">Young entrepreneur</span>}
-              {!creator.taking_bookings && <span className="rounded-md bg-[#FFF4D6] px-2 py-0.5 text-xs font-semibold text-[#7A5200]">Fully booked</span>}
-            </div>
-          </div>
-          <div className="flex flex-none gap-2">
-            {isOwner ? (
-              <Link href="/settings/account" className="btn btn-ghost min-h-11 px-4 text-sm">
-                Edit profile
-              </Link>
-            ) : (
-              <>
-                <SaveButton creatorId={creator.id} initialSaved={Boolean(savedRow)} viewerId={user?.id ?? null} />
-                <Link href={`/messages/new?to=${creator.handle}`} data-track="profile_message_click" data-track-creator={creator.id} className="btn min-h-11 px-4 text-sm" style={{ background: theme.button, color: theme.text }}>
-                  Message
+      <nav aria-label="Breadcrumb" className="on-bg-muted mb-4 text-sm text-ink-2">
+        <ol className="flex flex-wrap items-center gap-1.5">
+          <li>
+            <Link href="/browse" className="hover:text-ink">
+              Creators
+            </Link>
+          </li>
+          {creator.niches[0] && (
+            <>
+              <li aria-hidden="true">/</li>
+              <li>
+                <Link href={`/browse?niche=${encodeURIComponent(creator.niches[0])}`} className="hover:text-ink">
+                  {creator.niches[0]}
                 </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
+              </li>
+            </>
+          )}
+          <li aria-hidden="true">/</li>
+          <li aria-current="page" className="font-semibold text-ink">
+            {creator.display_name}
+          </li>
+        </ol>
+      </nav>
 
-      {!isOwner && (
-        <div className="mt-2 flex justify-end">
-          <ReportButton targetType="profile" targetId={creator.id} ownerId={creator.id} ownerName={creator.display_name} viewerId={user?.id ?? null} blocked={Boolean(blockRow)} />
-        </div>
-      )}
-
-      <div className="mt-6 grid items-start gap-6 lg:grid-cols-[1fr_400px]">
-        {/* Services */}
-        <section aria-labelledby="services-title" className="flex flex-col gap-4 lg:order-2">
-          <h2 id="services-title" className="eyebrow on-bg-muted">
-            Services
-          </h2>
-          {services.length === 0 ? (
-            <div className="panel p-6 text-sm text-body">{isOwner ? "You haven't added any services yet." : `${creator.display_name} hasn't listed services yet.`}</div>
-          ) : (
-            services.map((s) => (
-              <div key={s.id} className="panel flex flex-col gap-3 p-5">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="font-bold">{s.name}</p>
-                    <p className="text-xs text-ink-2">
-                      {s.turnaround_days}-day turnaround · {s.revisions === 0 ? "No revisions" : `${s.revisions} revision${s.revisions > 1 ? "s" : ""}`}
-                    </p>
-                  </div>
-                  <p className="text-lg font-extrabold">{money(s.price_cents)}</p>
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_380px] lg:gap-8">
+        <div className="flex min-w-0 flex-col gap-6">
+          {/* Profile header */}
+          <section className="panel overflow-hidden">
+            <div className="h-20 sm:h-24" style={{ background: theme.banner }} />
+            <div className="px-5 pb-6 sm:px-7">
+              <div className="flex items-end justify-between gap-3">
+                <span className="-mt-10 rounded-[26px] border-[5px] border-white bg-white">
+                  <Avatar name={creator.display_name} source={creator.avatar_source} pattern={creator.avatar_pattern} url={creator.avatar_url} mainPlatform={main?.platform} size={92} rounded={22} />
+                </span>
+                <div className="flex gap-2 pt-3">
+                  {isOwner ? (
+                    <Link href="/settings/account" className="btn btn-ghost min-h-10 px-4 text-sm">
+                      Edit profile
+                    </Link>
+                  ) : (
+                    <SaveButton creatorId={creator.id} initialSaved={Boolean(savedRow)} viewerId={user?.id ?? null} />
+                  )}
                 </div>
-                {s.is_bundle && <span className="badge-violet self-start rounded-md px-2 py-0.5 text-[11px] font-semibold">Bundle</span>}
-                {s.includes && <p className="text-sm leading-relaxed text-body">{s.includes}</p>}
-                {isOwner ? null : creator.payouts_ready && creator.taking_bookings ? (
-                  <Link href={`/checkout/${s.id}`} data-track="book_click" data-track-creator={creator.id} data-track-service={String(s.id)} className="btn min-h-11 text-sm" style={{ background: theme.button, color: theme.text }}>
-                    Book · {money(s.price_cents)}
-                  </Link>
-                ) : (
-                  <button type="button" disabled className="btn min-h-11 text-sm" title={creator.taking_bookings ? "This creator hasn't finished payout setup yet" : "Fully booked right now"}>
-                    {creator.taking_bookings ? "Booking opens soon" : "Fully booked"}
-                  </button>
+              </div>
+              <div className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1">
+                <h1 className="text-2xl font-extrabold tracking-[-0.03em] sm:text-[28px]">{creator.display_name}</h1>
+                {verifiedFollowers > 0 && (
+                  <span title="Social accounts verified by Clouta" className="inline-flex items-center gap-1 rounded-full bg-ok-bg px-2 py-0.5 text-xs font-semibold text-ok">
+                    <svg viewBox="0 0 20 20" className="size-3.5" fill="currentColor" aria-hidden="true">
+                      <path d="M10 1.5l2.1 1.6 2.6-.2.9 2.5 2.3 1.3-.6 2.6.6 2.6-2.3 1.3-.9 2.5-2.6-.2L10 18.5l-2.1-1.6-2.6.2-.9-2.5-2.3-1.3.6-2.6-.6-2.6 2.3-1.3.9-2.5 2.6.2L10 1.5zm-1.2 11.3l5-5-1.1-1.1-3.9 3.9-1.8-1.8-1.1 1.1 2.9 2.9z" />
+                    </svg>
+                    Verified
+                  </span>
                 )}
               </div>
-            ))
-          )}
-          <div className="panel flex items-start gap-3 bg-ok-bg/60 p-4 text-sm text-ok">
-            <span aria-hidden="true">🔒</span>
-            <p>
-              <b>Payment held by Clouta.</b> Brands pay up front and the creator is paid once the work is approved.
-            </p>
-          </div>
-        </section>
-
-        {/* About, audience, socials */}
-        <div className="flex flex-col gap-6 lg:order-1">
-          <TrustPanel trust={trust} role="creator" reviewsHref={`/c/${creator.handle}/reviews`} />
-          {about && (
-            <section className="panel p-6" aria-labelledby="about-title">
-              <h2 id="about-title" className="eyebrow">
-                About
-              </h2>
-              <p className="mt-3 whitespace-pre-line text-[15px] leading-relaxed text-body">{about}</p>
-              {creator.niches.length > 0 && (
-                <div className="mt-4 flex flex-wrap gap-1.5">
-                  {creator.niches.map((n) => (
-                    <Link key={n} href={`/browse?niche=${encodeURIComponent(n)}`} className="rounded-md bg-black/[.05] px-2.5 py-1 text-xs font-semibold text-body hover:text-ink">
-                      {n}
-                    </Link>
-                  ))}
+              <p className="mt-0.5 text-sm text-ink-2">
+                @{creator.handle}
+                {creator.location ? ` · ${creator.location}` : ""}
+                {joined ? ` · On Clouta since ${joined}` : ""}
+              </p>
+              {creator.tagline && <p className="mt-3 max-w-2xl text-[16px] leading-relaxed text-body">{creator.tagline}</p>}
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                <BadgeRow codes={shownBadges.filter((b) => b !== "verified_socials")} />
+                {creator.young_tag && <span className="badge-violet rounded-md px-2 py-0.5 text-xs font-semibold">Young entrepreneur</span>}
+                {!creator.taking_bookings && <span className="rounded-md bg-[#FFF4D6] px-2 py-0.5 text-xs font-semibold text-[#7A5200]">Fully booked</span>}
+              </div>
+            </div>
+            {/* Key numbers, like any marketplace seller page */}
+            <dl className="grid grid-cols-2 border-t border-black/[.08] sm:grid-cols-4">
+              {stats.map((s, n) => (
+                <div key={s.label} className={`px-5 py-4 sm:px-7 ${n % 2 ? "border-l" : ""} ${n > 1 ? "border-t sm:border-t-0" : ""} ${n === 2 ? "sm:border-l" : ""} border-black/[.08]`}>
+                  <dt className="text-xs font-semibold text-ink-2">{s.label}</dt>
+                  <dd className="tabular mt-0.5 text-lg font-extrabold tracking-[-0.02em]">{s.value}</dd>
                 </div>
-              )}
-            </section>
-          )}
+              ))}
+            </dl>
+          </section>
 
-          {creator.show_audience && (creator.audience || main) && (
-            <section className="panel p-6" aria-labelledby="aud-title">
-              <h2 id="aud-title" className="eyebrow">
-                Audience snapshot
-              </h2>
-              <dl className="mt-4 grid gap-4 sm:grid-cols-3">
-                {creator.audience && (
-                  <div className="sm:col-span-2">
-                    <dt className="text-xs font-semibold text-ink-2">Who watches</dt>
-                    <dd className="mt-0.5 text-sm font-semibold">{creator.audience}</dd>
+          {/* Services on small screens, right under the header (the sticky card is in the sidebar on desktop) */}
+          <div className="scroll-mt-36 lg:hidden" id="services">
+            <ServicePicker services={services} creatorId={creator.id} creatorName={creator.display_name ?? "this creator"} handle={creator.handle ?? ""} bookable={bookable} takingBookings={creator.taking_bookings} isOwner={isOwner} button={{ background: theme.button, color: theme.text }} />
+          </div>
+
+          {/* Section tabs */}
+          <nav aria-label="Profile sections" className="panel sticky top-[72px] z-10 flex gap-1 overflow-x-auto px-2">
+            {sections.map((s) => (
+              <a key={s.id} href={`#${s.id}`} className="min-h-12 whitespace-nowrap px-3 py-3.5 text-sm font-semibold text-ink-2 hover:text-ink">
+                {s.label}
+              </a>
+            ))}
+          </nav>
+
+          {/* Overview */}
+          <section id="overview" className="panel scroll-mt-36 p-6 sm:p-7" aria-labelledby="about-title">
+            <h2 id="about-title" className="text-lg font-bold">
+              About {creator.display_name}
+            </h2>
+            {about ? (
+              <p className="mt-3 whitespace-pre-line text-[15px] leading-relaxed text-body">{about}</p>
+            ) : (
+              <p className="mt-3 text-sm text-ink-2">{isOwner ? "Add a short pitch in My shop so brands know what you make." : "No description yet."}</p>
+            )}
+            {(creator.niches.length > 0 || (creator.show_audience && (creator.audience || main))) && (
+              <dl className="mt-6 grid gap-5 border-t border-black/[.08] pt-5 sm:grid-cols-3">
+                {creator.niches.length > 0 && (
+                  <div>
+                    <dt className="text-xs font-semibold text-ink-2">Categories</dt>
+                    <dd className="mt-1.5 flex flex-wrap gap-1.5">
+                      {creator.niches.map((n) => (
+                        <Link key={n} href={`/browse?niche=${encodeURIComponent(n)}`} className="rounded-md border border-black/10 px-2 py-0.5 text-xs font-semibold text-body hover:border-black/25 hover:text-ink">
+                          {n}
+                        </Link>
+                      ))}
+                    </dd>
                   </div>
                 )}
-                {main && (
+                {creator.show_audience && creator.audience && (
                   <div>
-                    <dt className="text-xs font-semibold text-ink-2">Best platform</dt>
-                    <dd className="mt-0.5 text-sm font-semibold">
+                    <dt className="text-xs font-semibold text-ink-2">Audience</dt>
+                    <dd className="mt-1 text-sm font-semibold">{creator.audience}</dd>
+                  </div>
+                )}
+                {creator.show_audience && main && (
+                  <div>
+                    <dt className="text-xs font-semibold text-ink-2">Main platform</dt>
+                    <dd className="mt-1 text-sm font-semibold">
                       {PLATFORMS[main.platform].label} · {formatFollowers(main.followers)}
                     </dd>
                   </div>
                 )}
               </dl>
-            </section>
-          )}
+            )}
+          </section>
+
+          <TrustPanel trust={trust} role="creator" reviewsHref={`/c/${creator.handle}/reviews`} />
 
           {socials.length > 0 && (
-            <section className="panel p-6" aria-labelledby="soc-title">
-              <h2 id="soc-title" className="eyebrow">
-                Socials
+            <section id="socials" className="panel scroll-mt-36 p-6 sm:p-7" aria-labelledby="soc-title">
+              <h2 id="soc-title" className="text-lg font-bold">
+                Platforms
               </h2>
-              <ul className="mt-3 divide-y divide-black/[.06]">
+              <p className="mt-1 text-sm text-ink-2">Follower counts are checked by the Clouta team.</p>
+              <ul className="mt-4 divide-y divide-black/[.08] border-y border-black/[.08]">
                 {socials.map((s) => (
-                  <li key={s.id} className="flex items-center gap-3 py-3">
+                  <li key={s.id} className="flex items-center gap-3 py-3.5">
                     <span className="grid size-9 flex-none place-items-center rounded-lg text-xs font-extrabold text-white" style={{ background: PLATFORMS[s.platform].color }}>
                       {PLATFORMS[s.platform].short}
                     </span>
                     <a href={profileUrl(s.platform, s.handle)} target="_blank" rel="noopener noreferrer nofollow" className="min-w-0 flex-1">
                       <span className="block truncate text-sm font-semibold hover:text-violet-deep">@{s.handle}</span>
-                      <span className="block text-xs text-ink-2">
-                        {PLATFORMS[s.platform].label} · {formatFollowers(s.followers)} followers
-                      </span>
+                      <span className="block text-xs text-ink-2">{PLATFORMS[s.platform].label}</span>
                     </a>
+                    <span className="tabular text-sm font-bold">{formatFollowers(s.followers)}</span>
                     {s.verified ? (
                       <span className="rounded-md bg-ok-bg px-2 py-0.5 text-xs font-semibold text-ok">✓ Verified</span>
                     ) : (
@@ -258,12 +274,16 @@ export default async function CreatorPage({ params }: Params) {
             </section>
           )}
 
-          {creator.show_comments && <Comments creatorId={creator.id} creatorName={creator.display_name ?? "this creator"} viewerId={user?.id ?? null} initial={comments} liked={liked} />}
-
-          <section className="panel p-6" aria-labelledby="rev-title">
-            <div className="flex items-center justify-between">
-              <h2 id="rev-title" className="eyebrow">
+          <section id="reviews" className="panel scroll-mt-36 p-6 sm:p-7" aria-labelledby="rev-title">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h2 id="rev-title" className="text-lg font-bold">
                 Reviews from brands
+                {trust && trust.review_count > 0 && (
+                  <span className="ml-2 inline-flex items-center gap-1.5 align-middle text-sm font-semibold">
+                    <Stars value={Number(trust.avg_rating)} /> {Number(trust.avg_rating).toFixed(1)}
+                    <span className="font-normal text-ink-2">({trust.review_count})</span>
+                  </span>
+                )}
               </h2>
               {trust && trust.review_count > 3 && (
                 <Link href={`/c/${creator.handle}/reviews`} className="text-sm font-semibold text-violet-deep">
@@ -281,7 +301,41 @@ export default async function CreatorPage({ params }: Params) {
               </div>
             )}
           </section>
+
+          {creator.show_comments && (
+            <div id="community" className="scroll-mt-36">
+              <Comments creatorId={creator.id} creatorName={creator.display_name ?? "this creator"} viewerId={user?.id ?? null} initial={comments} liked={liked} />
+            </div>
+          )}
         </div>
+
+        {/* Sidebar: services and booking, always in view on desktop */}
+        <aside className="hidden flex-col gap-4 lg:sticky lg:top-24 lg:flex" aria-label="Services and booking">
+          {fromPrice !== null && (
+            <p className="on-bg-muted text-sm text-ink-2">
+              Services from <b className="text-ink">{money(fromPrice)}</b>
+            </p>
+          )}
+          <ServicePicker services={services} creatorId={creator.id} creatorName={creator.display_name ?? "this creator"} handle={creator.handle ?? ""} bookable={bookable} takingBookings={creator.taking_bookings} isOwner={isOwner} button={{ background: theme.button, color: theme.text }} />
+          <div className="panel flex flex-col gap-3 p-5 text-sm">
+            <p className="font-bold">Every booking is protected</p>
+            <ul className="flex flex-col gap-2 text-body">
+              <li>✓ You pay up front; Clouta holds the money</li>
+              <li>✓ The creator is paid only after you approve</li>
+              <li>✓ Free revisions and dispute support</li>
+            </ul>
+          </div>
+          {!isOwner && (
+            <div className="flex justify-center">
+              <ReportButton targetType="profile" targetId={creator.id} ownerId={creator.id} ownerName={creator.display_name} viewerId={user?.id ?? null} blocked={Boolean(blockRow)} />
+            </div>
+          )}
+        </aside>
+        {!isOwner && (
+          <div className="flex justify-center lg:hidden">
+            <ReportButton targetType="profile" targetId={creator.id} ownerId={creator.id} ownerName={creator.display_name} viewerId={user?.id ?? null} blocked={Boolean(blockRow)} />
+          </div>
+        )}
       </div>
     </AppShell>
   );

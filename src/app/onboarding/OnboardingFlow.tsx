@@ -153,6 +153,13 @@ export default function OnboardingFlow({ userId, email }: { userId: string; emai
               />
             </div>
           </Field>
+          <p className="-mt-1 flex items-start gap-2 rounded-xl bg-black/[.04] px-3.5 py-2.5 text-[13px] text-body">
+            <span aria-hidden="true">🔒</span>
+            <span>
+              <b className="text-ink">Choose carefully:</b> your {role === "brand" ? "brand name" : "name"} and handle are permanent once you continue, so brands and
+              creators always know who they&apos;re dealing with. Your handle is also your profile link.
+            </span>
+          </p>
           <Field label="Date of birth" id="ob-birth" hint="Kept private. Never shown on your profile.">
             <input id="ob-birth" type="date" value={birth} onChange={(e) => setBirth(e.target.value)} className="input" max={new Date().toISOString().slice(0, 10)} />
           </Field>
