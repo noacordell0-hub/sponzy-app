@@ -1,5 +1,6 @@
 "use client";
 
+import { RESERVED_HANDLE, RESERVED_NAME } from "@/lib/fraud";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -47,6 +48,9 @@ export default function OnboardingFlow({ userId, email }: { userId: string; emai
     if (!role) return setStep(0);
     if (!name.trim()) return setError("Enter your name or brand name.");
     if (!/^[a-z0-9_]{3,30}$/.test(handle)) return setError("Handles use 3 to 30 lowercase letters, numbers or underscores.");
+    // Can't pose as Clouta staff (the database enforces this too).
+    if (RESERVED_HANDLE.test(handle)) return setError("That handle is reserved. Please choose another.");
+    if (RESERVED_NAME.test(name)) return setError("That name is reserved. Please use your own name or brand name.");
     if (age === null) return setError("Enter your date of birth.");
     if (age < 13) return setError("You must be at least 13 to use Clouta.");
     if (role === "brand" && age < 18) return setError("Brand accounts must be run by someone 18 or older.");

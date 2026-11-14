@@ -10,6 +10,7 @@ import { autoApproveDue, type Order } from "@/lib/orders";
 import { STATUS_LABEL, STATUS_STYLE } from "@/lib/order-status";
 import OrderActions from "./OrderActions";
 import DisputePanel from "./DisputePanel";
+import ReportButton from "@/components/ReportButton";
 import { Celebrate } from "@/components/Delight";
 import { REVIEW_WINDOW_DAYS } from "@/lib/trust";
 
@@ -113,6 +114,15 @@ export default async function OrderPage({ params, searchParams }: { params: Prom
       <div className="grid items-start gap-6 lg:grid-cols-[1fr_340px]">
         <div className="flex flex-col gap-6">
           {order.status !== "disputed" && <OrderActions order={order} isBrand={isBrand} otherName={other?.display_name ?? "the other side"} />}
+          {/* After payment: creators promise to keep the post up for 30 days. Give brands an obvious way to report a take-down. */}
+          {isBrand && ["approved", "paid"].includes(order.status) && otherId && (order.approved_at ? Date.now() - new Date(order.approved_at).getTime() < 45 * 864e5 : true) && (
+            <section className="panel flex flex-wrap items-center justify-between gap-3 p-5 text-sm">
+              <p className="text-body">
+                <b className="text-ink">Post taken down or edited?</b> Creators agree to keep posts up for 30 days. Tell us and we&apos;ll step in.
+              </p>
+              <ReportButton targetType="profile" targetId={otherId} ownerId={otherId} ownerName={other?.display_name ?? "this creator"} viewerId={user.id} variant="button" />
+            </section>
+          )}
           {(dispute || canDispute) && (
             <DisputePanel orderId={order.id} dispute={dispute} viewerId={user.id} myRole={isBrand ? "brand" : "creator"} otherName={other?.display_name ?? "the other side"} canOpen={canDispute} />
           )}

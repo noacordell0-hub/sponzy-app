@@ -3,7 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-const CHECKS = ["The post is live and public", "It follows the brand's brief", "The brand is tagged or mentioned as asked"];
+const CHECKS = [
+  "The post is live, public and on my verified account",
+  "It follows the brand's brief",
+  "The brand is tagged or mentioned as asked",
+  "I'll keep it up for at least 30 days (taking it down early can get my account removed)",
+];
 
 export default function DeliverForm({ orderId, initialLinks, revisionNote }: { orderId: number; initialLinks: string[]; revisionNote: string | null }) {
   const router = useRouter();
@@ -20,7 +25,7 @@ export default function DeliverForm({ orderId, initialLinks, revisionNote }: { o
     if (clean.length === 0) return setError("Add at least one link to the live post.");
     if (!checked.every(Boolean)) return setError("Tick each item to confirm before submitting.");
     setBusy(true);
-    const res = await fetch(`/api/orders/${orderId}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "submit", links: clean, note }) }).catch(() => null);
+    const res = await fetch(`/api/orders/${orderId}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "submit", links: clean, note, keep_live: checked[3] }) }).catch(() => null);
     const json = res ? await res.json().catch(() => ({})) : {};
     setBusy(false);
     if (!res?.ok) return setError(json.error || "Couldn't submit. Please try again.");

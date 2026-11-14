@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSupabaseAdmin } from "@/lib/supabase-server";
 import { getStripe, priceBreakdown } from "@/lib/stripe";
+import { normalizeEmail } from "@/lib/fraud";
 
 type Body = { service_id?: number; offer_message_id?: number; brief?: string; post_by?: string; tag?: string };
 
@@ -59,6 +60,23 @@ export async function POST(request: Request) {
   // Every creator must have at least one verified social account before they can be booked, including through custom offers.
   const { count: verifiedCount } = await admin.from("social_accounts").select("id", { count: "exact", head: true }).eq("profile_id", creator.id).eq("verified", true);
   if (!verifiedCount) return NextResponse.json({ error: `${creator.display_name} hasn't verified their social accounts yet, so they can't be booked.` }, { status: 409 });
+
+  // Self-booking (one person running both accounts to farm reviews and trust score): the same inbox is refused outright;
+  // the same network is allowed (homes and offices share one) but flagged for the Clouta team to look at.
+  const { data: creatorUser } = await admin.auth.admin.getUserById(creator.id);
+  if (user.email && creatorUser?.user?.email && normalizeEmail(user.email) === normalizeEmail(creatorUser.user.email)) {
+    return NextResponse.json({ error: "You can't book your own creator account." }, { status: 403 });
+  }
+  const { data: sharedIp } = await admin.rpc("accounts_share_ip", { p_a: user.id, p_b: creator.id });
+  const { count: openFlag } = sharedIp
+    ? await admin.from("reports").select("id", { count: "exact", head: true }).is("reporter_id", null).eq("target_profile_id", creator.id).eq("reason", "fake_reviews").eq("status", "open")
+    : { count: 1 };
+  if (sharedIp && !openFlag) {
+    await admin.from("reports").insert({
+      reporter_id: null, target_type: "profile", target_id: creator.id, target_profile_id: creator.id, reason: "fake_reviews",
+      details: `Auto-flag: possible self-booking. Brand ${user.id} and this creator have signed in from the same network. Check before reviews count.`,
+    }).then(() => null, () => null);
+  }
   if (!creator.taking_bookings) return NextResponse.json({ error: `${creator.display_name} isn't taking bookings right now.` }, { status: 409 });
   if (!creator.payouts_ready && (await refreshCreatorPayouts(admin, creator.id))) creator.payouts_ready = true;
   if (!creator.payouts_ready) return NextResponse.json({ error: `${creator.display_name} hasn't finished payout setup yet, so they can't be booked. Message them to let them know!` }, { status: 409 });

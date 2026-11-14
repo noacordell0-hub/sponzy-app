@@ -281,3 +281,18 @@ The site says creators can join from age 13, with a parent or guardian handling 
 - `next.config.ts`: security headers.
 - `tests/e2e/`: tests.
 - `src/app/admin/metrics/page.tsx`: dashboard.
+
+## Scam review (thinking like a dishonest creator)
+
+| Scam | What stops it now |
+|---|---|
+| "Pay me on Venmo/PayPal/gift cards, it's cheaper" | The reader sees a warning under the message, and the database flags it to Admin → Reports automatically (migration 0027, `flag_risky_message`). |
+| Fake "Clouta Support" messages asking for codes or logins | Same phishing warning and auto-flag. Names and handles like "Clouta Support" or "@admin" are reserved (DB trigger + onboarding check). |
+| Submitting someone else's post, or a link to a random or look-alike site, as proof | Proof links must be on a real social platform, and a link that names an account must name one of the creator's **verified** accounts (`checkProofLinks`). |
+| Taking the post down right after being paid | The creator must promise to keep it up for 30 days (logged on the order). Brands get a "Post taken down? Report it" button for 45 days after approval. |
+| Weak proof sneaking through auto-approval | The daily job reminds the brand (chat + email) within 36h of the 3-day auto-approve deadline. |
+| Booking yourself from a second account to farm reviews and trust score | The same inbox (incl. Gmail dots and +tags) can't book itself. Accounts that sign in from the same network are flagged to Admin (`accounts_share_ip`). Shared homes are normal, so this flags but doesn't block. |
+| Faking waitlist signups or self-referrals to climb the list | Throwaway inboxes are refused. One spot per inbox (`email_normalized`). Referring another spelling of your own inbox earns nothing. |
+| Fake follower counts or someone else's account | Already covered: verification is required to go live, and only verified accounts and counts are public (0025). |
+| Never delivering after being paid | Already covered: money is held until approval, and the brand can cancel and get a refund once the post-by date passes. |
+| Changing name to impersonate after building trust | Already covered: names and handles are permanent (0026). |

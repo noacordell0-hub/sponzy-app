@@ -105,6 +105,9 @@ export async function emailOrderEvent(admin: SupabaseClient, orderId: number, ki
     case "proof_submitted":
       out.push({ to: o.brand_id, c: { subject: `Ready to review: ${o.title}`, heading: "The post is live. Please review it.", lines: [`${creator} submitted the link to the live post.`, o.auto_approve_at ? `Approve it, or ask for a revision, by ${day(o.auto_approve_at)}. If you don't respond, it's approved automatically and ${creator} is paid.` : "Approve it or ask for a revision."], cta: { label: "Review the post", path } } });
       break;
+    case "review_reminder":
+      out.push({ to: o.brand_id, c: { subject: `Approves automatically soon: ${o.title}`, heading: "Please check this post before it's approved", lines: [o.auto_approve_at ? `"${o.title}" will be approved automatically on ${day(o.auto_approve_at)}, and ${creator} will be paid.` : `"${o.title}" will be approved automatically soon.`, "Make sure the link is live, posted from the creator's own account, and matches your brief. If not, ask for a revision or open a dispute first."], cta: { label: "Review the post", path } } });
+      break;
     case "revision_requested":
       out.push({ to: o.creator_id, c: { subject: `Revision requested: ${o.title}`, heading: "The brand asked for a change", lines: [o.revision_note ? `"${o.revision_note}"` : "Open the order to see what they'd like changed.", "Update the post, then resubmit your link."], cta: { label: "See the request", path } } });
       break;
